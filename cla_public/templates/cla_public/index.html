@@ -1,0 +1,121 @@
+{% extends 'layout/base.html.twig' %}
+
+{% block page_title %}Centrale Lille Associations{% endblock %}
+
+{% block content %}
+    <div class="content">
+
+        <section class="gradient-peach br mt-15">
+            <div class="jumbotron small">
+                <div>
+                    <h3 style="color: white">Plaquette Alpha</h3>
+                    <hr style="border-color: white">
+                    <a class="button white mt-5" target="_blank" href="https://alpha.jeanba.fr">Découvrir l'édition 2019-2020</a>
+                </div>
+            </div>
+        </section>
+
+        <h2 class="header border-primary">Centrale Lille Associations</h2>
+        <section>
+            <p class="text-justify">
+                <b>Centrale Lille Associations</b> est une association loi 1901 fondée en 2008, continuation de plus d'un siècle
+                et demi de développement perpétuel des structures associatives de l’École par ses étudiants.
+            </p>
+
+            <p class="text-justify">
+                Elle a pour but d’organiser et de favoriser la vie associative des élèves de l’École Centrale de Lille
+                et de l’ITEEM (département de l’École). Elle s'appuie pour cela sur un capital humain fort de près de
+                mille élèves-ingénieurs impliqués dans leur vie associative, et autant de cotisants pour un budget annuel
+                de 80 000€.
+            </p>
+
+            <p class="text-justify">
+                Le Conseil d’Administration (dit "CA Élèves") est composé d'élèves élus provenant de toutes les promotions
+                actuelles de l’École Centrale et de l'ITEEM.<br>
+                Il est chargé de la gestion financière, morale et structurelle de Centrale Lille Associations.<br>
+                Il répartit équitablement les ressources entre ses cotisants, définit les orientations générales de l’Association
+                et de ses membres associatifs et en assure le suivi.
+            </p>
+
+            <p class="text-justify">
+                L'Association peut également pour cela s'appuyer sur ces comités-experts : le Comité Électoral et ses
+                commissaires électoraux ; et le Comité d'Audit et ses vérificateurs aux comptes (dits aussi "auditeurs').
+            </p>
+
+            <p class="text-justify">
+                En relation avec l'Ecole et ses membres associatifs que sont les BDX ;
+                Centrale Lille Associations est l'interlocuteur privilégié des élèves pour développer leurs projets en
+                recevant conseil et expérience capitalisée sur la gestion comptable et légale des associations.
+            </p>
+
+        </section>
+
+        {#<h2 class="header border-primary">Le conseil d'administration</h2>#}
+        {#<section>#}
+            {#<p>#}
+                {#L'équipe du Conseil d'Administration des Élèves est composée de 21 membres élus par l'ensemble des cotisants#}
+                {#et d'un membre de droit par membre associatif (BDX).<br>#}
+                {#Les cotisants sont divisés en six "corps électoraux" correspondant à l'ancienneté qui élisent chacun dans#}
+                {#leur corps électoral et au suffrage direct leurs administrateurs.<br>#}
+            {#</p>#}
+
+            {#<ul>#}
+                {#<li>5 élus en première année de l'EC Lille (G1)</li>#}
+                {#<li>5 élus en deuxième année de l'EC Lille (G2 et G1')</li>#}
+                {#<li>5 élus en troisième année de l'EC Lille et doctorants (G3, G4, G2' ,EXT)</li>#}
+                {#<li>2 élèves de deuxième année de l'ITEEM (IE2)</li>#}
+                {#<li>2 élèves des promos supérieures de l'ITEEM (IE3, IE4, IE2', IE3')</li>#}
+                {#<li>2 élèves de dernière année de l'ITEEM (IE5, IE4')</li>#}
+            {#</ul>#}
+
+            {#<p>#}
+                {#En tant qu'administrateurs, ils ont droit de vote et devoir de représentation lors des réunions hebdomadaires#}
+                {#de l'Association. Ce sont également les responsables légaux de l'Association.#}
+            {#</p>#}
+
+            {#<h4>Les postes-clés (dit "Bureau")</h4>#}
+
+            {#<p>#}
+                {#Les administrateurs élisent parmi eux trois membres qui occuperont les postes de gestion de droit de l'Association.#}
+            {#</p>#}
+
+            {#<p>#}
+                {#<b>Secrétaire Général :</b> Le Secrétaire Général est le dirigeant et le représentant de l'Association#}
+                {#dans tous les actes de la vie civile. Il est le garant de son intégrité, de sa pérennité et de sa crédibilité.#}
+                {#Concrètement, il doit apposer sa signature sur les actes réalisés par l'Association et ses constituants#}
+                {#(sauf délégation) : conventions, décisions du CA, etc.<br>#}
+                {#Il est généralement élu lors de sa deuxième année au Conseil d'Administration, ou après un an dans un poste#}
+                {#au Bureau d'une autre association.<br>#}
+            {#</p>#}
+
+            {#<p>#}
+                {#<b>Secrétaire :</b> A l'inverse, le Secrétaire est le responsable de la vie interne de l'Association. Il est chargé#}
+                {#d’en rédiger les documents de communication essentiels tels que les comptes-rendus de réunion, de planifier#}
+                {#les réunions et d’informer les Centraliens de leurs modalités, de tenir à jour le Règlement Intérieur, y#}
+                {#compris la liste des membres associatifs et entités constitutives (commissions et clubs).<br>#}
+                {#Il est généralement élu lors de sa première année au Conseil d'Administration.#}
+            {#</p>#}
+
+            {#<p>#}
+                {#<b>Trésorier :</b> Poste classique, le Trésorier est le responsable financier de l'Association. Il partage#}
+                {#avec le Secrétaire Général la responsabilité des fonds confiés sur tout le périmètre de l'Association,#}
+                {#surveille et dirige l'utilisation des moyens de paiement. Il établit, tient à jour et gère les pièces attenantes#}
+                {#à une comptabilité lisible et exhaustive.<br>#}
+                {#Il est généralement élu après avoir été vice-trésorier au Conseil d'Administration, ou trésorier d'une autre association.#}
+            {#</p>#}
+
+            {#<h4>Les autres postes</h4>#}
+
+            {#<p>#}
+                {#Selon les années et les besoins, les autres administrateurs occupent et échangent des postes ad hoc au#}
+                {#sein des groupes de travaux fondés en réunion. On retrouve néanmoins souvent :#}
+            {#</p>#}
+            {#<ul>#}
+                {#<li>Un responsable locaux, chargé de l'attribution des différents locaux de la résidence Léonard de Vinci aux associations</li>#}
+                {#<li>Un responsable passation, chargé d'encadrer le suivi des changements de bureau des différents clubs et commissions de Centrale Lille Associations</li>#}
+                {#<li>Un responsable web, chargé de veillez au bon fonctionnement des services offerts par le site internet de l'association</li>#}
+            {#</ul>#}
+        {#</section>#}
+
+    </div>
+{% endblock %}

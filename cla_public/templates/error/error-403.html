@@ -1,0 +1,27 @@
+{% extends "layout/base.html" %}
+
+{% block page_title %}
+    Erreur 403
+{% endblock %}
+
+{% block content %}
+
+    <div style="height: calc(75vh)" class="d-flex align-items-center justify-content-center">
+        <div class="card">
+            <div class="card-body">
+                <div class="max-width-750 m-auto d-flex align-items-center justify-content-center">
+                    <div class="mr-5 d-sm-none">
+                        <div class="d-flex h-100 w-100 align-items-center justify-content-center">
+                            <i class="fad fa-lock fa-7x"></i>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <h2 class="fs-22px mb-3">Oups, vous n'avez pas accès à cette page</h2>
+                        <a href="{% url "cla_public:index" %}" class="btn btn-outline-primary">Retourner à l'accueil</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

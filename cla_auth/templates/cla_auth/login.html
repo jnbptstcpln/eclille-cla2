@@ -1,0 +1,76 @@
+{% extends 'base/layout.html.twig' %}
+
+{% block page_title %}CLA | Connexion{% endblock %}
+
+{% block content %}
+    <div class="layout center fullwidth" style="height: calc(100vh - 50px)">
+        <div class="fullwidth">
+            <div id="login-logo">
+                <img src="/static/cla/logo/cla.png" class="fullwidth fullheight">
+            </div>
+            <div class="max-w-450 ms-auto bg-white p-20 br">
+
+                {% include '/flash/info.html.twig' %}
+
+                <div class="rendered">
+                    <form method="post">
+                        {% csrf_token %}
+
+                        {% if messages %}
+                            <div class="messages mt-4 mb-4">
+                                {% for msg in messages %}
+                                    <div class="alert alert-{{ msg.level_tag }} mb-2">
+                                        {{ msg.message }}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
+                        <fieldset class="max-width-750 m-auto">
+                            {% for field in form %}
+                                <div class="form-group{% if field.errors %} is-invalid{% endif %}">
+
+                                    <label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} <b class="text-red">*</b>{% endif %}</label>
+
+                                    {% if field.errors %}
+                                        <div class="invalid-feedback">
+                                            {% if field.errors|length > 1 %}
+                                                <ul>
+                                                    {% for error in field.errors %}
+                                                        <li>{{ error|escape }}</li>
+                                                    {% endfor %}
+                                                </ul>
+                                            {% else %}
+                                                {{ field.errors.0|escape }}
+                                            {% endif %}
+                                        </div>
+                                    {% endif %}
+
+                                    {{ field }}
+
+                                    {% if field.help_text %}
+                                        <p class="help">{{ field.help_text|safe }}</p>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </fieldset>
+
+                        <div class="text-right mt-0" style="font-size: 0.8em;">
+                            J'ai oublié mon <a href="{% url "" %}">identifiant</a> / <a href="{% url "" %}">mot de passe</a>
+                        </div>
+
+                        <div class="mt-15">
+                            <button class="button primary button-block" type="submit">{{ form.submitText }}</button>
+                        </div>
+
+                    </form>
+                </div>
+
+                <div class="text-center mt-0">
+                    Première connexion ? <a href="{% url "" %}">Activer votre compte</a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+{% endblock %}

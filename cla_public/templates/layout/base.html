@@ -1,0 +1,91 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+
+        <!-- Basic Page Needs ––––––––––––––––––––––––––––––––––––––––––––––––––-->
+        <meta charset="utf-8">
+        <title>{% block page_title %}{% endblock %}</title>
+
+        <!-- Mobile Specific Metas ––––––––––––––––––––––––––––––––––––––––––––––––––-->
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+        <link rel="preconnect" href="https://fonts.gstatic.com">
+        <link href="https://fonts.googleapis.com/css2?family=Eczar&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+        <link rel="icon" type="image/png" href="{% static 'app/img/logo/cla_s.png' %}"/>
+
+        <link rel="stylesheet" type="text/css" href="{% static 'normalize/normalize.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'aquila2/aquila2.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'app/extensions.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'app/extensions.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'app/gradient.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'app/style.css' %}">
+        <style>
+            .badge.badge-warning {
+                color: white;
+            }
+        </style>
+        {% block css %}{% endblock %}
+        <script defer src="{% static 'fontawesome/js/all.min.js' %}"></script>
+
+    </head>
+    <body>
+        <!-- Page Header ––––––––––––––––––––––––––––––––––––––––––––––––––-->
+        <div class="bg-light navbar-container">
+            <div class="max-w-1000 ms-auto">
+                <nav class="navbar">
+                    <a class="title" href="/"><img src="/static/cla/logo/cla_s.png" style="height: 25px; position: relative; top: 2px;" />CLA</a>
+
+                    <span class="separator"></span>
+
+                    <div class="hide-phone">
+                        <a href="{% url "" %}" class="{% if activeBundle == 'association' %}active{% endif %}">Associations</a>
+                        <a href="https://bds-centralelille.fr">Sports</a>
+                    </div>
+
+                    {% spaceless %}
+                        <div class="buttons">
+                            <div class="hide-phone">
+                                {% if request.user %}
+                                    <a class="button" href="{% url "" %}" title="Espace cotisant"><i class="fas fa-toolbox"></i></a>
+                                    <a class="button" href="{% url "" %}" title="Mon compte"><i class="fas fa-user"></i></a>
+                                    <a class="button" href="{% url "" %}" title="Se déconnecter"><i class="fas fa-sign-out"></i></a>
+                                {% else %}
+                                    <a class="button" href="{% url "" %}" title="Se connecter"><i class="fas fa-sign-in"></i></a>
+                                {% endif %}
+                            </div>
+                            <div class="visible-phone-only">
+                                <a id="toggle-mobile-navbar" class="button" href="#"><i class="fas fa-bars"></i></a>
+                            </div>
+                        </div>
+                    {% endspaceless %}
+                </nav>
+                <ul class="mobile-navbar visible-phone-only">
+                    <li><a href="{% url "" %}" class="{% if activeBundle == 'association' %}active{% endif %}">Associations</a></li>
+                    <li><a href="https://bds-centralelille.fr">Sports</a></li>
+
+                    {% if request.user %}
+                        <li><a href="{% url "" %}" title="Espace cotisant">Espace cotisant</a></li>
+                        <li><a href="{% url "" %}" title="Mon compte">Mon compte</a></li>
+                        <li><a href="{% url "" %}" title="Se déconnecter">Déconnexion</a></li>
+                    {% else %}
+                        <li><a href="{% url "" %}" title="Se connecter">Connexion</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+
+        <!-- Content ––––––––––––––––––––––––––––––––––––––––––––––––––-->
+        <div class="content-wrapper">
+            {% block content %}{% endblock %}
+        </div>
+
+        <!-- End Document ––––––––––––––––––––––––––––––––––––––––––––––––––-->
+        <script src="{% static 'jquery/jquery.min.js' %}"></script>
+        <script src="{% static 'jquery/jquery.autocomplete.min.js' %}"></script>
+        <script src="{% static 'app/extensions.js' %}"></script>
+        <script src="{% static 'app/bootstrap.js' %}"></script>
+        {% block body_js %}{% endblock %}
+    </body>
+</html>

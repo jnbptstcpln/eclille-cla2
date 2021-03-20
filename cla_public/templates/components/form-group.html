@@ -1,0 +1,24 @@
+<div class="form-group{% if field.errors %} is-invalid{% endif %}">
+
+    <label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} <b class="text-red">*</b>{% endif %}</label>
+
+    {% if field.errors %}
+        <div class="invalid-feedback">
+            {% if field.errors|length > 1 %}
+                <ul>
+                    {% for error in field.errors %}
+                        <li>{{ error|escape }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                {{ field.errors.0|escape }}
+            {% endif %}
+        </div>
+    {% endif %}
+
+    {{ field }}
+
+    {% if field.help_text %}
+        <p class="help">{{ field.help_text|safe }}</p>
+    {% endif %}
+</div>
