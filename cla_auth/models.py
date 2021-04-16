@@ -119,7 +119,7 @@ class UserInfos(models.Model):
     valid_until = models.DateTimeField(verbose_name="Compte valide jusqu'au", null=True)
     picture = ResizedImageField(
         verbose_name="Photo de profil",
-        storage=FilePath.picture,
+        upload_to=FilePath.picture,
         size=[500, 500],
         quality=90,
         force_format="JPEG",
