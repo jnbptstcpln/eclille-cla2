@@ -17,7 +17,7 @@ from decouple import config
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 # Project Version
-PROJECT_VERSION = "0.2"
+PROJECT_VERSION = "0.1"
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
@@ -135,11 +135,6 @@ MEDIA_URL = '/media/'
 
 # Django resized
 DJANGORESIZED_DEFAULT_FORMAT_EXTENSIONS = {'PNG': ".png"}
-
-# CLA Auth
-CLA_AUTH_HOST = config("CLA_AUTH_HOST")
-CLA_AUTH_IDENTIFIER = config("CLA_AUTH_IDENTIFIER")
-
 
 # Login & Session
 LOGIN_REDIRECT_URL = "/auth/connexion"
