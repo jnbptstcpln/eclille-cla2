@@ -14,7 +14,6 @@ from cla_auth.forms.admin_user_form import UserCreationForm
 # Remove default User management interface
 admin.site.unregister(User)
 
-
 @admin.register(User)
 class UserAdmin(UserAdmin):
     class UserInfosInline(admin.StackedInline):
@@ -58,7 +57,7 @@ class UserAdmin(UserAdmin):
         (
             _('Permissions'),
             {
-                'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions'),
+                'fields': ('is_active', 'is_staff', 'is_superuser', 'groups'),
                 'classes': ('collapse',),
             }
         ),
@@ -92,3 +91,56 @@ class UserAdmin(UserAdmin):
         return obj.infos.valid_until is not None and obj.infos.valid_until > timezone.now()
     is_validated.short_description = 'Compte validé'
     is_validated.boolean = True
+
+
+@admin.register(Service)
+class ServiceAdmin(admin.ModelAdmin):
+    fieldsets = (
+        (
+            "Informations générales",
+            {
+                'fields': ('identifier', 'name', 'domain', 'endpoint'),
+                'classes': ('wide',)
+            }
+        ),
+        (
+            "Gestion des connexions",
+            {
+                'fields': ('validation_required', 'authorization_required', 'auto_login', 'colleges'),
+            }
+        ),
+        (
+            "Dernières connexions",
+            {
+                'fields': ('last_tickets',),
+                'classes': ('wide', 'collapse')
+            }
+        )
+    )
+    add_fieldsets = (
+        (None, {
+            'fields': ('identifier', 'name', 'domain', 'endpoint'),
+            'classes': ('wide',),
+        }),
+    )
+    readonly_fields = ('identifier', 'last_tickets',)
+
+    def last_tickets(self, obj: Service):
+        return "\n".join(
+            [
+                f"[{ticket.created_on.strftime('%d/%m/%Y %H:%M')}] {ticket.user.first_name} {ticket.user.last_name}"
+                for ticket in obj.tickets.all()[:20]
+            ]
+        )
+    last_tickets.short_description = 'Dernières connexions'
+
+    def get_fieldsets(self, request, obj=None):
+        if obj is None:
+            return self.add_fieldsets
+        return super().get_fieldsets(request, obj)
+
+    def get_readonly_fields(self, request, obj=None):
+        if obj is not None:
+            return self.readonly_fields
+        return tuple()
+

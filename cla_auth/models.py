@@ -4,8 +4,10 @@ import uuid
 
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
 from django.utils.text import slugify
 from django_resized import ResizedImageField
+from multiselectfield import MultiSelectField
 
 from cla_web.utils import current_school_year
 
@@ -41,11 +43,12 @@ class UserInfos(models.Model):
         G1 = 'g1', 'G1'
         G2 = 'g2', 'G2'
         G3 = 'g3', 'G3'
+        ALUMNI_CENTRALE = 'alumni-centrale', 'Diplomé de Centrale'
         IE1_IE2 = 'ie1/ie2', 'IE1/IE2'
         IE3 = 'ie3', 'IE3'
         IE4 = 'ie4', 'IE4'
         IE5 = 'ie5', 'IE5'
-        OTHER = 'other', 'Autre'
+        ALUMNI_ITEEM = 'alumni-iteem', 'Diplomé de l\'ITEEM'
 
     class CursusChoices(models.TextChoices):
 
@@ -78,10 +81,10 @@ class UserInfos(models.Model):
         G3_DD_INTERNATIONAL = "DD-INTERNATIONAL", "Double diplôme internationnal"
         G3_DD_FRANCE = "DD-FRANCE", "Double diplôme en France"
 
-        G3_DIPLOME_DD_EDHEC = "G3-DIPLOME-DD-EDHEC", "Diplomé"
-        G3_DIPLOME_DD_INTERNATIONAL = "G3-DIPLOME-DD-INTERNATIONAL", "Diplomé"
+        G3_DIPLOME_DD_EDHEC = "G3-DIPLOME-DD-EDHEC", "Diplomé DD EDHEC"
+        G3_DIPLOME_DD_INTERNATIONAL = "G3-DIPLOME-DD-INTERNATIONAL", "Diplomé DD Internationnal"
 
-        G3_DIPLOME = "G3-DIPLOME", "Diplomé"
+        G3_DIPLOME = "G3-DIPLOME", "Diplomé de Centrale"
 
         # # # # # # # # #
         # CURSUS  ITEEM #
@@ -102,7 +105,7 @@ class UserInfos(models.Model):
         IE5 = "IE5", "IE5"
         IE5P = "IE5P", "IE5'"
 
-        IE5_DIPLOME = "IE5-DIPLOME"
+        IE5_DIPLOME = "IE5-DIPLOME", 'Diplomé de l\ITEEM'
 
         # # # # # # # # #
         # CURSUS  AUTRE #
@@ -137,7 +140,9 @@ class UserInfos(models.Model):
 
     @property
     def college(self):
-        if self.promo <= current_school_year() + 1:
+        if self.promo <= current_school_year() and self.valid_until < timezone.now():
+            return self.Colleges.ALUMNI_CENTRALE if self.is_from_centrale() else self.Colleges.ALUMNI_ITEEM
+        elif self.promo <= current_school_year() + 1:
             return self.Colleges.G3 if self.is_from_centrale() else self.Colleges.IE5
         elif self.promo == current_school_year() + 2:
             return self.Colleges.G2 if self.is_from_centrale() else self.Colleges.IE4
@@ -318,3 +323,36 @@ class UserMembership(models.Model):
 
     def __str__(self):
         return f"{self.user.first_name} {self.user.last_name}"
+
+
+class Service(models.Model):
+
+    class Meta:
+        verbose_name = "Service"
+        ordering = "name",
+
+    identifier = models.CharField(max_length=100, verbose_name="Identifiant du service", unique=True)
+    name = models.CharField(max_length=100, verbose_name="Nom du service")
+    domain = models.CharField(max_length=250, verbose_name="Nom de domaine du service")
+    endpoint = models.CharField(max_length=250, verbose_name="Endpoint du service")
+    validation_required = models.BooleanField(default=True, verbose_name="La validation du compte est requise pour se connecter (permet de s'assurer que l'utilisateur est encore cotisant)")
+    authorization_required = models.BooleanField(default=True, verbose_name="L'utilisateur doit approuver le partage d'informations lors de la première utilisation")
+    colleges = MultiSelectField(choices=UserInfos.Colleges.choices, verbose_name="Collèges autorisés à se connecter", blank=True)
+    auto_login = models.BooleanField(default=True, verbose_name="Connexion automatique")
+
+    def __str__(self):
+        return self.name
+
+
+class ServiceAuthorization(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="+", to_field="username")
+    service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name="+", to_field="identifier")
+    created_on = models.DateTimeField(auto_now=True)
+
+
+class ServiceTicket(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="+", to_field="username")
+    service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name="tickets", to_field="identifier")
+    created_on = models.DateTimeField(auto_now=True)
+    token = models.CharField(max_length=250)
+    used = models.BooleanField(default=False)
