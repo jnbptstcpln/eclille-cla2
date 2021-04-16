@@ -24,16 +24,17 @@ class FilePath:
         return cls._path(instance, ["cla_ath", "user", "picture"], filename)
 
 
-
 class UserInfos(models.Model):
     """
         The UserInfo model extends user by adding new properties
     """
 
+    class Meta:
+        verbose_name = "Information"
+
     class AccountType(models.TextChoices):
         STUDENT = 'student', "Étudiant"
         SCHOOL = 'school', 'Personnel de l\'école'
-        ADMIN = 'admin', 'Compte administrateur'
         OTHER = 'other', 'Autre'
 
     class Colleges(models.TextChoices):
@@ -110,8 +111,8 @@ class UserInfos(models.Model):
 
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="infos", to_field="username")
     email_school = models.EmailField(null=False, verbose_name="Adresse mail de l'école")
-    account_type = models.CharField(max_length=10, choices=AccountType.choices)
-    phone = models.CharField(max_length=20, blank=True)
+    account_type = models.CharField(max_length=10, choices=AccountType.choices, default=AccountType.STUDENT, verbose_name="Type de compte")
+    phone = models.CharField(max_length=20, blank=True, verbose_name="Numéro de téléphone")
     cursus = models.CharField(max_length=100, null=True, choices=CursusChoices.choices, verbose_name="Cursus")
     promo = models.PositiveIntegerField(verbose_name="Promotion (lors de l'arrivée à Centrale)")
     birthdate = models.DateField(verbose_name="Date de naissance")
@@ -291,8 +292,15 @@ class UserInfos(models.Model):
 
         return NextCursusChoices
 
+    def __str__(self):
+        return f"{self.user.first_name} {self.user.last_name} ({self.get_account_type_display()})"
+
 
 class UserMembership(models.Model):
+
+    class Meta:
+        verbose_name = "Cotisation"
+
     class MeanOfPayment(models.TextChoices):
         PUMPKIN = 'Pumpkin', 'pumpkin'
         CHECK = 'Chèque', 'check'
@@ -307,3 +315,6 @@ class UserMembership(models.Model):
     refunded = models.BooleanField(default=False, blank=True, verbose_name="La cotisation a été remboursée")
     refunded_amount = models.PositiveIntegerField(null=True, blank=True, verbose_name="Montant remboursé")
     refunded_on = models.DateField(null=True, blank=True, verbose_name="Date du remboursement")
+
+    def __str__(self):
+        return f"{self.user.first_name} {self.user.last_name}"
