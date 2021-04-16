@@ -301,6 +301,31 @@ class UserInfos(models.Model):
         return f"{self.user.first_name} {self.user.last_name} ({self.get_account_type_display()})"
 
 
+class PasswordResetRequest(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="+")
+    email = models.EmailField()
+    created_on = models.DateTimeField(auto_now=True)
+    sent_on = models.DateTimeField(null=True)
+    token = models.CharField(max_length=250)
+    used = models.BooleanField(default=False)
+
+
+class ActivationRequest(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="+")
+    email_school = models.EmailField()
+    created_on = models.DateTimeField(auto_now=True)
+    sent_on = models.DateTimeField(null=True)
+    token = models.CharField(max_length=250)
+
+
+class ValidationRequest(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="+")
+    email_school = models.EmailField()
+    created_on = models.DateTimeField(auto_now=True)
+    sent_on = models.DateTimeField(null=True)
+    code = models.IntegerField(max_length=250)
+
+
 class UserMembership(models.Model):
 
     class Meta:
