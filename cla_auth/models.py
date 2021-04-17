@@ -1,9 +1,11 @@
 import re
 import os
 import uuid
+import secrets
 
 from django.db import models
 from django.contrib.auth.models import User
+from django.contrib.auth.tokens import default_token_generator
 from django.utils import timezone
 from django.utils.text import slugify
 from django_resized import ResizedImageField
@@ -137,6 +139,12 @@ class UserInfos(models.Model):
 
     def is_from_iteem(self):
         return re.match(r'^IE\d.*', self.cursus)
+
+    def is_activated(self):
+        return self.activated_on is not None
+
+    def is_valid(self):
+        return self.valid_until is not None and self.valid_until > timezone.now()
 
     @property
     def college(self):
@@ -301,13 +309,47 @@ class UserInfos(models.Model):
         return f"{self.user.first_name} {self.user.last_name} ({self.get_account_type_display()})"
 
 
+class PasswordResetRequestManager(models.Manager):
+
+    def get_current_reset_request(self, user):
+        """
+        Reset request are only valid for 24h hours
+        """
+        return self.filter(user=user, used=False, created_on__gte=timezone.now() - timezone.timedelta(hours=24)).last()
+
+    def get_or_create_reset_request(self, user, count_attempt=True):
+        reset_request = self.get_current_reset_request(user)
+        if reset_request:
+            if count_attempt:
+                reset_request.attempt += 1  # Saving the attempt
+                reset_request.save()
+            return reset_request
+        else:
+            return self.create(
+                user=user,
+                email=user.email,
+                token=default_token_generator.make_token(user=user)
+            )
+
+
 class PasswordResetRequest(models.Model):
+
+    class Meta:
+        ordering = "created_on",
+
+    objects = PasswordResetRequestManager()
+
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="+")
     email = models.EmailField()
     created_on = models.DateTimeField(auto_now=True)
     sent_on = models.DateTimeField(null=True)
     token = models.CharField(max_length=250)
     used = models.BooleanField(default=False)
+    attempt = models.IntegerField(default=1)
+
+    @staticmethod
+    def get_token_generator():
+        return default_token_generator
 
 
 class ActivationRequest(models.Model):

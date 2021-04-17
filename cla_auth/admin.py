@@ -1,7 +1,11 @@
 from django.contrib import admin
 from django.contrib.auth.models import User
+from django.shortcuts import redirect
 from django.contrib.auth.admin import UserAdmin
 from django.utils.translation import gettext, gettext_lazy as _
+from django.urls import path, reverse
+from django.http import Http404
+from django.core.exceptions import PermissionDenied
 from django.shortcuts import resolve_url
 from django.utils.html import mark_safe, escape
 from django.template.loader import render_to_string
@@ -9,10 +13,11 @@ from django.conf import settings
 from django.utils import timezone
 
 from .models import *
-from cla_auth.forms.admin_user_form import UserCreationForm
+from cla_auth.forms.admin_user_form import UserCreationForm, UserChangeForm
 
 # Remove default User management interface
 admin.site.unregister(User)
+
 
 @admin.register(User)
 class UserAdmin(UserAdmin):
@@ -20,10 +25,11 @@ class UserAdmin(UserAdmin):
         model = UserInfos
         verbose_name = "Informations complémentaires"
         fields = (
-            ('email_school', 'phone'),
-            ('promo', 'cursus'),
+            'email_school',
             'birthdate',
+            ('promo', 'cursus'),
             ('activated_on', 'valid_until'),
+            'phone',
             'account_type'
         )
         readonly_fields = 'activated_on', 'valid_until'
@@ -44,7 +50,7 @@ class UserAdmin(UserAdmin):
         (
             _('Personal info'),
             {
-                'fields': (('first_name', 'last_name'), 'email')
+                'fields': ('account_status', 'first_name', 'last_name', 'email')
             }
         ),
         (
@@ -68,7 +74,7 @@ class UserAdmin(UserAdmin):
             'fields': (('first_name', 'last_name'), 'email'),
         }),
     )
-    readonly_fields = 'username', 'last_login', 'date_joined'
+    readonly_fields = 'account_status', 'username', 'last_login', 'date_joined'
     inlines = [
         UserInfosInline,
         MembershipInline,
@@ -76,6 +82,7 @@ class UserAdmin(UserAdmin):
     list_display = ('username', 'first_name', 'last_name', 'email_school', 'is_activated', 'is_validated')
     list_filter = ('is_staff',)
     search_fields = ('username', 'first_name', 'last_name', 'email')
+    form = UserChangeForm
     add_form = UserCreationForm
 
     def email_school(self, obj: User):
@@ -91,6 +98,52 @@ class UserAdmin(UserAdmin):
         return obj.infos.valid_until is not None and obj.infos.valid_until > timezone.now()
     is_validated.short_description = 'Compte validé'
     is_validated.boolean = True
+
+    def account_status(self, obj: User):
+        if hasattr(obj, 'infos'):
+            if not obj.infos.is_activated():
+                return mark_safe(
+                    (
+                        "Ce compte n'a encore été activé "
+                    )
+                )
+            elif not obj.infos.is_valid():
+                return mark_safe(
+                    (
+                        "Ce compte n'a encore été validé pour cette année scolaire "
+                    )
+                )
+            else:
+                return mark_safe(
+                    (
+                        "Ce compte est activé et validé pour cette année scolaire (jusqu'au {})"
+                    ).format(obj.infos.valid_until.strftime("%d/%m/%Y"))
+                )
+        else:
+            return "Ce compte n'est qu'un compte de gestion"
+    account_status.short_description = 'Statut du compte'
+
+    def get_urls(self):
+        return [
+               path(
+                   '<id>/password-reset',
+                   self.admin_site.admin_view(self.user_reset_password),
+                   name='auth_user_password_reset',
+               ),
+           ] + super().get_urls()
+
+    def user_reset_password(self, req, id, form_url=''):
+        user = self.get_object(req, id)
+        if not self.has_change_permission(req, user):
+            raise PermissionDenied
+        if user is None:
+            raise Http404(_('%(name)s object with primary key %(key)r does not exist.') % {
+                'name': self.model._meta.verbose_name,
+                'key': escape(id),
+            })
+        if req.method == 'POST':
+            PasswordResetRequestManager.get_or_create_reset_request(user, count_attempt=False)
+            return redirect(f"{self.admin_site.name}:{user._meta_.app_label}_{user._meta.model_name}_change", user.pk)
 
 
 @admin.register(Service)
@@ -143,4 +196,3 @@ class ServiceAdmin(admin.ModelAdmin):
         if obj is not None:
             return self.readonly_fields
         return tuple()
-
