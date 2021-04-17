@@ -31,6 +31,7 @@ SECRET_KEY=random_string
 ALLOWED_HOSTS=host1,host2,...
 
 ; Email
+EMAIL_FROM=
 EMAIL_HOST=
 EMAIL_LOGIN=
 EMAIL_PASSWORD=

@@ -4,6 +4,17 @@ from .base import *
 DEBUG = False
 
 
+# Email
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = config("EMAIL_HOST")
+EMAIL_HOST_FROM = config("EMAIL_FROM")
+EMAIL_HOST_USER = config("EMAIL_LOGIN")
+EMAIL_HOST_PASSWORD = config("EMAIL_PASSWORD")
+EMAIL_PORT = 465
+EMAIL_USE_SSL = True
+
+
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 

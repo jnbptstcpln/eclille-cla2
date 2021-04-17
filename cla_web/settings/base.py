@@ -28,14 +28,6 @@ SECRET_KEY = config('SECRET_KEY')
 ALLOWED_HOSTS = config("ALLOWED_HOSTS").split(",")
 
 
-# Email
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = config("EMAIL_HOST")
-EMAIL_HOST_USER = config("EMAIL_LOGIN")
-EMAIL_HOST_PASSWORD = config("EMAIL_PASSWORD")
-EMAIL_PORT = 465
-EMAIL_USE_SSL = True
-
 # Application definition
 
 INSTALLED_APPS = [
