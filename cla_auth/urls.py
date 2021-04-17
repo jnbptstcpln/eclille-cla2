@@ -1,10 +1,13 @@
 from django.urls import path
 
-from cla_auth.views.session import *
+from cla_auth import views
 
 app_name = "cla_auth"
 urlpatterns = [
-    path('connexion', LoginAuthView.as_view(), name="login"),
-    path('connexion/cla', HandleAuthView.as_view(), name="handle"),
-    path('deconnexion', LogoutAuthView.as_view(), name="logout")
+    # Session management
+    path('connexion', views.session.login, name="login"),
+    path('deconnexion', views.session.logout, name="logout"),
+
+    # Account activation
+    path('activation/<str:activation_jwt>', views.activation.activate, name="activate"),
 ]
