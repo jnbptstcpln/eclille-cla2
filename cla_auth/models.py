@@ -158,6 +158,17 @@ class UserInfos(models.Model):
             algorithm="HS256"
         )
 
+    def check_activation_jwt(self, token):
+        try:
+            payload = jwt.decode(
+                token,
+                f"{settings.SECRET_KEY}-{self.user.username}",
+                algorithms=["HS256"]
+            )
+            return True
+        except jwt.InvalidTokenError:
+            return False
+
     @property
     def college(self):
         if self.promo <= current_school_year() and self.valid_until < timezone.now():
