@@ -152,9 +152,9 @@ class UserInfos(models.Model):
     def activation_jwt(self):
         return jwt.encode(
             {
-                'user_pk': self.pk
+                'pk': self.user.pk
             },
-            f"{settings.SECRET}-{self.user.username}",
+            f"{settings.SECRET_KEY}-{self.user.username}",
             algorithm="HS256"
         )
 
