@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.utils.text import slugify
+from django.contrib.auth.forms import UserChangeForm as Auth_UserChangeForm
 
 
 class UserCreationForm(forms.ModelForm):
@@ -24,3 +25,27 @@ class UserCreationForm(forms.ModelForm):
         if commit:
             user.save()
         return user
+
+
+class UserChangeForm(Auth_UserChangeForm):
+    def __init__(self, *args, reset_request=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        password = self.fields.get('password')
+        if password:
+            if self.instance.infos:
+                if self.instance.infos.activated_on is not None:
+                    if reset_request:  # User did request password reset
+                        password.help_text = (
+                            "L'utilisateur a demandé à réinitialiser son mot de passe "
+                            "transmettez lui le lien suivant : <a href={href}>{href}</a>"
+                        ).format(href="https://google.com")
+                    else:
+                        password.help_text = (
+                            "Vous avez la possiblité de lancer la procédure de réinitialisation "
+                            "de mot de passe à l'aide de <a href='{}'>ce formulaire</a>"
+                        ).format('../password-reset')
+                else:
+                    password.help_text = (
+                        "L'utilisateur n'a pas encore activé son compte."
+                    )
+
