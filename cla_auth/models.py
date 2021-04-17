@@ -394,11 +394,11 @@ class UserMembership(models.Model):
         verbose_name = "Cotisation"
 
     class MeanOfPayment(models.TextChoices):
-        PUMPKIN = 'Pumpkin', 'pumpkin'
-        CHECK = 'Chèque', 'check'
-        CASH = 'Liquide', 'cash'
-        TRANSFER = 'Virement', 'transfer',
-        CARD = 'Carte bancaire', 'card'
+        PUMPKIN = 'pumpkin', 'Pumpkin'
+        CHECK = 'check', 'Chèque'
+        CASH = 'cash', 'Liquide'
+        TRANSFER = 'transfer', 'Virement'
+        CARD = 'card', 'Carte bancaire'
 
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="membership", to_field="username")
     amount = models.PositiveIntegerField(verbose_name="Montant de la cotisation")
