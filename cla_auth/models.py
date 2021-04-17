@@ -1,8 +1,10 @@
 import re
 import os
 import uuid
+import jwt
 import secrets
 
+from django.conf import settings
 from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
@@ -145,6 +147,16 @@ class UserInfos(models.Model):
 
     def is_valid(self):
         return self.valid_until is not None and self.valid_until > timezone.now()
+
+    @property
+    def activation_jwt(self):
+        return jwt.encode(
+            {
+                'user_pk': self.pk
+            },
+            f"{settings.SECRET}-{self.user.username}",
+            algorithm="HS256"
+        )
 
     @property
     def college(self):
@@ -352,20 +364,12 @@ class PasswordResetRequest(models.Model):
         return default_token_generator
 
 
-class ActivationRequest(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="+")
-    email_school = models.EmailField()
-    created_on = models.DateTimeField(auto_now=True)
-    sent_on = models.DateTimeField(null=True)
-    token = models.CharField(max_length=250)
-
-
 class ValidationRequest(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="+")
     email_school = models.EmailField()
     created_on = models.DateTimeField(auto_now=True)
     sent_on = models.DateTimeField(null=True)
-    code = models.IntegerField(max_length=250)
+    code = models.IntegerField()
 
 
 class UserMembership(models.Model):
