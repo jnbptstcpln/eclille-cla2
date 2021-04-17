@@ -32,7 +32,7 @@ class UserChangeForm(Auth_UserChangeForm):
         super().__init__(*args, **kwargs)
         password = self.fields.get('password')
         if password:
-            if self.instance.infos:
+            if hasattr(self, "infos"):
                 if self.instance.infos.activated_on is not None:
                     if reset_request:  # User did request password reset
                         password.help_text = (
