@@ -30,9 +30,13 @@ class UserCreationForm(forms.ModelForm):
 class UserChangeForm(Auth_UserChangeForm):
     def __init__(self, *args, reset_request=None, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields['first_name'].required = True
+        self.fields['last_name'].required = True
+        self.fields['email'].required = True
+        # Password field customization
         password = self.fields.get('password')
         if password:
-            if hasattr(self, "infos"):
+            if hasattr(self.instance, "infos"):
                 if self.instance.infos.activated_on is not None:
                     if reset_request:  # User did request password reset
                         password.help_text = (
@@ -48,4 +52,3 @@ class UserChangeForm(Auth_UserChangeForm):
                     password.help_text = (
                         "L'utilisateur n'a pas encore activé son compte."
                     )
-
