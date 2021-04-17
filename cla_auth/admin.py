@@ -104,8 +104,13 @@ class UserAdmin(UserAdmin):
             if not obj.infos.is_activated():
                 return mark_safe(
                     (
-                        "Ce compte n'a encore été activé "
-                    )
+                        "<div>Ce compte n'a encore été activé</div>"
+                        "<div>"
+                        "<label style='float:none;width:100%'>Transmettez le lien suivant à l'utilisateur pour qu'il puisse procéder à l'activation de son compte</label>"
+                        "<input style='margin-right: .5rem' class='vTextField' value='{activation_jwt}' id='id_activation_jwt'>"
+                        "<a class='button' onclick='document.getElementById(\"id_activation_jwt\").select();document.execCommand(\"copy\");return false;','>Copier</a>"
+                        "</div>"
+                    ).format(activation_jwt=f"https://{settings.ALLOWED_HOSTS[0]}{resolve_url('cla_auth:activate', obj.infos.activation_jwt)}")
                 )
             elif not obj.infos.is_valid():
                 return mark_safe(
