@@ -1,4 +1,6 @@
-from django.contrib import admin
+import copy
+
+from django.contrib import admin, messages
 from django.contrib.auth.models import User
 from django.shortcuts import redirect
 from django.contrib.auth.admin import UserAdmin
@@ -50,7 +52,7 @@ class UserAdmin(UserAdmin):
         (
             _('Personal info'),
             {
-                'fields': ('account_status', 'first_name', 'last_name', 'email')
+                'fields': ['account_status', 'first_name', 'last_name', 'email']
             }
         ),
         (
@@ -74,7 +76,7 @@ class UserAdmin(UserAdmin):
             'fields': (('first_name', 'last_name'), 'email'),
         }),
     )
-    readonly_fields = 'account_status', 'username', 'last_login', 'date_joined'
+    readonly_fields = 'account_status', 'username', 'last_login', 'date_joined', 'link_activation'
     inlines = [
         UserInfosInline,
         MembershipInline,
@@ -102,16 +104,7 @@ class UserAdmin(UserAdmin):
     def account_status(self, obj: User):
         if hasattr(obj, 'infos'):
             if not obj.infos.is_activated():
-                return mark_safe(
-                    (
-                        "<div>Ce compte n'a encore été activé</div>"
-                        "<div>"
-                        "<label style='float:none;width:100%'>Transmettez le lien suivant à l'utilisateur pour qu'il puisse procéder à l'activation de son compte</label>"
-                        "<input style='margin-right: .5rem' class='vTextField' value='{activation_jwt}' id='id_activation_jwt'>"
-                        "<a class='button' onclick='document.getElementById(\"id_activation_jwt\").select();document.execCommand(\"copy\");return false;','>Copier</a>"
-                        "</div>"
-                    ).format(activation_jwt=f"https://{settings.ALLOWED_HOSTS[0]}{resolve_url('cla_auth:activate', obj.infos.activation_jwt)}")
-                )
+                return mark_safe("Ce compte n'a encore été activé")
             elif not obj.infos.is_valid():
                 return mark_safe(
                     (
@@ -128,6 +121,27 @@ class UserAdmin(UserAdmin):
             return "Ce compte n'est qu'un compte de gestion"
     account_status.short_description = 'Statut du compte'
 
+    def link_password_reset(self, obj: User):
+        pass
+    link_password_reset.short_description = 'Lien pour réinitialiser le mot de passe de l\'utilisateur'
+
+    def link_activation(self, obj: User):
+        return mark_safe(
+            (
+                "<label style='float:none;width:100%'>Transmettez le lien suivant à l'utilisateur pour qu'il puisse procéder à l'activation de son compte</label>"
+                "<input style='margin-right: .5rem' class='vTextField' value='{activation_jwt}' id='id_activation_jwt'>"
+                "<a class='button' onclick='document.getElementById(\"id_activation_jwt\").select();document.execCommand(\"copy\");return false;','>Copier</a>"
+            ).format(activation_jwt=f"https://{settings.ALLOWED_HOSTS[0]}{resolve_url('cla_auth:activate', obj.infos.activation_jwt)}")
+        )
+    link_activation.short_description = 'Activation du compte'
+
+    def get_fieldsets(self, request, obj: User=None):
+        fieldsets = copy.deepcopy(super().get_fieldsets(request, obj))
+        if obj is not None:
+            if request.user.has_perm("") and not obj.infos.is_activated():
+                fieldsets[0][1]['fields'] = ['link_activation'] + fieldsets[0][1]['fields']
+        return fieldsets
+
     def get_urls(self):
         return [
                path(
@@ -136,6 +150,13 @@ class UserAdmin(UserAdmin):
                    name='auth_user_password_reset',
                ),
            ] + super().get_urls()
+
+    def save_model(self, request, obj: User, form, change):
+        super().save_model(request, obj, form, change)
+
+        if hasattr(obj, 'infos'):
+            messages.success(request, f"Un mail de bienvenue a été envoyé à {obj.infos.email_school} avec un lien d'activation")
+
 
     def user_reset_password(self, req, id, form_url=''):
         user = self.get_object(req, id)
@@ -148,6 +169,7 @@ class UserAdmin(UserAdmin):
             })
         if req.method == 'POST':
             PasswordResetRequestManager.get_or_create_reset_request(user, count_attempt=False)
+            self.log_change(req, user, "Password reset link created")
             return redirect(f"{self.admin_site.name}:{user._meta_.app_label}_{user._meta.model_name}_change", user.pk)
 
 
