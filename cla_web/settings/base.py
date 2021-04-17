@@ -27,6 +27,7 @@ SECRET_KEY = config('SECRET_KEY')
 
 ALLOWED_HOSTS = config("ALLOWED_HOSTS").split(",")
 
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 # Application definition
 
