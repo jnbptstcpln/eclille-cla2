@@ -1,0 +1,58 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+
+    <!-- Basic Page Needs -->
+    <meta charset="utf-8">
+    <title>{% block page_title %}Centrale Lille Associations{% endblock %}</title>
+    <meta name="description"
+          content="{% block page_description %}Centrale Lille Associations est une association loi 1901 fondée en 2008, continuation de plus d'un siècle et demi de développement perpétuel des structures associatives de l’École par ses étudiants.{% endblock %}">
+    <meta name="author" content="Centrale Lille Associations">
+
+    <!-- Mobile Specific Metas -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{% static 'app/img/logo/cla_s.png' %}"/>
+
+    <!-- Google fonts -->
+    <link href='http://fonts.googleapis.com/css?family=Montserrat:400,500,600,700,300' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700,300' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Rambla:400,700' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Calligraffitti' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Roboto+Slab:400,700' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Roboto:100,400,700' rel='stylesheet' type='text/css'>
+
+    <!-- Bootstrap v4.5.0 CSS via CDN -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+
+    <!-- Theme style -->
+    <link href="{% static "theme/theme-style.min.css" %}" rel="stylesheet">
+
+    <!--Your custom colour override-->
+    <!-- <link href="{% static "theme/colour-pink.min.css" %}" id="colour-scheme" rel="stylesheet">  -->
+    <link href="{% static "theme/colour-red.min.css" %}" id="colour-scheme" rel="stylesheet">
+
+    <!-- Your custom override -->
+    <link rel="stylesheet" type="text/css" href="{% static 'app/style.css' %}">
+
+    {% block css %}{% endblock %}
+    <script defer src="{% static 'fontawesome/js/all.min.js' %}"></script>
+
+</head>
+<body class="page page-starter navbar-layout-default">
+{% block body %}{% endblock %}
+
+<!--jQuery 3.3.1 via CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<!-- Popper 1.16.0 via CDN, needed for Bootstrap Tooltips & Popovers -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<!-- Bootstrap v4.5.0 JS via CDN -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+<!-- App's script -->
+<script src="{% static "theme/script.min.js" %}"></script>
+
+{% block body_js %}{% endblock %}
+</body>
+</html>
