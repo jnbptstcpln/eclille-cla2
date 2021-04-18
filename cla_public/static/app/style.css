@@ -38,15 +38,18 @@
  *--------------------------------------------------
  */
 #header {
-  /* 1. Header wrapper */
+
+}
+body .header {
+    border-bottom: 1px solid #dee2e6;
 }
 
 #highlighted {
-  /* 2. Highlighted (below header) wrapper */
+
 }
 
 #content {
-  /* 3. Content wrapper */
+
 }
 
 #content-below {
@@ -130,3 +133,43 @@
  * Other stuff
  *--------------------------------------------------
  */
+.cla_logo {
+    --logo-size: 47px;
+    display: inline-block;
+    position: relative;
+    padding-left: var(--logo-size);
+}
+.cla_logo::before {
+    content: " ";
+    height: var(--logo-size);
+    width: var(--logo-size);
+    left: 0;
+    display: block;
+    position: absolute;
+    background: center / contain no-repeat url("/static/app/img/logo/cla_s.png");
+}
+.cla_logo > span {
+    display: block;
+    font-family: Montserrat, sans-serif;
+    font-weight: 400 !important;
+    text-transform: uppercase;
+}
+.cla_logo > span.cl {
+    font-size: 22px;
+    font-weight: 600 !important;
+}
+.cla_logo > span.a {
+    font-size: 25px;
+}
+@media (max-width: 768px) {
+    .cla_logo {
+        --logo-size: 36px;
+    }
+    .cla_logo > span.cl {
+        font-size: 17px;
+        font-weight: 600 !important;
+    }
+    .cla_logo > span.a {
+        font-size: 19px;
+    }
+}
