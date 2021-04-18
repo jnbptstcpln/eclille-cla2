@@ -156,18 +156,18 @@ class UserInfos(models.Model):
     @property
     def activation_jwt(self):
         return jwt.encode(
-            {
+            payload={
                 'pk': self.user.pk
             },
-            f"{settings.SECRET_KEY}-{self.user.username}",
+            key=f"{settings.SECRET_KEY}-{self.user.username}",
             algorithm="HS256"
         )
 
     def check_activation_jwt(self, token):
         try:
             payload = jwt.decode(
-                token,
-                f"{settings.SECRET_KEY}-{self.user.username}",
+                token=token,
+                key=f"{settings.SECRET_KEY}-{self.user.username}",
                 algorithms=["HS256"]
             )
             return True
@@ -370,14 +370,32 @@ class PasswordResetRequest(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="+")
     email = models.EmailField()
     created_on = models.DateTimeField(auto_now=True)
-    sent_on = models.DateTimeField(null=True)
-    token = models.CharField(max_length=250)
-    used = models.BooleanField(default=False)
-    attempt = models.IntegerField(default=1)
 
     @staticmethod
     def get_token_generator():
         return default_token_generator
+
+    def get_reset_jwt(self, exp=True):
+        payload = {'pk': self.user.pk}
+        if exp:
+            payload['exp'] = timezone.datetime.utcnow() + timezone.timedelta(minutes=60)  # Token is valid for 60 minutes
+
+        return jwt.encode(
+            payload=payload,
+            key=f"{settings.SECRET_KEY}-{self.user.password}-{self.user.date_joined.time()}",
+            algorithm="HS256"
+        )
+
+    def check_reset_jwt(self, token):
+        try:
+            payload = jwt.decode(
+                token=token,
+                key=f"{settings.SECRET_KEY}-{self.user.password}-{self.user.date_joined.time()}",
+                algorithms=["HS256"]
+            )
+            return True
+        except jwt.InvalidTokenError:
+            return False
 
 
 class ValidationRequest(models.Model):
