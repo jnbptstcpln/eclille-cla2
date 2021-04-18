@@ -3,6 +3,8 @@ from django.contrib.auth.models import User
 from django.utils.text import slugify
 from django.contrib.auth.forms import UserChangeForm as Auth_UserChangeForm
 
+from cla_auth.models import PasswordResetRequest
+
 
 class UserCreationForm(forms.ModelForm):
 
@@ -52,3 +54,16 @@ class UserChangeForm(Auth_UserChangeForm):
                     password.help_text = (
                         "L'utilisateur n'a pas encore activé son compte."
                     )
+
+
+class UserResetPasswordForm(forms.Form):
+
+    def __init__(self, user, *args, **kwargs):
+        self.user = user
+        super().__init__(*args, **kwargs)
+
+    def save(self, commit=True):
+        return PasswordResetRequest.objects.get_or_create_reset_request(
+            user=self.user,
+            count_attempt=False
+        )
