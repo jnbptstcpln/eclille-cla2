@@ -3,5 +3,5 @@ from .views import *
 
 app_name = "cla_public"
 urlpatterns = [
-    path("", IndexPublicView.as_view(), name="index")
+    path("", index, name="index")
 ]
