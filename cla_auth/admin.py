@@ -58,7 +58,7 @@ class UserAdmin(UserAdmin):
         (
             "Information de connexion",
             {
-                'fields': ('username', 'password', ('last_login', 'date_joined')),
+                'fields': ('username', ('last_login', 'date_joined')),
                 'classes': ('collapse',),
             }
         ),
@@ -138,8 +138,12 @@ class UserAdmin(UserAdmin):
     def get_fieldsets(self, request, obj: User=None):
         fieldsets = copy.deepcopy(super().get_fieldsets(request, obj))
         if obj is not None:
-            if request.user.has_perm("") and not obj.infos.is_activated():
+            # Il est nécessaire d'avoir la permission `manage_user_activation` pour accéder au lien d'activation du compte
+            if request.user.has_perm("manage_user_activation") and not obj.infos.is_activated():
                 fieldsets[0][1]['fields'] = ['link_activation'] + fieldsets[0][1]['fields']
+            # Il est nécessaire d'avoir la permission `manage_user_password` pour accéder au champ de modification du mot de passe
+            if request.user.has_perm("manage_user_password"):
+                fieldsets[1][1]['fields'] = fieldsets[0][1]['fields'][:1] + ['password'] + fieldsets[0][1]['fields'][1:]
         return fieldsets
 
     def get_urls(self):
@@ -156,7 +160,6 @@ class UserAdmin(UserAdmin):
 
         if hasattr(obj, 'infos'):
             messages.success(request, f"Un mail de bienvenue a été envoyé à {obj.infos.email_school} avec un lien d'activation")
-
 
     def user_reset_password(self, req, id, form_url=''):
         user = self.get_object(req, id)
