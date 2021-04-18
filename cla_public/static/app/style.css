@@ -1,578 +1,132 @@
-/** ----- GENERAL ----- */
-body {
-    color: #273142;
-    background-color: rgb(242, 246, 250);
-    margin: auto;
-    font-family: Raleway, sans-serif;
-    min-height: 100vh;
-    width: 100%;
-    /*overflow: hidden;*/
+/*/////////////////////////////////////////////////////////////////////
+ //
+ // Custom theme code styles
+ // Written by Themelize.me (http://themelize.me)
+ //
+ // This is an empty starter template for overriding styles
+ // set by Bootstrap & the theme
+ //
+ // ----------------------------------------------------
+ //
+ // Remove unused code for better performances
+ //
+ // ----------------------------------------------------
+ //
+ // $see - Usefuls tools online for editing
+ // 1. http://charliepark.org/bootstrap_buttons/ - Button style generator
+ // 2. http://www.colorzilla.com/gradient-editor/ - CSS3 gradient maker
+ //
+ // $note
+ // To ensure custom styles are picked up
+ // wrap definitions in body tag
+ // ie.
+ // body .navbar-inner {
+ //   background: #ff0000;
+ // }
+ //
+ /////////////////////////////////////////////////////////////////////*/
+/*******************************************************
+ * Custom theme code styles
+ * Written by Themelize.me (http://themelize.me)
+ *
+ * Includes the base variables & mixins needed for all
+ * scss files
+ *******************************************************/
+/*
+ * --------------------------------------------------
+ * 1. General Elements
+ *--------------------------------------------------
+ */
+#header {
+  /* 1. Header wrapper */
 }
 
-/** ----- COLOR ----- */
-:root {
-    --primary-color: #e8463f;
-}
-.bg-light {
-    background-color: #fbfbfb;
-    color: #273142;
-    --background-color: #fbfbfb;
-    --color: #273142;
-}
-.gradient-light {
-    background: linear-gradient(to right top, rgb(237,241,245), #fafafa)
-}
-.gradient-primary {
-    background-image: linear-gradient(to right top, #E63E38, #CF336B);
-    color: white;
-    --color: white;
-}
-.border-primary {
-    border-color: var(--primary-color);
+#highlighted {
+  /* 2. Highlighted (below header) wrapper */
 }
 
-/** ----- TYPo ----- */
-h1, h2, h3, h4, h5, h6 {
-    font-family: "Dosis", sans-serif;
+#content {
+  /* 3. Content wrapper */
 }
 
-/** ----- NAVBAR ----- */
-.navbar-container {
-    border-bottom: 1px solid #e3e3e3;
-    position: fixed;
-    width: 100vw;
-    z-index: 1000;
-}
-.navbar {
-    font-family: "Open Sans", sans-serif;
-}
-.navbar a:hover, .navbar a.active {
-    border-bottom: 2px solid var(--primary-color);
-    opacity: 1;
+#content-below {
+  /* 4. Content Below wrapper */
 }
 
-.mobile-navbar {
-    font-size: 1.25em;
-    font-weight: 600;
-    list-style: none;
-    margin-bottom: 0;
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 150ms ease-out;
-    width: 100vh;
-    z-index: 1000;
-}
-.mobile-navbar.visible {
-    max-height: 100vh;
-    transition: max-height 300ms ease-out;
-}
-.mobile-navbar li {
-    width: 100%;
-    height: 40px;
-    line-height: 40px;
-    margin-bottom: 0;
-}
-.mobile-navbar li {
-
-}
-.mobile-navbar li a.active, .mobile-navbar li a:hover {
-    color: var(--primary-color-text);
-    background-color: var(--primary-color);
-}
-.mobile-navbar li a {
-    color: var(--color-navy);
-    display: inline-block;
-    padding: 0 30px;
-    text-decoration: none;
-    font-family: "Open Sans", sans-serif;
-    text-transform: uppercase;
-    width: 100%;
-    height: 100%;
+#footer {
+  /* 5. Footer wrapper */
 }
 
-/** ----- NAVHEADER ----- */
-.navheader {
-    background-color: white;
-    border-radius: 3px;
-    padding: var(--padding);
-    position: relative;
-    --header-color: var(--primary-color);
-    --padding: 10px;
-
-}
-.navheader h1 {
-    /*border-bottom: 2px solid var(--header-color);*/
-    font-family: Oswald, sans-serif;
-    font-weight: 400;
-    text-align: center;
-    text-transform: uppercase;
-    font-size: 2.25em;
-    margin: 0;
-}
-.navheader h1 .icon {
-    color: var(--primary-color);
-}
-.navheader a.back {
-    color: var(--primary-color);
-    font-size: 1.25em;
-    height: calc(100% - 2 * var(--padding));
-    left: var(--padding);
-    line-height: 2;
-    position: absolute;
-    text-decoration: none;
-    top: var(--padding);
-    transition: opacity 300ms;
-}
-.navheader a.back:hover {
-    opacity: 0.8;
-    transition: opacity 300ms;
-}
-.navheader .tools {
-    display: inline-block;
-    height: calc(100% - 2 * var(--padding));
-    line-height: 2;
-    position: absolute;
-    right: var(--padding);
-    text-align: right;
-    top: var(--padding);
-}
-.navheader .tools > a {
-    color: var(--primary-color);
-    font-size: 1.25em;
-    text-decoration: none;
-    transition: opacity 300ms;
-}
-.navheader .tools > a:hover {
-    opacity: 0.8;
-    transition: opacity 300ms;
-}
-/* Phones */
-@media (max-width: 544px) {
-    .navheader h1 {
-        font-size: 1.75em;
-    }
-    .navheader a.back, .navheader .tools {
-        line-height: 30px;
-    }
-    .navheader a.back span, .navheader .tools span {
-        display: none;
-    }
-}
-/* Small Phones */
-@media (max-width: 350px) {
-    .navheader h1 {
-        font-size: 1.5em;
-    }
-    .navheader a.back {
-        line-height: 28px;
-    }
+/*
+ * --------------------------------------------------
+ * 2. Colours
+ *--------------------------------------------------
+ */
+/*
+ * --------------------------------------------------
+ * 3. Responsiveness/media queries
+ *--------------------------------------------------
+ */
+/* Extra small devices (phones, less than 768px) */
+/* No media query since this is the default in Bootstrap */
+@media (min-width: 576px) {
+  /* Small devices (576px and up). Mixin: media-breakpoint-up(sm) */
 }
 
-/** ----- CONTENT ----- */
-.content-wrapper {
-    min-height: calc(100vh - 50px);
-    overflow-x: scroll;
-    position: relative;
-    top: 50px;
-    width: 100%;
-
-}
-.content {
-    margin: auto;
-    max-width: 1000px;
-    padding: 10px;
-}
-.content > * {
-    /*overflow-x: hidden;
-    overflow-y: visible;*/
-}
-.content nav, .content section {
-    margin-bottom: 0.75em;
-}
-.content section {
-    background-color: var(--color-white);
-    color: var(--color-white-text);
-    padding: 10px;
+@media (min-width: 768px) {
+  /* Medium devices (768px and up). Mixin: media-breakpoint-up(md) */
 }
 
-
-/** ----- COLLECTION ----- */
-.collection .item {
-    border-radius: 5px;
-}
-.collection .item * {
-    font-family: Oswald, "sans-serif";
-    text-transform: uppercase;
-}
-.collection .item > *:first-child {
-    margin-top: 0;
-}
-.collection .item > *:last-child {
-    margin-bottom: 0;
-}
-.collection a.item {
-    transition: opacity 300ms;
-    text-decoration: none;
-}
-.collection a.item:hover {
-    color: var(--color);
-    opacity: 0.8;
-    transition: opacity 300ms;
+@media (min-width: 992px) {
+  /* Large devices (992px and up). Mixin: media-breakpoint-up(lg) */
 }
 
-/** ----- FORM ----- */
-input,
-textarea,
-select {
-    font-family: "Open Sans", sans-serif;
-}
-label > b {
-    color: var(--color-red);
-}
-fieldset {
-    padding: 10px 25px;
-    border: 2px dashed #e3e3e3;
-    border-radius: 5px;
+@media (min-width: 1200px) {
+  /* X-Large devices (1200px and up). Mixin: media-breakpoint-up(xl) */
 }
 
-/** ----- GRID ITEM ----- */
-.grid.items > a.item {
-    text-decoration: none;
-    border-radius: 5px;
-}
-.grid.items > a.item * {
-    font-family: Oswald, "sans-serif";
-    text-transform: uppercase;
+/* max-width */
+@media (max-width: 575.98px) {
+  /* Small devices (575px and down). Mixin: media-breakpoint-down(xs) */
 }
 
-/** ----- HEADER ----- */
-.header {
-    font-family: Oswald, "sans-serif";
+@media (max-width: 767.98px) {
+  /* Medium devices (767px and down). Mixin: media-breakpoint-down(sm) */
 }
 
-/** ----- SHORTCUTS ----- */
-.br {
-    border-radius: 5px;
-}
-.pointer {
-    cursor: pointer;
+@media (max-width: 991.98px) {
+  /* Large devices (992px and down). Mixin: media-breakpoint-down(md) */
 }
 
-
-
-/** ----- MARKDOWN ----- */
-.markdown > p {
-    margin: 5px auto;
-}
-.bold {
-    font-weight: bold;
+@media (max-width: 1199.98px) {
+  /* X-Large devices (1200px and down). Mixin: media-breakpoint-down(lg) */
 }
 
-
-/** ----- ITEMS ----- */
-ul.items {
-    list-style: none;
-}
-ul.items > li {
-    border-radius: 7px;
-    text-align: center;
-}
-ul.items > li h1,
-ul.items > li h2,
-ul.items > li h3,
-ul.items > li h4,
-ul.items > li h5,
-ul.items > li h6 {
-    font-family: Oswald, "sans-serif";
-    text-transform: uppercase;
+/* target one breakpoint */
+@media (min-width: 576px) and (max-width: 767.98px) {
+  /* Small devices (between 576px and 767px). Mixin: media-breakpoint-only(sm) */
 }
 
-ul.items > li *:first-child {
-    margin-top: 0;
-}
-ul.items > li *:last-child {
-    margin-bottom: 0;
+@media (min-width: 768px) and (max-width: 991.98px) {
+  /* Medium devices (tablets, between 768px and 991px). Mixin: media-breakpoint-only(md) */
 }
 
-/** ----- TABLE ----- */
-table.classic-table a {
-    text-decoration: none;
-    display: inline-block;
-    height: 100%;
-    width: 100%;
-}
-table.classic-table a:hover {
-    text-decoration: underline;
-}
-table.classic-table tr.header-row, table.classic-table tr.header-row:hover {
-    background-color: #ebebeb;
-}
-table.small th, table.small td {
-    padding: 6px 7px;
-}
-table.classic-table a.link {
-    color: inherit;
-    text-decoration: underline;
+@media (min-width: 992px) and (max-width: 1199.98px) {
+  /* Large devices (desktops, between 992px and 1199px). Mixin: media-breakpoint-only(lg) */
 }
 
-/** ----- TICKET ----- */
-div.ticket {
-    background: linear-gradient(135deg, #000428, #004e92);
-    border-radius: 10px;
-    color: white;
-    font-family: "Open Sans", sans-serif;
-    height: 250px;
-    padding: 25px;
-}
-div.ticket p {
-    margin-bottom: 2px;
-    margin-top: 2px;
-}
-div.ticket.nc {
-    background-image: linear-gradient( 135deg, #F05F57 10%, #360940 100%);
-}
-@media (max-width: 1000px) {
-    div.ticket .header {
-        font-size: 1.75em;
-    }
-}
-@media (max-width: 544px) {
-    div.ticket {
-        padding: 10px;
-    }
-    div.ticket .header {
-        font-size: 1.5em;
-    }
-}
-/** ----- BLOCK ----- */
-.block {
-    border: 1px solid rgb(232, 236, 240);
-    border-radius: 10px;
+@media (min-width: 1200px) {
+  /* Extra large devices (large desktops, 1200px and up). Mixin: media-breakpoint-only(xl) */
 }
 
-/** ----- BUTTON GROUP ----- */
-.buttons-group {
-    display: flex;
-    flex-wrap: wrap;
-    padding: 5px 5px;
-}
-.buttons-group > .button {
-    flex: auto;
-    margin: 2.5px;
+/* span multiple screenwidths */
+@media (min-width: 768px) {
+  /* From medium to large (between 768px and 1199px). Mixin: media-breakpoint-between(md, xl)  */
 }
 
-
-/** ----- ID ----- */
-div#login-logo {
-    margin: auto;
-    max-width: 300px;
-    max-height: 300px;
-}
-@media (max-width: 544px) {
-    div#login-logo {
-        max-width: 200px;
-        max-height: 200px;
-    }
-}
-@media (max-height: 550px) {
-    div#login-logo {
-        display: none;
-    }
-}
-
-/** ----- PLANNING ----- */
-.planning {
-    max-width: 650px;
-    margin: auto;
-}
-.planning h4,
-.planning h5,
-.planning h6 {
-    font-family: "Open Sans", sans-serif;
-}
-.planning .day {
-    background-color: #e3e3e3;
-    border-top-left-radius: 5px;
-    border-top-right-radius: 5px;
-    text-transform: uppercase;
-    font-weight: 500;
-    padding: 10px 20px;
-}
-.planning .day.today {
-    background-color: var(--primary-color);
-    color: white;
-    font-weight: 600;
-}
-.planning .day h4 {
-    margin-bottom: 0;
-    font-size: 1.5em;
-}
-.planning .plan {
-    padding: 10px 25px;
-    border-bottom: 1px solid #e3e3e3;
-    border-left: 1px solid #e3e3e3;
-    border-right: 1px solid #e3e3e3;
-}
-.planning .plan.chill {
-    border-left: 5px solid #74bf51;
-}
-.planning .plan.normale {
-    border-left: 5px solid #0ABFBC;
-}
-.planning .plan.grosse {
-    border-left: 5px solid #bf8a47;
-}
-.planning .plan h4 {
-    margin-bottom: 5px;
-    text-decoration: underline;
-}
-.planning .plan h5 {
-    margin-bottom: 5px;
-}
-.planning .plan h6 {
-    margin-bottom: 0;
-}
-.planning .plan:last-child {
-    border-bottom: 1px solid #e3e3e3;
-}
-.planning .separator {
-    height: 15px;
-    border-top: 1px solid #e3e3e3;
-}
-.planning .no-plan {
-    background-color: #e3e3e3;
-    border-radius: 5px;
-    text-transform: uppercase;
-    font-weight: 500;
-    padding: 10px 20px;
-}
-.planning .no-plan h4 {
-    font-size: 1.25em;
-    margin-bottom: 0;
-}
-
-/** ----- DL ----- */
-
-dl dt {
-    font-weight: bold;
-}
-dl.horizontal dt {
-    display: flex;
-}
-dl.horizontal dd {
-    display: flex;
-}
-
-/** ----- GRADIENT ----- */
-.gradient-frost {
-    background: #000428; /* fallback for old browsers */
-    background: -webkit-linear-gradient(to right, #000428, #004e92); /* Chrome 10-25, Safari 5.1-6 */
-    background: linear-gradient(to right, #000428, #004e92); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
-    color: white;
-    --color: white;
-}
-.gradient-1 {
-    background-image: linear-gradient( 135deg, #FDEB71 10%, #F8D800 100%);
-    color: whitesmoke;
-    --color: white
-}
-.gradient-2 {
-    background-image: linear-gradient( 135deg, #ABDCFF 10%, #0396FF 100%);
-    color: whitesmoke;
-    --color: white
-}
-.gradient-3 {
-    background-image: linear-gradient( 135deg, #FEB692 10%, #EA5455 100%);
-    color: whitesmoke;
-    --color: white
-}
-.gradient-4 {
-    background-image: linear-gradient( 135deg, #CE9FFC 10%, #7367F0 100%);
-    color: whitesmoke;
-    --color: white
-}
-.gradient-5 {
-    background-image: linear-gradient( 135deg, #90F7EC 10%, #32CCBC 100%);
-    color: whitesmoke;
-    --color: white
-}
-.gradient-6 {
-    background-image: linear-gradient( 135deg, #FFF6B7 10%, #F6416C 100%);
-    color: whitesmoke;
-    --color: white
-}
-.gradient-7 {
-    background-image: linear-gradient( 135deg, #81FBB8 10%, #28C76F 100%);
-    color: whitesmoke;
-    --color: white
-}
-.gradient-8 {
-    background-image: linear-gradient( 135deg, #E2B0FF 10%, #9F44D3 100%);
-    color: whitesmoke;
-    --color: white
-}
-.gradient-9 {
-    background-image: linear-gradient( 135deg, #F97794 10%, #623AA2 100%);
-    color: whitesmoke;
-    --color: white
-}
-.gradient-10 {
-    background-image: linear-gradient( 135deg, #FCCF31 10%, #F55555 100%);
-    color: whitesmoke;
-    --color: white
-}
-.gradient-11 {
-    background-image: linear-gradient( 135deg, #F761A1 10%, #8C1BAB 100%);
-    color: whitesmoke;
-    --color: white
-}
-.gradient-12 {
-    background-image: linear-gradient( 135deg, #43CBFF 10%, #9708CC 100%);
-    color: whitesmoke;
-    --color: white
-}
-.gradient-13 {
-    background-image: linear-gradient( 135deg, #5EFCE8 10%, #736EFE 100%);
-    color: whitesmoke;
-    --color: white
-}
-.gradient-14 {
-    background-image: linear-gradient( 135deg, #FFD26F 10%, #3677FF 100%);
-    color: whitesmoke;
-    --color: white
-}
-.gradient-15 {
-    background-image: linear-gradient( 135deg, #A0FE65 10%, #FA016D 100%);
-    color: whitesmoke;
-    --color: white
-}
-.gradient-16 {
-    background-image: linear-gradient( 135deg, #FFDB01 10%, #0E197D 100%);
-    color: whitesmoke;
-    --color: white
-}
-.gradient-17 {
-    background-image: linear-gradient( 135deg, #FEC163 10%, #DE4313 100%);
-    color: whitesmoke;
-    --color: white
-}
-.gradient-18 {
-    background-image: linear-gradient( 135deg, #92FFC0 10%, #002661 100%);
-    color: whitesmoke;
-    --color: white
-}
-.gradient-19 {
-    background-image: linear-gradient( 135deg, #F05F57 10%, #360940 100%);
-    color: whitesmoke;
-    --color: white
-}
-.gradient-20 {
-    background-image: linear-gradient( 135deg, #FAB2FF 10%, #1904E5 100%);
-    color: whitesmoke;
-    --color: white
-}
-.gradient-21 {
-    background-image: linear-gradient( 135deg, #FFCF71 10%, #2376DD 100%);
-    color: whitesmoke;
-    --color: white
-}
+/*
+ * --------------------------------------------------
+ * 4. Misc
+ * Other stuff
+ *--------------------------------------------------
+ */
