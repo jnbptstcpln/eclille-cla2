@@ -2,82 +2,149 @@
 
 {% block body %}
 
-    <div id="header">
+    <header id="header">
         <div class="header-upper">
-        <div class="header-inner container">
-            <!--user menu-->
-            <div class="header-block-flex order-1 mr-auto">
-                <nav class="nav nav-sm header-block-flex">
-                    {% if not request.user.is_authenticated %}
-                        <a class="nav-link d-md-none" href="{% url "cla_auth:login" %}"><i class="fa fa-user"></i></a>
-                        <a class="nav-link text-xs text-uppercase d-none d-md-block" href="{% url "cla_auth:login" %}" data-toggle="modal">Connexion</a>
-                    {% else %}
-                        <a class="nav-link d-md-none" href="#"><i class="fa fa-user"></i></a>
-                        <a class="nav-link text-xs text-uppercase d-none d-md-block" href="#" data-toggle="modal">Mon compte</a>
-                    {% endif %}
+            <div class="header-inner container">
+                <div class="header-block-flex order-1 mr-auto">
+                    <nav class="nav nav-sm header-block-flex">
+                        {% if not request.user.is_authenticated %}
+                            <a class="nav-link d-md-none" href="{% url "cla_auth:login" %}"><i class="fa fa-user"></i></a>
+                            <a class="nav-link text-xs text-uppercase d-none d-md-block" href="{% url "cla_auth:login" %}" data-toggle="modal">Connexion</a>
+                        {% else %}
+                            <a class="nav-link d-md-none" href="#"><i class="fa fa-user"></i></a>
+                            <a class="nav-link text-xs text-uppercase d-none d-md-block" href="#" data-toggle="modal">Mon compte</a>
+                        {% endif %}
 
-                </nav>
+                    </nav>
+                </div>
+                <div class="nav nav-icons header-block order-12">
+                    <a href="https://www.facebook.com/CentraleLilleAssociations" target="_blank" class="nav-link"> <i class="fab fa-facebook-square icon-1x"></i> <span class="sr-only">Facebook</span></a>
+                    <a href="https://www.linkedin.com/company/centrale-lille-associations" target="_blank" class="nav-link"> <i class="fab fa-linkedin icon-1x"></i> <span class="sr-only">Linkedin</span> </a>
+                </div>
             </div>
-            <!--social media icons-->
-            <div class="nav nav-icons header-block order-12">
-                <a href="https://www.facebook.com/CentraleLilleAssociations" target="_blank" class="nav-link"> <i class="fab fa-facebook-square icon-1x"></i> <span class="sr-only">Facebook</span></a>
-                <a href="https://www.linkedin.com/company/centrale-lille-associations" target="_blank" class="nav-link"> <i class="fab fa-linkedin icon-1x"></i> <span class="sr-only">Linkedin</span> </a>
-            </div>
-        </div>
         </div>
         <div data-toggle="sticky">
-          <!--Header & Branding region-->
-          <div class="header">
-            <!-- all direct children of the .header-inner element will be vertically aligned with each other you can override all the behaviours using the flexbox utilities (flexbox.html) All elements with .header-brand & .header-block-flex wrappers will automatically be aligned inline & vertically using flexbox, this can be overridden using the flexbox utilities (flexbox.htm) Use .header-block to stack elements within on small screen & "float" on larger screens use .order-first or/and .order-last classes to make an element show first or last within .header-inner or .headr-block elements -->
-            <div class="header-inner container">
-              <!--branding/logo -->
-              <div class="header-brand">
-                <a class="header-brand-text" href="{% url "cla_public:index" %}" title="Accueil">
-                  <h1 class="h2">
+            <!--Header & Branding region-->
+            <div class="header">
+                <!-- all direct children of the .header-inner element will be vertically aligned with each other you can override all the behaviours using the flexbox utilities (flexbox.html) All elements with .header-brand & .header-block-flex wrappers will automatically be aligned inline & vertically using flexbox, this can be overridden using the flexbox utilities (flexbox.htm) Use .header-block to stack elements within on small screen & "float" on larger screens use .order-first or/and .order-last classes to make an element show first or last within .header-inner or .headr-block elements -->
+                <div class="header-inner container">
+                    <!--branding/logo -->
+                    <div class="header-brand">
+                        <a class="header-brand-text" href="{% url "cla_public:index" %}" title="Accueil">
+                            <h1 class="h2">
                       <span class="cla_logo">
                           <span class="cl">Centrale Lille</span>
                           <span class="a">Associations</span>
                       </span>
-                  </h1>
-                </a>
-              </div>
-              <!-- other header content -->
-              <div class="header-block order-12">
-                <!-- mobile collapse menu button - data-toggle="collapse" = default BS menu - data-toggle="off-canvas" = Off-cavnas Menu - data-toggle="overlay" = Overlay Menu -->
-                <a href="#top" class="btn btn-link btn-icon header-btn float-right d-lg-none" data-toggle="off-canvas" data-target=".navbar-main" data-settings='{"cloneTarget":true, "targetClassExtras": "navbar-offcanvas"}'> <i class="fa fa-bars"></i> </a>
-                <!--Show/hide trigger for #offcanvas-sidebar -->
-                <a href="#" title="Click me you'll get a surprise" class="btn btn-icon btn-link header-btn float-right order-last" data-toggle="off-canvas" data-target="#offcanvas-sidebar" data-settings='{"cloneTarget":false}'> <i class="ion-android-more-vertical"></i> </a>
-              </div>
+                            </h1>
+                        </a>
+                    </div>
+                    <!-- other header content -->
+                    <div class="header-block order-12">
+                        <!-- mobile collapse menu button - data-toggle="collapse" = default BS menu - data-toggle="off-canvas" = Off-cavnas Menu - data-toggle="overlay" = Overlay Menu -->
+                        <a href="#top" class="btn btn-link btn-icon header-btn float-right d-lg-none" data-toggle="off-canvas" data-target=".navbar-main" data-settings='{"cloneTarget":true, "targetClassExtras": "navbar-offcanvas"}'> <i
+                                class="fa fa-bars"></i> </a>
+                        <!--Show/hide trigger for #offcanvas-sidebar -->
+                        <a href="#" title="Click me you'll get a surprise" class="btn btn-icon btn-link header-btn float-right order-last" data-toggle="off-canvas" data-target="#offcanvas-sidebar" data-settings='{"cloneTarget":false}'> <i
+                                class="ion-android-more-vertical"></i> </a>
+                    </div>
 
-              <div class="navbar navbar-expand-md navbar-static-top">
-                <!--everything within this div is collapsed on mobile-->
-                <div class="navbar-main collapse">
-                  <!--main navigation-->
-                  <ul class="nav navbar-nav navbar-nav-stretch float-lg-right dropdown-effect-fade">
+                    <div class="navbar navbar-expand-md navbar-static-top">
+                        <!--everything within this div is collapsed on mobile-->
+                        <div class="navbar-main collapse">
+                            <!--main navigation-->
+                            <ul class="nav navbar-nav navbar-nav-stretch float-lg-right dropdown-effect-fade">
 
-                    <li class="nav-item dropdown {% if page_active == "" %}active{% endif %}">
-                      <a href="#" class="nav-link dropdown-toggle" id="pages-drop" data-toggle="dropdown" data-hover="dropdown">Pages</a>
-                      <div class="dropdown-menu">
-                          <a href="customers.html" class="dropdown-item">Customers</a>
-                          <div class="dropdown dropdown-submenu">
-                            <a href="about.html" class="dropdown-item dropdown-toggle" id="about-drop" data-toggle="dropdown" data-hover="dropdown" data-close-others="false">About</a>
-                            <div class="dropdown-menu" role="menu" aria-labelledby="about-drop">
-                                <a href="about.html" class="dropdown-item">About Us Basic</a>
-                                <a href="about-extended.html" class="dropdown-item">About Us Extended</a>
-                            </div>
-                          </div>
-                      </div>
-                    </li>
+                                <li class="nav-item dropdown {% if page_active == "" %}active{% endif %}">
+                                    <a href="#" class="nav-link dropdown-toggle" id="pages-drop" data-toggle="dropdown" data-hover="dropdown">Pages</a>
+                                    <div class="dropdown-menu">
+                                        <a href="customers.html" class="dropdown-item">Customers</a>
+                                        <div class="dropdown dropdown-submenu">
+                                            <a href="about.html" class="dropdown-item dropdown-toggle" id="about-drop" data-toggle="dropdown" data-hover="dropdown" data-close-others="false">About</a>
+                                            <div class="dropdown-menu" role="menu" aria-labelledby="about-drop">
+                                                <a href="about.html" class="dropdown-item">About Us Basic</a>
+                                                <a href="about-extended.html" class="dropdown-item">About Us Extended</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
 
-                  </ul>
+                            </ul>
+                        </div>
+                        <!--/.navbar-collapse -->
+                    </div>
                 </div>
-                <!--/.navbar-collapse -->
-              </div>
             </div>
-          </div>
         </div>
-    </div>
-    <div id="content" style="min-height:calc(100vh - 120px)">
+    </header>
+    <section id="content" style="min-height:calc(100vh - 450px)">
         {% block content %}{% endblock %}
-    </div>
+    </section>
+    <footer id="footer" class="p-0">
+        <div class="container pt-6 pb-5">
+            <div class="row">
+                <div class="col-md-6">
+                    <h4 class="text-uppercase text-white">
+                        Nous contacter
+                    </h4>
+                    <address>
+                        <ul class="list-unstyled">
+                            <li class="mb-2">
+                                <div class="d-flex align-middle">
+                                    <div class="w-10">
+                                        <abbr title="Email"><i class="fa fa-envelope fa-fw"></i></abbr>
+                                    </div>
+                                    <div class="flex-fill">
+                                        cla@centralelille.fr
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="d-flex align-items-center">
+                                    <div class="w-10">
+                                        <abbr title="Adresse"><i class="fa fa-home fa-fw"></i></abbr>
+                                    </div>
+                                    <div class="flex-fill">
+                                        Centrale Lille Associations<br>
+                                        Ecole Centrale de Lille, Cité Scientifique CS 20048<br>
+                                        59651 Villeneuve d'Ascq CEDEX
+                                    </div>
+                                </div>
+
+
+                            </li>
+                        </ul>
+                    </address>
+                </div>
+                <div class="col-md-6">
+                    <h4 class="text-uppercase text-white">
+                        A propos de nous
+                    </h4>
+                    <p>
+                        Centrale Lille Associations est une association loi 1901 fondée en 2008, continuation de plus d'un siècle et demi
+                        de développement perpétuel des structures associatives de Centrale Lille par ses étudiants.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+        <hr class="my-0 hr-blank op-2">
+        <div class="bg-inverse-dark text-sm py-3">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p class="mb-0">Copyright {% now "Y" %} © Centrale Lille Associations</p>
+                    </div>
+                    <div class="col-md-6">
+                        <ul class="list-inline footer-links float-md-right mb-0">
+                            <li class="list-inline-item"><a href="#">Mentions légales</a></li>
+                            <li class="list-inline-item"><a href="#">Charte de confidentialité</a></li>
+                            <li class="list-inline-item"><a href="mailto:cla@centralelille.fr">Nous contacter</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <a href="#top" class="btn btn-icon btn-dark pos-fixed pos-b pos-r mr-3 mb-3 scroll-state-active" title="Back to top" data-scroll="scroll-state"><i class="fa fa-chevron-up"></i></a>
+            </div>
+        </div>
+    </footer>
 {% endblock %}
