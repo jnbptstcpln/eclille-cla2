@@ -2,8 +2,9 @@ asgiref==3.3.4
 certifi==2020.12.5
 chardet==4.0.0
 Django==3.2
-django-resized==0.3.11
 django-multiselectfield==0.1.12
+django-resized==0.3.11
+django-summernote==0.8.11.6
 idna==3.1
 mysqlclient==2.0.3
 Pillow==8.2.0

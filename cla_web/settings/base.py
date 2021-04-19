@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
     'django.contrib.flatpages',
+    'django_summernote',
     # cla_web' apps
     'cla_auth.apps.ClaAuthConfig',
     'cla_public.apps.ClaPublicConfig',
@@ -82,6 +83,7 @@ WSGI_APPLICATION = 'cla_web.wsgi.application'
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
 SITE_ID = 1
+X_FRAME_OPTIONS = 'SAMEORIGIN'
 
 
 # Database
