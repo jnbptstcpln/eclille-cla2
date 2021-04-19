@@ -166,7 +166,7 @@ class UserInfos(models.Model):
     def check_activation_jwt(self, token):
         try:
             payload = jwt.decode(
-                token=token,
+                jwt=token,
                 key=f"{settings.SECRET_KEY}-{self.user.username}",
                 algorithms=["HS256"]
             )
@@ -389,7 +389,7 @@ class PasswordResetRequest(models.Model):
     def check_reset_jwt(self, token):
         try:
             payload = jwt.decode(
-                token=token,
+                jwt=token,
                 key=f"{settings.SECRET_KEY}-{self.user.password}-{self.user.date_joined.time()}",
                 algorithms=["HS256"]
             )
