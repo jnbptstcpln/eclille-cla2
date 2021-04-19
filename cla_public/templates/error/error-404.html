@@ -1,27 +1,37 @@
-{% extends "layout/base.html" %}
+{% extends "layout/main.html" %}
 
 {% block page_title %}
     Erreur 404
 {% endblock %}
 
 {% block content %}
-
-    <div style="height: calc(75vh)" class="d-flex align-items-center justify-content-center">
-        <div class="card">
-            <div class="card-body">
-                <div class="max-width-750 m-auto d-flex align-items-center justify-content-center">
-                    <div class="mr-5 d-sm-none">
-                        <div class="d-flex h-100 w-100 align-items-center justify-content-center">
-                            <i class="fad fa-exclamation-triangle fa-7x"></i>
-                        </div>
-                    </div>
-                    <div class="text-center">
-                        <h2 class="fs-22px mb-3">Oups, cette page n'est plus accessible</h2>
-                        <a href="{% url "cla_public:index" %}" class="btn btn-outline-primary">Retourner à l'accueil</a>
-                    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8">
+                <div class="w-90 mx-auto">
+                    <h2 class="error-code text-x7 text-md-x10 op-9">
+                        404 <i class="fa fa-file text-primary text-xs-x6 text-md-x6"></i>
+                    </h2>
+                    <h3 class="error-message text-xs-x1 text-md-x2" style="max-width: 500px">
+                        Oups, la page que vous demandez n'existe pas...
+                    </h3>
+                    <p class="error-details">
+                        Peut être avez-vous suivi un lien erroné ou bien la page que vous cherchez n'est plus disponible.
+                        Si vous pensez qu'il s'agit d'une erreur, contactez nous à <a href="mailto:cla@centralelille.fr">cla@centralelille.fr</a>
+                    </p>
                 </div>
+            </div>
+            <div class="col-md-4">
+                <h4 class="mt-4">
+                    Peut être souhaitez-vous accéder à
+                </h4>
+                <ul class="list-unstyled list-lg list-bordered">
+                    <li><i class="fa fa-angle-right list-item-icon"></i> <a href="{% url "cla_public:index" %}">Accueil</a></li>
+                    <li><i class="fa fa-angle-right list-item-icon"></i> <a href="#">Les associations</a></li>
+                    <li><i class="fa fa-angle-right list-item-icon"></i> <a href="#">Comment adhérer ?</a></li>
+                    <li><i class="fa fa-angle-right list-item-icon"></i> <a href="#">Mon compte</a></li>
+                </ul>
             </div>
         </div>
     </div>
-
 {% endblock %}

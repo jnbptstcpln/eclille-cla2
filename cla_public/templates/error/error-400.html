@@ -1,27 +1,26 @@
-{% extends "layout/base.html" %}
+{% extends "layout/main.html" %}
 
 {% block page_title %}
-    Erreur 400
+    Erreur 403
 {% endblock %}
 
 {% block content %}
-
-    <div style="height: calc(75vh)" class="d-flex align-items-center justify-content-center">
-        <div class="card">
-            <div class="card-body">
-                <div class="max-width-750 m-auto d-flex align-items-center justify-content-center">
-                    <div class="mr-5 d-sm-none">
-                        <div class="d-flex h-100 w-100 align-items-center justify-content-center">
-                            <i class="fad fa-exclamation-triangle fa-7x"></i>
-                        </div>
-                    </div>
-                    <div class="text-center">
-                        <h2 class="fs-22px mb-3">Oups, votre requête a été mal formulée</h2>
-                        <a href="{% url "cla_public:index" %}" class="btn btn-outline-primary">Retourner à l'accueil</a>
-                    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8 offset-2">
+                <div class="w-90 mx-auto">
+                    <h2 class="error-code text-x7 text-md-x10 op-9">
+                        400 <i class="fa fa-question-circle text-primary text-xs-x6 text-md-x6"></i>
+                    </h2>
+                    <h3 class="error-message text-xs-x1 text-md-x2">
+                        Oups, votre demande n'est pas valide
+                    </h3>
+                    <p class="error-details text-xs-x1">
+                        Peut être avez-vous suivi un lien erroné ou bien une erreur s'est produite au niveau de votre navigateur.<br>
+                        Si l'erreur persiste, contactez nous à <a href="mailto:cla@centralelille.fr">cla@centralelille.fr</a>
+                    </p>
                 </div>
             </div>
         </div>
     </div>
-
 {% endblock %}
