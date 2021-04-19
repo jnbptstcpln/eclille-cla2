@@ -14,16 +14,19 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, re_path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.shortcuts import redirect
+from django.contrib.flatpages import views
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include("cla_auth.urls")),
     path('', include("cla_public.urls")),
+    path('privacy/', views.flatpage, {'url': '/privacy/'}, name='privacy'),
+    re_path(r'^(?P<url>.*/)$', views.flatpage)  # Catch all URLs and redirect them to flatpage module
 ]
 
 if settings.DEBUG:

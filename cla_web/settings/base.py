@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
+    'django.contrib.flatpages',
     # cla_web' apps
     'cla_auth.apps.ClaAuthConfig',
     'cla_public.apps.ClaPublicConfig',
@@ -51,7 +53,7 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware'
 ]
 
 ROOT_URLCONF = 'cla_web.urls'
@@ -74,6 +76,13 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'cla_web.wsgi.application'
+
+
+# Site
+# https://docs.djangoproject.com/en/3.1/ref/settings/#databases
+
+SITE_ID = 1
+
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
