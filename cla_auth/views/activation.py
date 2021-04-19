@@ -10,7 +10,7 @@ from django.http import HttpResponse, Http404
 from cla_auth.models import UserInfos
 
 
-def _get_user_from_jwt(activation_jwt):
+def _get_user_from_jwt(activation_jwt) -> User:
     # Retrieve jwt payload to fetch user
     jwt_payload = jwt.decode(activation_jwt, algorithms=["HS256"], options={"verify_signature": False})
     user = get_object_or_404(User, pk=jwt_payload.get('pk'))
@@ -23,7 +23,13 @@ def _get_user_from_jwt(activation_jwt):
 
 def activate(req, activation_jwt):
     user = _get_user_from_jwt(activation_jwt)
-    req.session.set('user_pk', user.pk)
+    return render(
+        req,
+        'cla_auth/activation/activate.html',
+        {
+            'user': user
+        }
+    )
 
 
 def activate_rgpd(req, activation_jwt):
