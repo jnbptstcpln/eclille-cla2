@@ -32,3 +32,7 @@ class LoginForm(forms.Form):
         required=False,
         widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
     )
+    redirect = forms.CharField(
+        required=False,
+        widget=forms.HiddenInput()
+    )
