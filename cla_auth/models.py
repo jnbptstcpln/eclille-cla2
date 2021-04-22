@@ -189,6 +189,10 @@ class UserInfos(models.Model):
         return self.validation_request.code
 
     @property
+    def reset_request(self):
+        return PasswordResetRequest.objects.get_current_reset_request(self.user)
+
+    @property
     def college(self):
         if self.promo <= current_school_year() and self.valid_until < timezone.now():
             return self.Colleges.ALUMNI_CENTRALE if self.is_from_centrale() else self.Colleges.ALUMNI_ITEEM
@@ -384,6 +388,7 @@ class PasswordResetRequest(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="+")
     email = models.EmailField()
     created_on = models.DateTimeField(auto_now=True)
+    used = models.BooleanField(default=False)
 
     @staticmethod
     def get_token_generator():
