@@ -21,6 +21,7 @@
                 {% include "components/form-errors.html" with form=form %}
                 {% include "components/form-group.html" with field=form.username %}
                 {% include "components/form-group.html" with field=form.password %}
+                {{ form.redirect }}
                 <div class="text-x1 d-flex justify-content-between">
                     <div class="form-check">
                         <label id="{{ form.stay_logged_in.id_for_label }}" class="form-check-label">{{ form.stay_logged_in }} {{ form.stay_logged_in.label }}</label>
