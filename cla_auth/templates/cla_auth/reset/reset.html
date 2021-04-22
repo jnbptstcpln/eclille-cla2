@@ -1,0 +1,26 @@
+{% extends "layout/standalone.html" %}
+
+{% block page_title %}CLA - Réinitialisation{% endblock %}
+
+{% block content %}
+    <div style="max-width: 650px" class="card w-100">
+        <div class="card-body">
+            <div class="mt-4 mt-md-0">
+                <h1 class="text-x1 text-lg-x2"><span style="font-size: 140%">Réinitialiser mon compte</span></h1>
+                <p class="lead mt-3">
+                    Définissez un nouveau mot de passe pour votre compte
+                </p>
+                <form method="post" action="{% url "cla_auth:reset" reset_jwt %}" class="mt-3">
+                    {% csrf_token %}
+                    {% include "components/form-group.html" with field=form.username %}
+                    {% include "components/form-group.html" with field=form.password1 %}
+                    {% include "components/form-group.html" with field=form.password2 %}
+                    <p class="text-center mt-5">
+                        <button type="submit" class="btn btn-primary btn-xl">Mettre à jour</button>
+                    </p>
+                </form>
+
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -373,8 +373,7 @@ class PasswordResetRequestManager(models.Manager):
         else:
             return self.create(
                 user=user,
-                email=user.email,
-                token=default_token_generator.make_token(user=user)
+                email=user.email
             )
 
 
@@ -389,10 +388,6 @@ class PasswordResetRequest(models.Model):
     email = models.EmailField()
     created_on = models.DateTimeField(auto_now=True)
     used = models.BooleanField(default=False)
-
-    @staticmethod
-    def get_token_generator():
-        return default_token_generator
 
     def get_reset_jwt(self, exp=True):
         payload = {'pk': self.user.pk}

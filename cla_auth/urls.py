@@ -15,4 +15,7 @@ urlpatterns = [
 
     # Account validation
     path('validation', views.validation.validate, name="validate"),
+
+    # Password reset
+    path('reinitialiser/<str:reset_jwt>', views.reset.reset, name="reset"),
 ]

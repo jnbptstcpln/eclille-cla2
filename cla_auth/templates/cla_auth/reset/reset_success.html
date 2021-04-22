@@ -1,0 +1,20 @@
+{% extends "layout/standalone.html" %}
+
+{% block page_title %}CLA - Réinitialisation{% endblock %}
+
+{% block content %}
+    <div style="max-width: 650px" class="card w-100">
+        <div class="card-body">
+            <div class="mt-4 mt-md-0">
+                <h1 class="text-x1 text-lg-x2"><span style="font-size: 140%">Mot de passe changé</span></h1>
+                <div class="alert alert-success mt-3">
+                    Votre mot de passe a bien été mis à jour.<br>
+                    Vous pouvez maintenant vous connecter.
+                </div>
+                <div class="mt-4 text-center">
+                    <a href="{% url "cla_auth:login" %}" class="btn btn-primary btn-lg">Se connecter</a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

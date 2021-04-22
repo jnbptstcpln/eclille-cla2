@@ -48,7 +48,7 @@ class UserChangeForm(Auth_UserChangeForm):
                     else:
                         password.help_text = (
                             "Vous avez la possiblité de lancer la procédure de réinitialisation "
-                            "de mot de passe à l'aide de <a href='{}'>ce formulaire</a>"
+                            "de mot de passe à l'aide de <a href='{}'>ce lien</a>"
                         ).format('../password-reset')
                 else:
                     password.help_text = (

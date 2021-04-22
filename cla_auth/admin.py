@@ -76,7 +76,7 @@ class UserAdmin(UserAdmin):
             'fields': (('first_name', 'last_name'), 'email'),
         }),
     )
-    readonly_fields = 'account_status', 'username', 'last_login', 'date_joined', 'link_activation'
+    readonly_fields = 'account_status', 'username', 'last_login', 'date_joined', 'link_activation', 'link_reset'
     inlines = [
         UserInfosInline,
         MembershipInline,
@@ -121,9 +121,15 @@ class UserAdmin(UserAdmin):
             return "Ce compte n'est qu'un compte de gestion"
     account_status.short_description = 'Statut du compte'
 
-    def link_password_reset(self, obj: User):
-        pass
-    link_password_reset.short_description = 'Lien pour réinitialiser le mot de passe de l\'utilisateur'
+    def link_reset(self, obj: User):
+        return mark_safe(
+            (
+                "<label style='float:none;width:100%'>Transmettez le lien suivant à l'utilisateur pour qu'il puisse procéder à la réinitilisation de son mot de passe</label>"
+                "<input style='margin-right: .5rem' class='vTextField' value='{reset_jwt}' id='id_reset_jwt'>"
+                "<a class='button' onclick='document.getElementById(\"id_reset_jwt\").select();document.execCommand(\"copy\");return false;','>Copier</a>"
+            ).format(reset_jwt=f"https://{settings.ALLOWED_HOSTS[0]}{resolve_url('cla_auth:reset', obj.infos.reset_request.get_reset_jwt(exp=False))}")
+        )
+    link_reset.short_description = 'Lien pour réinitialiser le mot de passe de l\'utilisateur'
 
     def link_activation(self, obj: User):
         return mark_safe(
@@ -144,6 +150,10 @@ class UserAdmin(UserAdmin):
             # Il est nécessaire d'avoir la permission `manage_user_password` pour accéder au champ de modification du mot de passe
             if request.user.has_perm("cla_auth.manage_user_password"):
                 fieldsets[1][1]['fields'] = list(fieldsets[1][1]['fields'][:1]) + ['password'] + list(fieldsets[1][1]['fields'][1:])
+                # Détection et affichage si une requête de réinitialisation est en cours
+                reset_request = PasswordResetRequest.objects.get_current_reset_request(obj)
+                if reset_request:
+                    fieldsets[0][1]['fields'] = ['link_reset'] + fieldsets[0][1]['fields']
         return fieldsets
 
     def get_urls(self):
@@ -163,17 +173,17 @@ class UserAdmin(UserAdmin):
 
     def user_reset_password(self, req, id, form_url=''):
         user = self.get_object(req, id)
-        if not self.has_change_permission(req, user):
+        if not req.user.has_perm("cla_auth.manage_user_password"):
             raise PermissionDenied
         if user is None:
             raise Http404(_('%(name)s object with primary key %(key)r does not exist.') % {
                 'name': self.model._meta.verbose_name,
                 'key': escape(id),
             })
-        if req.method == 'POST':
-            PasswordResetRequestManager.get_or_create_reset_request(user, count_attempt=False)
-            self.log_change(req, user, "Password reset link created")
-            return redirect(f"{self.admin_site.name}:{user._meta_.app_label}_{user._meta.model_name}_change", user.pk)
+        PasswordResetRequest.objects.get_or_create_reset_request(user, count_attempt=False)
+        self.log_change(req, user, "Password reset link created")
+        messages.success(req, "Lien de réinitialisation de mot de passe créé, il est disponible en haut de cette page")
+        return redirect(f"{self.admin_site.name}:{user._meta.app_label}_{user._meta.model_name}_change", user.pk)
 
 
 @admin.register(Service)
