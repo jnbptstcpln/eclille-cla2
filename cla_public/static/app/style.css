@@ -40,6 +40,7 @@
 #header {
 
 }
+
 body .header {
     border-bottom: 1px solid #dee2e6;
 }
@@ -49,15 +50,15 @@ body .header {
 }
 
 #content {
-
+    min-height: calc(100vh - 450px);
 }
 
 #content-below {
-  /* 4. Content Below wrapper */
+    /* 4. Content Below wrapper */
 }
 
 #footer {
-  /* 5. Footer wrapper */
+    /* 5. Footer wrapper */
 }
 
 /*
@@ -73,58 +74,61 @@ body .header {
 /* Extra small devices (phones, less than 768px) */
 /* No media query since this is the default in Bootstrap */
 @media (min-width: 576px) {
-  /* Small devices (576px and up). Mixin: media-breakpoint-up(sm) */
+    /* Small devices (576px and up). Mixin: media-breakpoint-up(sm) */
 }
 
 @media (min-width: 768px) {
-  /* Medium devices (768px and up). Mixin: media-breakpoint-up(md) */
+    /* Medium devices (768px and up). Mixin: media-breakpoint-up(md) */
 }
 
 @media (min-width: 992px) {
-  /* Large devices (992px and up). Mixin: media-breakpoint-up(lg) */
+    /* Large devices (992px and up). Mixin: media-breakpoint-up(lg) */
 }
 
 @media (min-width: 1200px) {
-  /* X-Large devices (1200px and up). Mixin: media-breakpoint-up(xl) */
+    /* X-Large devices (1200px and up). Mixin: media-breakpoint-up(xl) */
 }
 
 /* max-width */
 @media (max-width: 575.98px) {
-  /* Small devices (575px and down). Mixin: media-breakpoint-down(xs) */
+    /* Small devices (575px and down). Mixin: media-breakpoint-down(xs) */
 }
 
 @media (max-width: 767.98px) {
-  /* Medium devices (767px and down). Mixin: media-breakpoint-down(sm) */
+    /* Medium devices (767px and down). Mixin: media-breakpoint-down(sm) */
+    #content {
+        min-height: calc(100vh - 200px);
+    }
 }
 
 @media (max-width: 991.98px) {
-  /* Large devices (992px and down). Mixin: media-breakpoint-down(md) */
+    /* Large devices (992px and down). Mixin: media-breakpoint-down(md) */
 }
 
 @media (max-width: 1199.98px) {
-  /* X-Large devices (1200px and down). Mixin: media-breakpoint-down(lg) */
+    /* X-Large devices (1200px and down). Mixin: media-breakpoint-down(lg) */
 }
 
 /* target one breakpoint */
 @media (min-width: 576px) and (max-width: 767.98px) {
-  /* Small devices (between 576px and 767px). Mixin: media-breakpoint-only(sm) */
+    /* Small devices (between 576px and 767px). Mixin: media-breakpoint-only(sm) */
 }
 
 @media (min-width: 768px) and (max-width: 991.98px) {
-  /* Medium devices (tablets, between 768px and 991px). Mixin: media-breakpoint-only(md) */
+    /* Medium devices (tablets, between 768px and 991px). Mixin: media-breakpoint-only(md) */
 }
 
 @media (min-width: 992px) and (max-width: 1199.98px) {
-  /* Large devices (desktops, between 992px and 1199px). Mixin: media-breakpoint-only(lg) */
+    /* Large devices (desktops, between 992px and 1199px). Mixin: media-breakpoint-only(lg) */
 }
 
 @media (min-width: 1200px) {
-  /* Extra large devices (large desktops, 1200px and up). Mixin: media-breakpoint-only(xl) */
+    /* Extra large devices (large desktops, 1200px and up). Mixin: media-breakpoint-only(xl) */
 }
 
 /* span multiple screenwidths */
 @media (min-width: 768px) {
-  /* From medium to large (between 768px and 1199px). Mixin: media-breakpoint-between(md, xl)  */
+    /* From medium to large (between 768px and 1199px). Mixin: media-breakpoint-between(md, xl)  */
 }
 
 /*
@@ -139,6 +143,7 @@ body .header {
     position: relative;
     padding-left: var(--logo-size);
 }
+
 .cla_logo::before {
     content: " ";
     height: var(--logo-size);
@@ -148,27 +153,33 @@ body .header {
     position: absolute;
     background: center / contain no-repeat url("/static/app/img/logo/cla_s.png");
 }
+
 .cla_logo > span {
     display: block;
     font-family: Montserrat, sans-serif;
     font-weight: 400 !important;
     text-transform: uppercase;
 }
+
 .cla_logo > span.cl {
     font-size: 22px;
     font-weight: 600 !important;
 }
+
 .cla_logo > span.a {
     font-size: 25px;
 }
+
 @media (max-width: 768px) {
     .cla_logo {
         --logo-size: 36px;
     }
+
     .cla_logo > span.cl {
         font-size: 17px;
         font-weight: 600 !important;
     }
+
     .cla_logo > span.a {
         font-size: 19px;
     }
@@ -179,6 +190,7 @@ body .header {
     margin-top: 0;
     margin-bottom: .25rem;
 }
+
 .form-group.is-invalid .form-control {
     border-color: #dc3545;
     padding-right: calc(1.5em + .75rem);
