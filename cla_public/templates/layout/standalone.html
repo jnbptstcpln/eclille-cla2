@@ -2,10 +2,12 @@
 {% load static %}
 
 {% block body %}
-    <div style="height:100vh; background-image: url('{% static "app/img/rez_blur.jpg" %}'); background-position: center; background-size: cover;" class="d-flex align-items-center justify-content-center position-relative p-2 p-sm-4">
-        {% block content %}{% endblock %}
-        <footer class="position-absolute p-2 w-100 text-center text-white" style="font-size: .75rem; bottom: 0; background: linear-gradient(to top, rgba(0,0,0,0.75), rgba(0,0,0,0))">
-            {% now "Y" %} © <a class="text-white" href="{% url "cla_public:index" %}">Centrale Lille Associations</a>
-        </footer>
+    <div style="height:100vh; background-image: url('{% static "app/img/rez_blur.jpg" %}'); background-position: center; background-size: cover; overflow-y: hidden;" class="position-relative p-2 p-sm-4">
+        <div style="height:100vh; z-index: 5; overflow-y: auto; box-sizing: content-box" class="d-flex align-items-start align-items-md-center justify-content-center">
+            {% block content %}{% endblock %}
+        </div>
     </div>
+    <footer class="position-fixed p-2 w-100 text-center text-white d-none d-md-block" style="font-size: .75rem; bottom: 0; background: linear-gradient(to top, rgba(0,0,0,0.75), rgba(0,0,0,0)); z-index: 10;">
+        {% now "Y" %} © <a class="text-white" href="{% url "cla_public:index" %}">Centrale Lille Associations</a>
+    </footer>
 {% endblock %}
