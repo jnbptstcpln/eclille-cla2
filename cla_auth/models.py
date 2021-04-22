@@ -2,7 +2,8 @@ import re
 import os
 import uuid
 import jwt
-import secrets
+
+from cla_web.utils import random_six_digits
 
 from django.conf import settings
 from django.db import models
@@ -173,6 +174,19 @@ class UserInfos(models.Model):
             return True
         except jwt.InvalidTokenError:
             return False
+
+    @property
+    def validation_request(self):
+        validation_request, created = ValidationRequest.objects.get_or_create(
+            user=self.user,
+            email_school=self.email_school,
+            used=False
+        )
+        return validation_request
+
+    @property
+    def validation_code(self):
+        return self.validation_request.code
 
     @property
     def college(self):
@@ -403,7 +417,9 @@ class ValidationRequest(models.Model):
     email_school = models.EmailField()
     created_on = models.DateTimeField(auto_now=True)
     sent_on = models.DateTimeField(null=True)
-    code = models.IntegerField()
+    code = models.IntegerField(default=random_six_digits)
+    used = models.BooleanField(default=False)
+    attempt = models.IntegerField(default=0)
 
 
 class UserMembership(models.Model):
