@@ -142,8 +142,8 @@ class UserAdmin(UserAdmin):
             if request.user.has_perm("manage_user_activation") and not obj.infos.is_activated():
                 fieldsets[0][1]['fields'] = ['link_activation'] + fieldsets[0][1]['fields']
             # Il est nécessaire d'avoir la permission `manage_user_password` pour accéder au champ de modification du mot de passe
-            if request.user.has_perm("manage_user_password"):
-                fieldsets[1][1]['fields'] = fieldsets[0][1]['fields'][:1] + ['password'] + fieldsets[0][1]['fields'][1:]
+            if request.user.has_perm("cla_auth.manage_user_password"):
+                fieldsets[1][1]['fields'] = list(fieldsets[1][1]['fields'][:1]) + ['password'] + list(fieldsets[1][1]['fields'][1:])
         return fieldsets
 
     def get_urls(self):
