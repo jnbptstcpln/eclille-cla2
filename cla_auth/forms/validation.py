@@ -17,9 +17,14 @@ class ValidationForm(forms.Form):
                 pass
 
     validation_code = forms.CharField(
-        label="Code à 6 chiffres",
+        label="Code à 6 chiffres reçu par mail",
         required=True,
         widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': '123456'})
+    )
+    cursus = forms.ChoiceField(
+        label="Vous êtes actuellement...",
+        required=True,
+        widget=forms.Select(attrs={'class': 'form-control'})
     )
 
     def validate_code(self, value):
@@ -40,3 +45,4 @@ class ValidationForm(forms.Form):
         super().__init__(*args, **kwargs)
         self.user = user
         self.fields['validation_code'].validators.append(self.validate_code)
+        self.fields['cursus'] = self.user.infos.next_cursus_choices.choices

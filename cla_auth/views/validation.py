@@ -39,6 +39,7 @@ def validate(req):
             # The lower boundaries (10/09) is set to not create to much problems on the first "soirée dansante"
             # With people who wouldn't get their place because of account validation delay
             user.infos.valid_until = timezone.datetime(year=current_school_year()+1, month=9, day=random.randint(10, 25))
+            user.infos.cursus = form.cleaned_data['cursus']
             user.infos.save()
 
             return render(
