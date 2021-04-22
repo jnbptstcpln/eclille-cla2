@@ -30,7 +30,7 @@ class ValidationForm(forms.Form):
     def validate_code(self, value):
         validation_request = self.user.infos.validation_request
         if validation_request.attempt > 10:
-            raise forms.ValidationError("Vous avez dépassé le nombre maximal d'essais, veuillez contacter cla@centralelille.fr")
+            raise forms.ValidationError("Vous avez dépassé le nombre maximum d'essais, veuillez contacter cla@centralelille.fr")
 
         validation_request.attempt += 1
 
