@@ -1,0 +1,9 @@
+{% if form.errors %}
+    <div class="messages mt-{{ margin_top|default:"0" }} mb-{{ margin_bottom|default:"2" }}">
+        {% for msg in form.errors %}
+            <div class="alert alert-danger mb-2">
+                {{ msg.message }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}

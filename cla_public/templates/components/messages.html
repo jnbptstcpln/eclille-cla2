@@ -1,0 +1,16 @@
+{% if messages %}
+    <div class="messages mt-{{ margin_top|default:"0" }} mb-{{ margin_bottom|default:"2" }}">
+        {% for msg in messages %}
+            {% if msg.level_tag == "error" %}
+                <div class="alert alert-danger mb-2">
+                    {{ msg.message }}
+                </div>
+            {% else %}
+                <div class="alert alert-{{ msg.level_tag }} mb-2">
+                    {{ msg.message }}
+                </div>
+            {% endif %}
+
+        {% endfor %}
+    </div>
+{% endif %}
