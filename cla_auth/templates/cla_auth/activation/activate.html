@@ -1,19 +1,21 @@
-{% extends "layout/main.html" %}
+{% extends "layout/standalone.html" %}
 
-{% block page_title %}CLA - Activer votre compte{% endblock %}
+{% block page_title %}CLA - Activation{% endblock %}
 
 {% block content %}
-    <div class="container h-100 d-flex align-items-center">
-        <div>
-            <h1 class="text-x1 text-lg-x2"><span style="font-size: 140%">Bienvenue {{ user.first_name }}</span></h1>
-            <p class="lead mt-3">
-                A partir de cette page, vous allez pouvoir activer votre compte.<br>
-                Cette opération est nécessaire pour accéder aux différents services de notre site ainsi
-                que ceux de nos partenaires.
-            </p>
-            <p class="text-center mt-4">
-                <a href="{% url "cla_auth:activate_rgpd" user.infos.activation_jwt %}" class="btn btn-primary btn-xl">Commencer</a>
-            </p>
+    <div style="max-width: 650px" class="card w-100">
+        <div class="card-body">
+            <div class="mt-4 mt-md-0">
+                <h1 class="text-x1 text-lg-x2"><span style="font-size: 140%">Bienvenue {{ user.first_name }}</span></h1>
+                <p class="lead mt-3">
+                    A partir de cette page, vous allez pouvoir activer votre compte.<br>
+                    Cette opération est nécessaire pour accéder aux différents services de notre site ainsi
+                    que ceux de nos partenaires.
+                </p>
+                <p class="text-center mt-5">
+                    <a href="{% url "cla_auth:activate_rgpd" user.infos.activation_jwt %}" class="btn btn-primary btn-xl">Commencer</a>
+                </p>
+            </div>
         </div>
     </div>
 {% endblock %}
