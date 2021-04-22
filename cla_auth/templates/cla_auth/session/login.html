@@ -1,95 +1,42 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="fr">
-<head>
+{% extends "layout/standalone.html" %}
 
-    <!-- Basic Page Needs -->
-    <meta charset="utf-8">
-    <title>{% block page_title %}CLA - Connexion{% endblock %}</title>
-    <meta name="author" content="Centrale Lille Associations">
+{% block page_title %}CLA - Connexion{% endblock %}
 
-    <!-- Mobile Specific Metas -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="{% static 'app/img/logo/cla_s.png' %}"/>
-
-    <!-- Google fonts -->
-    <link href='http://fonts.googleapis.com/css?family=Montserrat:400,500,600,700,300' rel='stylesheet' type='text/css'>
-    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700,300' rel='stylesheet' type='text/css'>
-    <link href='http://fonts.googleapis.com/css?family=Rambla:400,700' rel='stylesheet' type='text/css'>
-    <link href='http://fonts.googleapis.com/css?family=Calligraffitti' rel='stylesheet' type='text/css'>
-    <link href='http://fonts.googleapis.com/css?family=Roboto+Slab:400,700' rel='stylesheet' type='text/css'>
-    <link href='http://fonts.googleapis.com/css?family=Roboto:100,400,700' rel='stylesheet' type='text/css'>
-
-    <!-- Bootstrap v4.5.0 CSS via CDN -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
-
-    <!-- Theme style -->
-    <link href="{% static "theme/theme-style.min.css" %}" rel="stylesheet">
-
-    <!--Your custom colour override-->
-    <!-- <link href="{% static "theme/colour-pink.min.css" %}" id="colour-scheme" rel="stylesheet">  -->
-    <link href="{% static "theme/colour-red.min.css" %}" id="colour-scheme" rel="stylesheet">
-
-    <!-- Your custom override -->
-    <link rel="stylesheet" type="text/css" href="{% static 'app/style.css' %}">
-
-    {% block css %}{% endblock %}
-    <script defer src="{% static 'fontawesome/js/all.min.js' %}"></script>
-
-</head>
-<body class="page page-starter navbar-layout-default">
-<div style="height:100vh; background-image: url('{% static "app/img/rez_blur.jpg" %}'); background-position: center; background-size: cover;" class="d-flex align-items-center justify-content-center position-relative">
-    <div class="p-2 p-sm-4">
-        <div style="max-width: 400px" class="card w-100">
-            <div class="card-body">
-                <form method="post" action="{% url "cla_auth:login" %}" class="p-2 p-md-4">
-                    <h1 class="text-center mb-4">
+{% block content %}
+    <div style="max-width: 400px" class="card w-100">
+        <div class="card-body">
+            <form method="post" action="{% url "cla_auth:login" %}" class="p-2 p-md-4">
+                <h1 class="text-center mb-4">
                         <span class="cla_logo" style="transform: scale(1.25)">
                           <span class="cl">Centrale Lille</span>
                           <span class="a">Associations</span>
                       </span>
-                    </h1>
-                    {% csrf_token %}
+                </h1>
+                {% csrf_token %}
+                {% if login_message %}
                     <div class="alert alert-info my-3">
-                        Veuillez vous connecter pour accéder à cette page
+                        {{ login_message|default:"Veuillez vous connecter pour accéder à cette page" }}
                     </div>
-                    {% include "components/form-group.html" with field=form.username %}
-                    {% include "components/form-group.html" with field=form.password %}
-                    <div class="text-x1 d-flex justify-content-between">
-                        <div class="form-check">
-                            <label id="{{ form.stay_logged_in.id_for_label }}" class="form-check-label">{{ form.stay_logged_in }} {{ form.stay_logged_in.label }}</label>
-                        </div>
-                        <div>
-                            <a href="#">J'ai oublié...</a>
-                        </div>
+                {% endif %}
+                {% include "components/form-errors.html" with form=form %}
+                {% include "components/form-group.html" with field=form.username %}
+                {% include "components/form-group.html" with field=form.password %}
+                <div class="text-x1 d-flex justify-content-between">
+                    <div class="form-check">
+                        <label id="{{ form.stay_logged_in.id_for_label }}" class="form-check-label">{{ form.stay_logged_in }} {{ form.stay_logged_in.label }}</label>
                     </div>
+                    <div>
+                        <a href="#">J'ai oublié...</a>
+                    </div>
+                </div>
 
-                    <div class="mt-4">
-                        <button type="submit" class="btn btn-lg btn-block btn-primary">Se connecter</button>
-                    </div>
-                    <div class="mt-3 text-center">
-                        <a href="#" class="text-sm text-reset">Besoin d'aide ?</a>
-                    </div>
-                </form>
-            </div>
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-lg btn-block btn-primary">Se connecter</button>
+                </div>
+                <div class="mt-3 text-center">
+                    <a href="#" class="text-sm text-reset">Besoin d'aide ?</a>
+                </div>
+            </form>
         </div>
     </div>
-    <footer class="position-absolute p-2 w-100 text-center text-white" style="font-size: .75rem; bottom: 0; background: linear-gradient(to top, rgba(0,0,0,0.75), rgba(0,0,0,0))">
-        Copyright {% now "Y" %} © <a class="text-white" href="{% url "cla_public:index" %}">Centrale Lille Associations</a>
-    </footer>
-</div>
-
-<!--jQuery 3.3.1 via CDN -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-<!-- Popper 1.16.0 via CDN, needed for Bootstrap Tooltips & Popovers -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-<!-- Bootstrap v4.5.0 JS via CDN -->
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
-<!-- App's script -->
-<script src="{% static "theme/script.min.js" %}"></script>
-
-{% block body_js %}{% endblock %}
-</body>
-</html>
+{% endblock %}
