@@ -15,7 +15,7 @@ def send_activation_email(sender, instance: User, created, **kwargs):
         if hasattr(instance, 'infos'):
             if instance.infos.activated_on is None:
                 send_mail(
-                    subject='Activation de votre compte CLA',
+                    subject='[CLA] Activation de votre compte',
                     from_email=settings.EMAIL_HOST_FROM,
                     recipient_list=[instance.infos.email_school],
                     message="Bienvenue au sein de Centrale Lille Association",
