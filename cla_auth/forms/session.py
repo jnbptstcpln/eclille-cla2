@@ -36,3 +36,22 @@ class LoginForm(forms.Form):
         required=False,
         widget=forms.HiddenInput()
     )
+
+
+class ForgotForm(forms.Form):
+
+    class Validators:
+
+        @classmethod
+        def validate_email(cls, value):
+            try:
+                user = User.objects.get(email=value)
+            except User.DoesNotExist:
+                raise forms.ValidationError("Aucun compte ne correspond à cette adresse email")
+
+    email = forms.EmailField(
+        label="Adresse mail personnelle",
+        required=True,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'prenom.nom@example.com'}),
+        validators=[Validators.validate_email]
+    )

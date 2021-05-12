@@ -1,0 +1,26 @@
+{% extends "layout/standalone.html" %}
+
+{% block page_title %}CLA - J'ai oublié...{% endblock %}
+
+{% block content_align %}align-items-center{% endblock %}
+
+{% block content %}
+    <div style="max-width: 650px" class="card w-100">
+        <div class="card-body">
+            <div class="mt-4 mt-md-0">
+                <h1 class="text-x1 text-lg-x2 text-center"><span style="font-size: 140%">J'ai oublié...</span></h1>
+                <div class="row mt-4">
+                    <div class="col-12 col-md-6">
+                        <a class="btn btn-primary btn-block btn-lg" href="{% url "cla_auth:forgot_username" %}">Mon identifiant</a>
+                    </div>
+                    <div class="col-12 col-md-6 mt-2 mt-md-0">
+                        <a class="btn btn-primary btn-block btn-lg" href="{% url "cla_auth:forgot_password" %}">Mon mot de passe</a>
+                    </div>
+                </div>
+                <p class="small mt-4 text-center">
+                    <a href="{% url "cla_auth:login" %}" class="text-reset">Retour</a>
+                </p>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -8,7 +8,7 @@ from django.utils import timezone
 
 from cla_web.middlewares import StayLoggedInMiddleware
 from cla_auth.models import UserInfos
-from cla_auth.forms.session import LoginForm
+from cla_auth.forms.session import LoginForm, ForgotForm
 
 
 def login(req):
@@ -56,6 +56,73 @@ def login(req):
         req,
         'cla_auth/session/login.html',
         {
+            'form': form
+        }
+    )
+
+
+def forgot(req):
+
+    if req.user.is_authenticated:
+        return redirect('cla_public:index')
+
+    return render(
+        req,
+        'cla_auth/session/forgot.html'
+    )
+
+
+def forgot_username(req):
+
+    if req.user.is_authenticated:
+        return redirect('cla_public:index')
+
+    if req.method == "POST":
+        form = ForgotForm(req.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            try:
+                username = User.objects.get(email=email).username
+            except User.DoesNotExist:
+                pass
+    else:
+        form = ForgotForm()
+        username = None
+
+    return render(
+        req,
+        'cla_auth/session/forgot_username.html',
+        {
+            'username': username,
+            'form': form
+        }
+    )
+
+
+def forgot_password(req):
+
+    if req.user.is_authenticated:
+        return redirect('cla_public:index')
+
+    error = None
+    reset_mail_sent = False
+
+    if req.method == "POST":
+        form = ForgotForm(req.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            try:
+                reset_mail_sent = User.objects.get(email=email).username
+            except User.DoesNotExist:
+                pass
+    else:
+        form = ForgotForm()
+
+    return render(
+        req,
+        'cla_auth/session/forgot_password.html',
+        {
+            'reset_mail_sent': reset_mail_sent,
             'form': form
         }
     )
