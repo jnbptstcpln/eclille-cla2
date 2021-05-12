@@ -1,13 +1,15 @@
 import jwt
 
 from django.contrib import auth, messages
+from django.core.mail import send_mail
 from django.shortcuts import render, redirect, reverse, resolve_url
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.template.loader import render_to_string
 from django.utils import timezone
 
 from cla_web.middlewares import StayLoggedInMiddleware
-from cla_auth.models import UserInfos
+from cla_auth.models import PasswordResetRequest
 from cla_auth.forms.session import LoginForm, ForgotForm
 
 
@@ -105,14 +107,34 @@ def forgot_password(req):
         return redirect('cla_public:index')
 
     error = None
-    reset_mail_sent = False
+    warning = None
+    success = None
 
     if req.method == "POST":
         form = ForgotForm(req.POST)
         if form.is_valid():
             email = form.cleaned_data['email']
             try:
-                reset_mail_sent = User.objects.get(email=email).username
+                user = User.objects.get(email=email)
+                reset_req: PasswordResetRequest = PasswordResetRequest.objects.get_or_create_reset_request(user=user)
+                if reset_req.attempt < 3:  # Send reset email if less than 3 attempts were made
+                    send_mail(
+                        subject='[CLA] Réinitialiser votre mot de passe',
+                        from_email=settings.EMAIL_HOST_FROM,
+                        recipient_list=[user.email],
+                        message="Réinitialiser le mot de passe de votre compte CLA",
+                        html_message=render_to_string(
+                            'cla_auth/reset/mail.html',
+                            {
+                                'site_href': f"https://{settings.ALLOWED_HOSTS[0]}",
+                                'activation_href': f"https://{settings.ALLOWED_HOSTS[0]}{resolve_url('cla_auth:reset', reset_req.get_reset_jwt())}",
+                            }
+                        ),
+                    )
+                    success = True
+                else:
+                    warning = True
+
             except User.DoesNotExist:
                 pass
     else:
@@ -122,8 +144,10 @@ def forgot_password(req):
         req,
         'cla_auth/session/forgot_password.html',
         {
-            'reset_mail_sent': reset_mail_sent,
-            'form': form
+            'form': form,
+            'error': error,
+            'warning': warning,
+            'success': success
         }
     )
 

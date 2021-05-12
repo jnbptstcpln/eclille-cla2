@@ -388,6 +388,7 @@ class PasswordResetRequest(models.Model):
     email = models.EmailField()
     created_on = models.DateTimeField(auto_now=True)
     used = models.BooleanField(default=False)
+    attempt = models.IntegerField(default=0)
 
     def get_reset_jwt(self, exp=True):
         payload = {'pk': self.user.pk}
