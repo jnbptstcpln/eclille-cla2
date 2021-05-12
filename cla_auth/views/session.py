@@ -127,7 +127,7 @@ def forgot_password(req):
                             'cla_auth/reset/mail.html',
                             {
                                 'site_href': f"https://{settings.ALLOWED_HOSTS[0]}",
-                                'activation_href': f"https://{settings.ALLOWED_HOSTS[0]}{resolve_url('cla_auth:reset', reset_req.get_reset_jwt())}",
+                                'reset_href': f"https://{settings.ALLOWED_HOSTS[0]}{resolve_url('cla_auth:reset', reset_req.get_reset_jwt())}",
                             }
                         ),
                     )
