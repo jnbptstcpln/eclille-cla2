@@ -462,6 +462,12 @@ class Service(models.Model):
     colleges = MultiSelectField(choices=UserInfos.Colleges.choices, verbose_name="Collèges autorisés à se connecter", blank=True)
     auto_login = models.BooleanField(default=True, verbose_name="Connexion automatique")
 
+    def create_ticket(self, user):
+        return ServiceTicket.objects.create(
+            user=user,
+            service=self
+        )
+
     def __str__(self):
         return self.name
 
@@ -476,5 +482,25 @@ class ServiceTicket(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="+", to_field="username")
     service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name="tickets", to_field="identifier")
     created_on = models.DateTimeField(auto_now=True)
-    token = models.CharField(max_length=250)
     used = models.BooleanField(default=False)
+
+    @property
+    def ticket_jwt(self):
+        return jwt.encode(
+            payload={
+                'pk': self.user.pk
+            },
+            key=f"{settings.SECRET_KEY}-{self.user.username}",
+            algorithm="HS256"
+        )
+
+    def check_ticket_jwt(self, token):
+        try:
+            payload = jwt.decode(
+                jwt=token,
+                key=f"{settings.SECRET_KEY}-{self.user.username}",
+                algorithms=["HS256"]
+            )
+            return True
+        except jwt.InvalidTokenError:
+            return False

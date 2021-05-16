@@ -21,4 +21,9 @@ urlpatterns = [
 
     # Password reset
     path('reinitialiser/<str:reset_jwt>', views.reset.reset, name="reset"),
+
+    # Services
+    path('authentification/<str:identifier>', views.service.authenticate, name="service_authenticate"),
+    path('authentification/<str:identifier>/connexion', views.service.login, name="service_login"),
+    path('authentification/<str:identifier>/<str:ticket>', views.service.validate, name="service_validate"),
 ]
