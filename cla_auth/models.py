@@ -462,6 +462,9 @@ class Service(models.Model):
     colleges = MultiSelectField(choices=UserInfos.Colleges.choices, verbose_name="Collèges autorisés à se connecter", blank=True)
     auto_login = models.BooleanField(default=True, verbose_name="Connexion automatique")
 
+    def has_user_gave_authorization(self, user: User):
+        return ServiceAuthorization.objects.filter(service=self, user=user).count() > 0
+
     def create_ticket(self, user):
         return ServiceTicket.objects.create(
             user=user,
@@ -488,19 +491,23 @@ class ServiceTicket(models.Model):
     def ticket_jwt(self):
         return jwt.encode(
             payload={
-                'pk': self.user.pk
+                'pk': self.pk,
+                'exp': timezone.datetime.utcnow() + timezone.timedelta(seconds=15)  # Token is valid for 15 seconds
             },
             key=f"{settings.SECRET_KEY}-{self.user.username}",
             algorithm="HS256"
         )
 
     def check_ticket_jwt(self, token):
-        try:
-            payload = jwt.decode(
-                jwt=token,
-                key=f"{settings.SECRET_KEY}-{self.user.username}",
-                algorithms=["HS256"]
-            )
-            return True
-        except jwt.InvalidTokenError:
+        if self.used:
             return False
+        else:
+            try:
+                payload = jwt.decode(
+                    jwt=token,
+                    key=f"{settings.SECRET_KEY}-{self.user.username}",
+                    algorithms=["HS256"]
+                )
+                return True
+            except jwt.InvalidTokenError:
+                return False

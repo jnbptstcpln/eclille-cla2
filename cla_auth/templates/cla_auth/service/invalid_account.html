@@ -1,0 +1,30 @@
+{% extends "layout/standalone.html" %}
+
+{% block page_title %}CLA - Validation{% endblock %}
+
+{% block content_align %}align-items-center{% endblock %}
+
+{% block content %}
+    <div style="max-width: 450px" class="card w-100">
+        <div class="card-body">
+            <div class="p-2 p-md-4">
+                <h1 class="text-center mb-4">
+                        <span class="cla_logo" style="transform: scale(1.25)">
+                          <span class="cl">Centrale Lille</span>
+                          <span class="a">Associations</span>
+                      </span>
+                </h1>
+                <div class="overflow-auto" style="max-height: 33vh">
+                    <p>
+                        Votre compte ne permet pas de se connecter à ce site.
+                    </p>
+                </div>
+
+                <p class="mt-3">
+                    <a href="http://{{ service.domain }}" class="btn btn-primary btn-lg btn-block">Retourner sur {{ service.domain }}</a>
+                </p>
+
+            </div>
+        </div>
+    </div>
+{% endblock %}

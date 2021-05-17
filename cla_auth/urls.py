@@ -24,6 +24,5 @@ urlpatterns = [
 
     # Services
     path('authentification/<str:identifier>', views.service.authenticate, name="service_authenticate"),
-    path('authentification/<str:identifier>/connexion', views.service.login, name="service_login"),
-    path('authentification/<str:identifier>/<str:ticket>', views.service.validate, name="service_validate"),
+    path('authentification/<str:identifier>/<str:ticket_jwt>', views.service.validate, name="service_validate"),
 ]
