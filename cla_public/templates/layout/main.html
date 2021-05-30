@@ -56,19 +56,8 @@
                         <div class="navbar-main collapse">
                             <!--main navigation-->
                             <ul class="nav navbar-nav navbar-nav-stretch float-lg-right dropdown-effect-fade">
-
-                                <li class="nav-item dropdown {% if page_active == "" %}active{% endif %}">
-                                    <a href="#" class="nav-link dropdown-toggle" id="pages-drop" data-toggle="dropdown" data-hover="dropdown">Pages</a>
-                                    <div class="dropdown-menu">
-                                        <a href="customers.html" class="dropdown-item">Customers</a>
-                                        <div class="dropdown dropdown-submenu">
-                                            <a href="about.html" class="dropdown-item dropdown-toggle" id="about-drop" data-toggle="dropdown" data-hover="dropdown" data-close-others="false">About</a>
-                                            <div class="dropdown-menu" role="menu" aria-labelledby="about-drop">
-                                                <a href="about.html" class="dropdown-item">About Us Basic</a>
-                                                <a href="about-extended.html" class="dropdown-item">About Us Extended</a>
-                                            </div>
-                                        </div>
-                                    </div>
+                                <li class="nav-item {% if page_active == "home" %}active{% endif %}">
+                                    <a href="{% url "cla_public:index" %}" class="nav-link">Accueil</a>
                                 </li>
                                 {% if request.user.is_authenticated and request.user.is_staff %}
                                     <li class="nav-item {% if page_active == "admin" %}active{% endif %}">
