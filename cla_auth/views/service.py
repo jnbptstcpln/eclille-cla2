@@ -90,7 +90,7 @@ def authenticate(req, identifier):
 
     # Create ticket and redirect to the service
     ticket = service.create_ticket(req.user)
-    response = redirect(f"{service.endpoint}?ticket={urlencode(ticket.ticket_jwt)}")
+    response = redirect(f"{service.endpoint}?ticket={ticket.ticket_jwt}")
     req.session[f"cla_auth:{service.identifier}_login"] = False  # Reset session login before redirect to service
 
     return response

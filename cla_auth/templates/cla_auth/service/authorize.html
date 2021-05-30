@@ -7,7 +7,8 @@
 {% block content %}
     <div style="max-width: 450px" class="card w-100">
         <div class="card-body">
-            <div class="p-2 p-md-4">
+            <form method="post" action="{% url "cla_auth:service_authenticate" service.identifier %}" class="p-2 p-md-4">
+                {% csrf_token %}
                 <h1 class="text-center mb-4">
                         <span class="cla_logo" style="transform: scale(1.25)">
                           <span class="cl">Centrale Lille</span>
@@ -16,15 +17,28 @@
                 </h1>
                 <div class="overflow-auto" style="max-height: 33vh">
                     <p>
-                        C'est la première fois que vous utilisez votre compte CLA pour vous connecter au site {{  }}
+                        C'est la première fois que vous utilisez votre compte CLA pour vous connecter au site {{ service.domain }}.
                     </p>
+                    <p>
+                        <strong>
+                            En cliquant sur continuer vous acceptez que les informations suivantes soient transmises
+                            au site "{{ service.domain }}" :
+                        </strong>
+                    </p>
+                    <ul class="max-w-400 ms-auto">
+                        <li>Votre nom et prénom</li>
+                        <li>Votre adresse mail centralienne</li>
+                        <li>Votre promotion et votre cursus</li>
+                    </ul>
                 </div>
 
                 <p class="mt-3">
-                    <a href="http://{{ service.domain }}" class="btn btn-primary btn-lg btn-block">Retourner sur {{ service.domain }}</a>
+                    <button type="submit" class="btn btn-primary btn-lg btn-block">Continuer</button>
                 </p>
-
-            </div>
+                <p class="small mt-4 mb-0 text-center">
+                    <a href="http://{{ service.domain }}">Annuler</a>
+                </p>
+            </form>
         </div>
     </div>
 {% endblock %}
