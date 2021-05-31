@@ -28,6 +28,7 @@ urlpatterns = [
     path('summernote/', include('django_summernote.urls')),
     path('', include("cla_auth.urls")),
     path('', include("cla_public.urls")),
+    path('billeterie', include("cla_ticketing.urls")),
     path('privacy/', views.flatpage, {'url': '/privacy/'}, name='privacy'),
     path('legal/', views.flatpage, {'url': '/legal/'}, name='legal'),
     re_path(r'^(?P<url>.*/)$', views.flatpage)  # Catch all URLs and redirect them to flatpage module
