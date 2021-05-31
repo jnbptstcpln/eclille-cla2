@@ -1,7 +1,9 @@
 from django.apps import AppConfig
 
+
 class ClaAuthConfig(AppConfig):
     name = 'cla_auth'
+    verbose_name = "Gestion de l'authentification"
 
     def ready(self):
         # Enregistrement des fonctions de l'application liées aux signaux
