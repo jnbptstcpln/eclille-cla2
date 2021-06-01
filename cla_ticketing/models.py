@@ -63,8 +63,8 @@ class Event(AbstractEvent):
 class EventRegistrationType(models.Model):
 
     class Meta:
-        verbose_name = "Type de billet"
-        verbose_name_plural = "Types de billet"
+        verbose_name = "Type de place"
+        verbose_name_plural = "Types de place"
 
     name = models.CharField(max_length=75, verbose_name="Nom")
     description = models.CharField(max_length=250, verbose_name="Description", blank=True)
