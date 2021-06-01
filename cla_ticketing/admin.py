@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.shortcuts import resolve_url
+from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 from django.conf import settings
 
@@ -12,8 +13,26 @@ class EventAdmin(admin.ModelAdmin):
     class EventRegistrationTypeInline(admin.TabularInline):
         fields = ['name', 'description', 'price']
         model = EventRegistrationType
+        classes = ['collapse']
 
+    class EventRegistrationInline(admin.TabularInline):
+        fields = ['last_name', 'first_name', 'email', 'created_on', 'is_contributor']
+        readonly_fields = ['last_name', 'first_name', 'email', 'created_on', 'is_contributor']
+        model = EventRegistration
+        classes = ['collapse']
+        max_num = 0
+        extra = 0
+
+        can_delete = False
+        template = "cla_ticketing/admin/change_event_registrations.html"
+
+        def is_contributor(self, obj: EventRegistration):
+            return obj.is_contributor
+        is_contributor.short_description = "Cotisants ?"
+
+    list_display = ("name", "event_starts_on", "organizer", "places")
     change_form_template = "cla_ticketing/admin/change_event.html"
+    filter_horizontal = ('managers',)
     fieldsets = [
         [
             "Informations pratiques",
@@ -30,12 +49,20 @@ class EventAdmin(admin.ModelAdmin):
         [
             "Informations supplémentaire",
             {
-                'fields': ('ticketing_href', 'colleges', 'description'),
+                'fields': ('ticketing_href', 'allow_non_contributor_registration', 'colleges', 'description'),
+                'classes': ('collapse',),
+            }
+        ],
+        [
+            "Administration de l'événement",
+            {
+                'fields': ('managers',),
                 'classes': ('collapse',),
             }
         ]
     ]
     readonly_fields = ['link_ticketing']
+    inlines = [EventRegistrationTypeInline, EventRegistrationInline]
 
     def link_ticketing(self, obj: Event):
         return mark_safe(
@@ -47,7 +74,6 @@ class EventAdmin(admin.ModelAdmin):
         )
     link_ticketing.short_description = ''
 
-    inlines = [EventRegistrationTypeInline]
 
 
 @admin.register(DancingParty)

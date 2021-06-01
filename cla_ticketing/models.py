@@ -22,6 +22,7 @@ class AbstractEvent(models.Model):
     colleges = MultiSelectField(choices=UserInfos.Colleges.choices, verbose_name="Collèges autorisés à prendre une place", blank=True)
     places = models.PositiveIntegerField(default=400, verbose_name="Nombre de places")
     ticketing_href = models.URLField(blank=True, null=True, verbose_name="Lien vers la billeterie d'encaissement", help_text="Laisser vide si aucune")
+    managers = models.ManyToManyField(User, related_name="+", verbose_name="Administrateurs", help_text="Les administrateurs ont la possiblité de modifier les informations de l'événement ainsi que de gérer la liste des inscrits")
 
     def __str__(self):
         return self.name
@@ -48,6 +49,10 @@ class AbstractRegistration(models.Model):
 
     def __str__(self):
         return f"{self.last_name.upper()} {self.first_name.capitalize()}"
+
+    @property
+    def is_contributor(self):
+        return self.student_status == self.StudentStatus.CONTRIBUTOR
 
 
 class Event(AbstractEvent):
@@ -79,8 +84,8 @@ class EventRegistration(AbstractRegistration):
 
     class Meta:
         abstract = False
-        verbose_name = "Inscription à un événement"
-        verbose_name_plural = "Inscriptions à un événement"
+        verbose_name = "Inscription"
+        verbose_name_plural = "Inscriptions"
 
     type = models.ForeignKey(EventRegistrationType, related_name="registrations", null=True, on_delete=models.SET_NULL)
     event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name="registrations", verbose_name="Evénement", editable=False)
@@ -98,8 +103,8 @@ class DancingPartyRegistration(AbstractRegistration):
 
     class Meta:
         abstract = False
-        verbose_name = "Inscription en soirée dansante"
-        verbose_name_plural = "Inscriptions en soirée dansante"
+        verbose_name = "Inscription"
+        verbose_name_plural = "Inscriptions"
 
     dancing_party = models.ForeignKey(DancingParty, on_delete=models.CASCADE, related_name="registrations", verbose_name="Soirée dansante", editable=False)
     home = models.CharField(max_length=100, verbose_name="Logement après la soirée")
