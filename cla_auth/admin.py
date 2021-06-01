@@ -129,7 +129,7 @@ class UserAdmin(UserAdmin):
                 "<a class='button' onclick='document.getElementById(\"id_reset_jwt\").select();document.execCommand(\"copy\");return false;','>Copier</a>"
             ).format(reset_jwt=f"https://{settings.ALLOWED_HOSTS[0]}{resolve_url('cla_auth:reset', obj.infos.reset_request.get_reset_jwt(exp=False))}")
         )
-    link_reset.short_description = 'Lien pour réinitialiser le mot de passe de l\'utilisateur'
+    link_reset.short_description = ""
 
     def link_activation(self, obj: User):
         return mark_safe(
@@ -219,13 +219,13 @@ class ServiceAdmin(admin.ModelAdmin):
     readonly_fields = ('identifier', 'last_tickets',)
 
     def last_tickets(self, obj: Service):
-        return "\n".join(
+        return mark_safe("<ul style='margin-left: 30px'>{}</ul>".format("".join(
             [
-                f"[{ticket.created_on.strftime('%d/%m/%Y %H:%M')}] {ticket.user.first_name} {ticket.user.last_name}"
+                f"<li>[{ticket.created_on.strftime('%d/%m/%Y %H:%M')}] {ticket.user.first_name} {ticket.user.last_name}</li>"
                 for ticket in obj.tickets.all()[:20]
             ]
-        )
-    last_tickets.short_description = 'Dernières connexions'
+        )))
+    last_tickets.short_description = ''
 
     def get_fieldsets(self, request, obj=None):
         if obj is None:
