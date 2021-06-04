@@ -26,7 +26,10 @@ class StayLoggedInMiddleware:
             return None
 
         # Retrieve jwt payload to fetch user
-        jwt_payload = jwt.decode(stay_logged_in_jwt, algorithms=["HS256"], options={"verify_signature": False})
+        try:
+            jwt_payload = jwt.decode(stay_logged_in_jwt, algorithms=["HS256"], options={"verify_signature": False})
+        except:
+            return None
 
         try:
             user = User.objects.get(pk=jwt_payload.get('pk'))
@@ -40,7 +43,7 @@ class StayLoggedInMiddleware:
                 algorithms=["HS256"]
             )
             return user
-        except jwt.InvalidTokenError:
+        except:
             return None
 
     @classmethod

@@ -16,7 +16,11 @@ from cla_web.utils import current_school_year
 
 def _get_user_from_jwt(reset_jwt) -> User:
     # Retrieve jwt payload to fetch user
-    jwt_payload = jwt.decode(reset_jwt, algorithms=["HS256"], options={"verify_signature": False})
+    try:
+        jwt_payload = jwt.decode(reset_jwt, algorithms=["HS256"], options={"verify_signature": False})
+    except:
+        raise Http404
+
     user = get_object_or_404(User, pk=jwt_payload.get('pk'))
     reset_request = PasswordResetRequest.objects.get_current_reset_request(user)
     if reset_request is not None:

@@ -16,7 +16,11 @@ from cla_web.utils import current_school_year
 
 def _get_user_from_jwt(activation_jwt) -> User:
     # Retrieve jwt payload to fetch user
-    jwt_payload = jwt.decode(activation_jwt, algorithms=["HS256"], options={"verify_signature": False})
+    try:
+        jwt_payload = jwt.decode(activation_jwt, algorithms=["HS256"], options={"verify_signature": False})
+    except:
+        raise Http404
+
     user = get_object_or_404(User, pk=jwt_payload.get('pk'))
     if hasattr(user, 'infos'):
         # Check that the token is correct and that activation was not already done
