@@ -18,10 +18,13 @@ from cla_auth.forms.session import LoginForm, ForgotForm
 def _get_service_ticket_from_jwt(ticket_jwt) -> ServiceTicket:
     # Retrieve jwt payload to fetch service ticket
     jwt_payload = jwt.decode(ticket_jwt, algorithms=["HS256"], options={"verify_signature": False})
-    ticket = ServiceTicket.objects.get(pk=jwt_payload.get('pk'))
-    if ticket and not ticket.used:
-        return ticket
-    raise None
+    try:
+        ticket = ServiceTicket.objects.get(pk=jwt_payload.get('pk'))
+        if ticket and not ticket.used:
+            return ticket
+        return None
+    except ServiceTicket.DoesNotExist:
+        return None
 
 
 def _get_error_json_response(message, status_code=400):
