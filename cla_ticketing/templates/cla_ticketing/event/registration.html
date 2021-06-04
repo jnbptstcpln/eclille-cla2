@@ -1,0 +1,33 @@
+{% extends "layout/standalone.html" %}
+
+{% block page_title %}Inscription : {{ view.event.name }}{% endblock %}
+
+{% block content %}
+    <div style="max-width: 650px" class="card w-100">
+        <div class="card-body">
+            <div class="mt-4 mt-md-0">
+                <div>
+                    <h1 class="text-x1 text-lg-x2 text-center">Inscription : {{ view.event.name }}</h1>
+                    {% if view.event.description|striptags|length > 0 %}
+                        <div class="mt-3">
+                            {{ event.description }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <form method="post" action="{% url "cla_ticketing:event_ticketing" view.event.slug %}" class="mt-3">
+                    {% csrf_token %}
+                    {% include "components/form-errors.html" with form=form %}
+                    {% include "components/form-group.html" with field=form.first_name %}
+                    {% include "components/form-group.html" with field=form.last_name %}
+                    {% include "components/form-group.html" with field=form.email %}
+                    {% include "components/form-group.html" with field=form.phone %}
+                    {% include "components/form-group.html" with field=form.type %}
+                    <p class="text-center mt-5">
+                        <button type="submit" class="btn btn-primary btn-xl">Confirmer mon inscription</button>
+                    </p>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

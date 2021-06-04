@@ -11,7 +11,7 @@ from cla_ticketing.models import *
 class EventAdmin(admin.ModelAdmin):
 
     class EventRegistrationTypeInline(admin.TabularInline):
-        fields = ['name', 'description', 'price']
+        fields = ['name', 'open_to', 'description', 'price']
         model = EventRegistrationType
         classes = ['collapse']
 
@@ -28,7 +28,8 @@ class EventAdmin(admin.ModelAdmin):
 
         def is_contributor(self, obj: EventRegistration):
             return obj.is_contributor
-        is_contributor.short_description = "Cotisants ?"
+        is_contributor.short_description = "Cotisant ?"
+        is_contributor.boolean = True
 
     list_display = ("name", "event_starts_on", "organizer", "places")
     change_form_template = "cla_ticketing/admin/change_event.html"
@@ -73,7 +74,6 @@ class EventAdmin(admin.ModelAdmin):
             ).format(link_ticketing=f"https://{settings.ALLOWED_HOSTS[0]}{resolve_url('cla_ticketing:event_ticketing', obj.slug)}")
         )
     link_ticketing.short_description = ''
-
 
 
 @admin.register(DancingParty)

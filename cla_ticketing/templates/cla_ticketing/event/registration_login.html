@@ -1,0 +1,25 @@
+{% extends "layout/standalone.html" %}
+
+{% block page_title %}Inscription : {{ view.event.name }}{% endblock %}
+
+{% block content %}
+    <div style="max-width: 650px" class="card w-100">
+        <div class="card-body">
+            <div class="mt-4 mt-md-0">
+                <div class="text-center">
+                    <h1 class="text-x1 text-lg-x2">Inscription : {{ event.name }}</h1>
+                    <p class="lead mt-3">
+                        Pour continuer, connectez-vous à votre compte CLA :
+                    </p>
+                    <p class="mt-2">
+                        <a class="btn btn-primary btn-lg" href="{% url 'cla_auth:login' %}?next={% url 'cla_ticketing:event_ticketing' event.slug %}">Connexion</a>
+                    </p>
+                </div>
+                <form method="post" action="{% url "cla_ticketing:event_ticketing_non_member" event.slug %}" class="mt-4 small text-center">
+                    {% csrf_token %}
+                    <button class="btn-link text-reset" type="submit">Je n'ai pas de compte CLA</button>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,1 @@
+from cla_ticketing.forms.event import EventRegistrationForm

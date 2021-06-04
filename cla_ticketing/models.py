@@ -3,6 +3,7 @@ from multiselectfield import MultiSelectField
 from cla_auth.models import UserInfos
 from django_summernote.fields import SummernoteTextField
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 
 class AbstractEvent(models.Model):
@@ -22,7 +23,15 @@ class AbstractEvent(models.Model):
     colleges = MultiSelectField(choices=UserInfos.Colleges.choices, verbose_name="Collèges autorisés à prendre une place", blank=True)
     places = models.PositiveIntegerField(default=400, verbose_name="Nombre de places")
     ticketing_href = models.URLField(blank=True, null=True, verbose_name="Lien vers la billeterie d'encaissement", help_text="Laisser vide si aucune")
-    managers = models.ManyToManyField(User, related_name="+", verbose_name="Administrateurs", help_text="Les administrateurs ont la possiblité de modifier les informations de l'événement ainsi que de gérer la liste des inscrits")
+    managers = models.ManyToManyField(User, related_name="+", verbose_name="Administrateurs", help_text="Les administrateurs ont la possiblité de modifier les informations de l'événement ainsi que de gérer la liste des inscrits", blank=True)
+
+    @property
+    def are_registrations_opened(self):
+        return self.registration_starts_on < timezone.now() <= self.registration_ends_on
+
+    @property
+    def places_remaining(self):
+        return max(self.places-self.registrations.count(), 0)
 
     def __str__(self):
         return self.name
@@ -48,7 +57,7 @@ class AbstractRegistration(models.Model):
     created_on = models.DateTimeField(auto_now=True, editable=False)
 
     def __str__(self):
-        return f"{self.last_name.upper()} {self.first_name.capitalize()}"
+        return f"{self.last_name.upper()} {self.first_name}"
 
     @property
     def is_contributor(self):
@@ -71,7 +80,13 @@ class EventRegistrationType(models.Model):
         verbose_name = "Type de place"
         verbose_name_plural = "Types de place"
 
+    class OpenTo(models.TextChoices):
+        CONTRIBUTOR = 'contributors', 'Cotisants'
+        NON_CONTRIBUTOR = 'non_contributors', 'Non cotisants'
+        BOTH = 'both', 'Cotisants et non cotisants'
+
     name = models.CharField(max_length=75, verbose_name="Nom")
+    open_to = models.CharField(max_length=75, choices=OpenTo.choices, verbose_name="Ouvert aux", default=OpenTo.BOTH)
     description = models.CharField(max_length=250, verbose_name="Description", blank=True)
     price = models.FloatField(blank=True)
     event = models.ForeignKey(Event, related_name="registration_types", on_delete=models.CASCADE)

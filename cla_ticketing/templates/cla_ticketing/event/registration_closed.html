@@ -1,0 +1,21 @@
+{% extends "layout/standalone.html" %}
+
+{% block page_title %}Inscription : {{ view.event.name }}{% endblock %}
+
+{% block content %}
+    <div style="max-width: 650px" class="card w-100">
+        <div class="card-body">
+            <div class="mt-4 mt-md-0 text-center">
+                <div class="text-center">
+                    <h1 class="text-x1 text-lg-x2">Les inscriptions sont fermées</h1>
+                    <p class="lead mt-3">
+                        Les inscriptions pour cet événement sont actuellement fermées.<br>
+                    </p>
+                </div>
+                <p>
+                    <a class="btn btn-primary" href="{% url "cla_public:index" %}">Retour</a>
+                </p>
+            </div>
+        </div>
+    </div>
+{% endblock %}
