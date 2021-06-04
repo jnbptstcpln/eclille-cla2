@@ -172,7 +172,7 @@ class UserInfos(models.Model):
                 algorithms=["HS256"]
             )
             return True
-        except jwt.InvalidTokenError:
+        except:
             return False
 
     @property
@@ -409,7 +409,7 @@ class PasswordResetRequest(models.Model):
                 algorithms=["HS256"]
             )
             return True
-        except jwt.InvalidTokenError:
+        except:
             return False
 
 
@@ -509,5 +509,5 @@ class ServiceTicket(models.Model):
                     algorithms=["HS256"]
                 )
                 return True
-            except jwt.InvalidTokenError:
+            except:
                 return False
