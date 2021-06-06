@@ -144,6 +144,27 @@ class EventAdmin(admin.ModelAdmin):
 
     link_ticketing.short_description = ''
 
+    def response_add(self, request, obj, post_url_continue=None):
+        self.update_managers(request, obj)
+        return super().response_add(request, obj, post_url_continue)
+
+    def response_change(self, request, obj):
+        self.update_managers(request, obj)
+        return super().response_change(request, obj)
+
+    def update_managers(self, request, obj: Event):
+        # Update manager perms to allow them to access the event
+        if request.user.has_perm('cla_ticketing.add_event'):
+            event_organizer_group = Event.get_or_create_event_organizer_group()
+            for manager in obj.managers.all():
+                manager.is_staff = True
+                manager.save()
+                print(manager, manager.is_staff)
+                event_organizer_group.user_set.add(manager)
+                event_organizer_group.save()
+
+        return super()._response_post_save(request, obj)
+
     def get_fieldsets(self, request: HttpRequest, obj=None):
         fielsets = deepcopy(super().get_fieldsets(request, obj))
         if request.user.has_perm("cla_ticketing.add_event"):
@@ -174,7 +195,6 @@ class EventAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
-        print(request.user.has_perm('cla_ticketing.add_event'))
         if not request.user.has_perm('cla_ticketing.add_event') and request.user.has_perm('cla_ticketing.event_manager'):
             qs = qs.filter(managers__in=[request.user])
         return qs

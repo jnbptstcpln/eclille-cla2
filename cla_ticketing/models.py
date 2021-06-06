@@ -2,7 +2,7 @@ from django.db import models
 from multiselectfield import MultiSelectField
 from cla_auth.models import UserInfos
 from django_summernote.fields import SummernoteTextField
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group, Permission
 from django.utils import timezone
 
 
@@ -74,6 +74,13 @@ class Event(AbstractEvent):
         permissions = (
             ('event_manager', "Accès à l'interface de gestion des événements pour lesquels l'utilisateur est administrateur"),
         )
+
+    @staticmethod
+    def get_or_create_event_organizer_group():
+        group, created = Group.objects.get_or_create(name="Organisateur d'événements")
+        if created and group.permissions.filter(codename="event_manager").count() == 0:
+            group.permissions.add(Permission.objects.get(codename='event_manager'))
+        return group
 
     allow_non_contributor_registration = models.BooleanField(default=False, verbose_name="Autoriser l'inscription des non cotisants")
 
