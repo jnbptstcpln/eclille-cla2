@@ -159,7 +159,6 @@ class EventAdmin(admin.ModelAdmin):
             for manager in obj.managers.all():
                 manager.is_staff = True
                 manager.save()
-                print(manager, manager.is_staff)
                 event_organizer_group.user_set.add(manager)
                 event_organizer_group.save()
 
