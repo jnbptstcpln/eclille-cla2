@@ -1,0 +1,87 @@
+{% extends "layout/standalone.html" %}
+
+{% block page_title %}CLA - {{ form_title }}{% endblock %}
+
+{% block content_align %}align-items-center{% endblock %}
+
+{% block css %}
+    <style>
+        tr.success {
+            background-color: rgba(0, 255, 0, 0.05);
+        }
+
+        tr.error {
+            background-color: rgba(255, 0, 0, 0.1);
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div style="max-width: 450px" class="card w-100">
+        <div class="card-body">
+            <form method="post" enctype="multipart/form-data" class="p-2 p-md-4">
+                {% csrf_token %}
+                <h1 class="text-center mb-4">
+                        <span class="cla_logo" style="transform: scale(1.25)">
+                          <span class="cl">Centrale Lille</span>
+                          <span class="a">Associations</span>
+                      </span>
+                </h1>
+
+                <div class="alert alert-info">
+                    {% if not logger.has_errors %}
+                        Votre requête s'est correctement exécutée.
+                    {% else %}
+                        Votre requête s'est exécutée mais avec des erreurs, consultez le journal pour en savoir plus.
+                    {% endif %}
+                </div>
+
+                <p class="text-center mt-4 mb-0">
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#logsModal">Afficher le journal</button>
+                </p>
+                <p class="text-center mt-2 mb-0">
+                    <a class="btn btn-default" href="{% url "cla_public:index" %}">Retour</a>
+                </p>
+
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block end_body %}
+    <div class="modal" tabindex="-1" id="logsModal" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Journal d'exécution de la requête</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <table class="table">
+                        <tbody>
+                        {% for log in logger.logs %}
+                            <tr class="{{ log.type }}">
+                                <td>{{ log.message }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block body_js %}
+    <script>
+        $('#show-log').on('click', function (e) {
+            e.preventDefault();
+            $('#logs').toggleClass("hidden");
+        })
+    </script>
+{% endblock %}

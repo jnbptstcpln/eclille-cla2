@@ -1,0 +1,32 @@
+{% extends "layout/standalone.html" %}
+
+{% block page_title %}CLA - {{ form_title }}{% endblock %}
+
+{% block content_align %}align-items-center{% endblock %}
+
+{% block content %}
+    <div style="max-width: 450px" class="card w-100">
+        <div class="card-body">
+            <form method="post" enctype="multipart/form-data" class="p-2 p-md-4">
+                {% csrf_token %}
+                <h1 class="text-center mb-4">
+                        <span class="cla_logo" style="transform: scale(1.25)">
+                          <span class="cl">Centrale Lille</span>
+                          <span class="a">Associations</span>
+                      </span>
+                </h1>
+
+                <h2 class="text-x1">{{ form_title }}</h2>
+                {% include "components/form-errors.html" with form=form %}
+                {% for field in form.visible_fields %}
+                    {% include "components/form-group.html" with field=field %}
+                {% endfor %}
+
+                <p class="mt-4 mb-0 text-center">
+                    <button type="submit" class="btn btn-primary">{{ submit_label|default:"Continuer" }}</button>
+                </p>
+
+            </form>
+        </div>
+    </div>
+{% endblock %}

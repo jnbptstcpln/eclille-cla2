@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from django.urls import path
 
 from cla_auth import views
@@ -25,4 +26,7 @@ urlpatterns = [
     # Services
     path('authentification/<str:identifier>', views.service.authenticate, name="service_authenticate"),
     path('authentification/<str:identifier>/<str:ticket_jwt>', views.service.validate, name="service_validate"),
+
+    # Debugging
+    path('__cla_auth/debug/import_legacy_users', login_required(views.debug.ImportLegacyUsersView.as_view()), name="debug__import_legacy_users"),
 ]

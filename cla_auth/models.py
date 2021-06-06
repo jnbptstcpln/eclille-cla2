@@ -437,9 +437,9 @@ class UserMembership(models.Model):
         CARD = 'card', 'Carte bancaire'
 
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="membership", to_field="username")
-    amount = models.PositiveIntegerField(verbose_name="Montant de la cotisation")
-    paid_on = models.DateField(verbose_name="Date de paiement")
-    paid_by = models.CharField(max_length=100, choices=MeanOfPayment.choices, verbose_name="Moyen de paiement")
+    amount = models.PositiveIntegerField(verbose_name="Montant de la cotisation", blank=True)
+    paid_on = models.DateField(verbose_name="Date de paiement", null=True, blank=True)
+    paid_by = models.CharField(max_length=100, choices=MeanOfPayment.choices, verbose_name="Moyen de paiement", blank=True)
     refunded = models.BooleanField(default=False, blank=True, verbose_name="La cotisation a été remboursée")
     refunded_amount = models.PositiveIntegerField(null=True, blank=True, verbose_name="Montant remboursé")
     refunded_on = models.DateField(null=True, blank=True, verbose_name="Date du remboursement")

@@ -3,5 +3,6 @@ from . import (
     activation,
     validation,
     reset,
-    service
+    service,
+    debug
 )
