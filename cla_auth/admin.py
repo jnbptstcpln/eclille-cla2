@@ -145,7 +145,7 @@ class UserAdmin(UserAdmin):
         fieldsets = copy.deepcopy(super().get_fieldsets(request, obj))
         if obj is not None:
             # Il est nécessaire d'avoir la permission `manage_user_activation` pour accéder au lien d'activation du compte
-            if request.user.has_perm("manage_user_activation") and not obj.infos.is_activated():
+            if request.user.has_perm("cla_auth.manage_user_activation") and not obj.infos.is_activated():
                 fieldsets[0][1]['fields'] = ['link_activation'] + fieldsets[0][1]['fields']
             # Il est nécessaire d'avoir la permission `manage_user_password` pour accéder au champ de modification du mot de passe
             if request.user.has_perm("cla_auth.manage_user_password"):
