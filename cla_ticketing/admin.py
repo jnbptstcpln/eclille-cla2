@@ -28,7 +28,7 @@ class EventAdmin(admin.ModelAdmin):
 
         def has_view_permission(self, request: HttpRequest, obj: Event = None):
             perm = super().has_view_permission(request, obj)
-            if not request.user.has_perm('cla_ticketing.create_event') and request.user.has_perm('cla_ticketing.event_manager'):
+            if not request.user.has_perm('cla_ticketing.add_event') and request.user.has_perm('cla_ticketing.event_manager'):
                 if obj:
                     perm = obj.managers.filter(pk=request.user.pk).count() > 0
                 else:
@@ -37,7 +37,7 @@ class EventAdmin(admin.ModelAdmin):
 
         def has_change_permission(self, request: HttpRequest, obj: Event = None):
             perm = super().has_change_permission(request, obj)
-            if not request.user.has_perm('cla_ticketing.create_event') and request.user.has_perm('cla_ticketing.event_manager'):
+            if not request.user.has_perm('cla_ticketing.add_event') and request.user.has_perm('cla_ticketing.event_manager'):
                 if obj:
                     perm = obj.managers.filter(pk=request.user.pk).count() > 0
                 else:
@@ -46,7 +46,7 @@ class EventAdmin(admin.ModelAdmin):
 
         def has_delete_permission(self, request: HttpRequest, obj: Event = None):
             perm = super().has_delete_permission(request, obj)
-            if not request.user.has_perm('cla_ticketing.create_event') and request.user.has_perm('cla_ticketing.event_manager'):
+            if not request.user.has_perm('cla_ticketing.add_event') and request.user.has_perm('cla_ticketing.event_manager'):
                 if obj:
                     perm = obj.managers.filter(pk=request.user.pk).count() > 0
                 else:
@@ -85,7 +85,7 @@ class EventAdmin(admin.ModelAdmin):
 
         def has_view_permission(self, request: HttpRequest, obj: Event = None):
             perm = super().has_view_permission(request, obj)
-            if not request.user.has_perm('cla_ticketing.create_event') and request.user.has_perm('cla_ticketing.event_manager'):
+            if not request.user.has_perm('cla_ticketing.add_event') and request.user.has_perm('cla_ticketing.event_manager'):
                 if obj:
                     perm = obj.managers.filter(pk=request.user.pk).count() > 0
                 else:
@@ -146,7 +146,7 @@ class EventAdmin(admin.ModelAdmin):
 
     def get_fieldsets(self, request: HttpRequest, obj=None):
         fielsets = deepcopy(super().get_fieldsets(request, obj))
-        if request.user.has_perm("cla_ticketing.create_event"):
+        if request.user.has_perm("cla_ticketing.add_event"):
             fielsets.append(self.fielset_event_administration)
         return fielsets
 
@@ -158,7 +158,7 @@ class EventAdmin(admin.ModelAdmin):
 
     def has_view_permission(self, request, obj=None):
         perm = super().has_view_permission(request, obj)
-        if not request.user.has_perm('cla_ticketing.create_event') and request.user.has_perm('cla_ticketing.event_manager'):
+        if not request.user.has_perm('cla_ticketing.add_event') and request.user.has_perm('cla_ticketing.event_manager'):
             if obj:
                 perm = obj.managers.filter(pk=request.user.pk).count() > 0
             else:
@@ -167,14 +167,15 @@ class EventAdmin(admin.ModelAdmin):
 
     def has_change_permission(self, request: HttpRequest, obj: Event = None):
         perm = super().has_change_permission(request, obj)
-        if not request.user.has_perm('cla_ticketing.create_event') and request.user.has_perm('cla_ticketing.event_manager'):
+        if not request.user.has_perm('cla_ticketing.add_event') and request.user.has_perm('cla_ticketing.event_manager'):
             if obj:
                 perm = obj.managers.filter(pk=request.user.pk).count() > 0
         return perm
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
-        if not request.user.has_perm('cla_ticketing.create_event') and request.user.has_perm('cla_ticketing.event_manager'):
+        print(request.user.has_perm('cla_ticketing.add_event'))
+        if not request.user.has_perm('cla_ticketing.add_event') and request.user.has_perm('cla_ticketing.event_manager'):
             qs = qs.filter(managers__in=[request.user])
         return qs
 
@@ -193,7 +194,7 @@ class EventRegistrationTypeAdmin(admin.ModelAdmin):
 
     def has_view_permission(self, request: HttpRequest, obj: EventRegistrationType = None):
         perm = super().has_view_permission(request, obj)
-        if not request.user.has_perm('cla_ticketing.create_event') and request.user.has_perm('cla_ticketing.event_manager'):
+        if not request.user.has_perm('cla_ticketing.add_event') and request.user.has_perm('cla_ticketing.event_manager'):
             if obj:
                 perm = obj.event.managers.filter(pk=request.user.pk).count() > 0
             else:
@@ -202,14 +203,14 @@ class EventRegistrationTypeAdmin(admin.ModelAdmin):
 
     def has_change_permission(self, request: HttpRequest, obj: EventRegistrationType = None):
         perm = super().has_change_permission(request, obj)
-        if not request.user.has_perm('cla_ticketing.create_event') and request.user.has_perm('cla_ticketing.event_manager'):
+        if not request.user.has_perm('cla_ticketing.add_event') and request.user.has_perm('cla_ticketing.event_manager'):
             if obj:
                 perm = obj.event.managers.filter(pk=request.user.pk).count() > 0
         return perm
 
     def has_delete_permission(self, request: HttpRequest, obj: EventRegistrationType = None):
         perm = super().has_delete_permission(request, obj)
-        if not request.user.has_perm('cla_ticketing.create_event') and request.user.has_perm('cla_ticketing.event_manager'):
+        if not request.user.has_perm('cla_ticketing.add_event') and request.user.has_perm('cla_ticketing.event_manager'):
             if obj:
                 perm = obj.event.managers.filter(pk=request.user.pk).count() > 0
             else:
@@ -255,7 +256,7 @@ class EventRegistrationAdmin(admin.ModelAdmin):
 
     def has_view_permission(self, request: HttpRequest, obj: EventRegistration = None):
         perm = super().has_view_permission(request, obj)
-        if not request.user.has_perm('cla_ticketing.create_event') and request.user.has_perm('cla_ticketing.event_manager'):
+        if not request.user.has_perm('cla_ticketing.add_event') and request.user.has_perm('cla_ticketing.event_manager'):
             if obj:
                 perm = obj.event.managers.filter(pk=request.user.pk).count() > 0
             else:
@@ -264,14 +265,14 @@ class EventRegistrationAdmin(admin.ModelAdmin):
 
     def has_change_permission(self, request: HttpRequest, obj: EventRegistration = None):
         perm = super().has_change_permission(request, obj)
-        if not request.user.has_perm('cla_ticketing.create_event') and request.user.has_perm('cla_ticketing.event_manager'):
+        if not request.user.has_perm('cla_ticketing.add_event') and request.user.has_perm('cla_ticketing.event_manager'):
             if obj:
                 perm = obj.event.managers.filter(pk=request.user.pk).count() > 0
         return perm
 
     def has_delete_permission(self, request: HttpRequest, obj: EventRegistration = None):
         perm = super().has_delete_permission(request, obj)
-        if not request.user.has_perm('cla_ticketing.create_event') and request.user.has_perm('cla_ticketing.event_manager'):
+        if not request.user.has_perm('cla_ticketing.add_event') and request.user.has_perm('cla_ticketing.event_manager'):
             if obj:
                 perm = obj.event.managers.filter(pk=request.user.pk).count() > 0
             else:
