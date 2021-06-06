@@ -17,7 +17,7 @@ class EventAdmin(admin.ModelAdmin):
     class EventRegistrationTypeInline(admin.TabularInline):
         fields = ['name', 'open_to', 'description', 'price']
         model = EventRegistrationType
-        classes = ['collapse']
+        classes = []
         extra = 0
 
         def has_add_permission(self, request, obj: Event = None):

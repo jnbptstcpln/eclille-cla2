@@ -48,6 +48,14 @@ class EventRegistrationView(generic.CreateView):
                         'event': self.event
                     }
                 )
+            elif request.user.infos.college not in self.event.colleges:
+                return render(
+                    request,
+                    "cla_ticketing/event/registration_forbidden.html",
+                    {
+                        'event': self.event
+                    }
+                )
 
         if not self.event.are_registrations_opened or self.event.places_remaining <= 0:
             return render(

@@ -20,6 +20,10 @@
                     <p class="text-center mt-4">
                         <a class="btn btn-primary btn-lg" target="_blank" href="{{ event.ticketing_href }}">Accéder à la billeterie</a>
                     </p>
+                {% else %}
+                    <p>
+                        <a class="btn btn-primary" href="{% url "cla_public:index" %}">Retour</a>
+                    </p>
                 {% endif %}
             </div>
         </div>
