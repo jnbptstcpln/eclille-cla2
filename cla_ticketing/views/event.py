@@ -30,7 +30,7 @@ class EventRegistrationView(generic.CreateView):
                         'event': self.event
                     }
                 )
-            elif self.request.session[self.event_registration_success_id(self.event)]:
+            elif self.request.session.get(self.event_registration_success_id(self.event), False):
                 return render(
                     request,
                     "cla_ticketing/event/registration_done.html",
@@ -80,6 +80,7 @@ class EventRegistrationView(generic.CreateView):
         self.object.event = self.event
         self.object.student_status = EventRegistration.StudentStatus.CONTRIBUTOR if self.request.user.is_authenticated else EventRegistration.StudentStatus.NON_CONTRIBUTOR
         self.object.user = self.request.user if self.request.user.is_authenticated else None
+        self.object.created_by = self.request.user if self.request.user.is_authenticated else None
         self.object.save()
         self.request.session[self.event_registration_success_id(self.event)] = True
         return redirect("cla_ticketing:event_ticketing", self.event.slug)

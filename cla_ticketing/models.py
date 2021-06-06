@@ -47,14 +47,15 @@ class AbstractRegistration(models.Model):
         CONTRIBUTOR = 'contributor', 'Cotisant'
         NON_CONTRIBUTOR = 'non_contributor', 'Non cotisant'
 
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="+", verbose_name="Utilisateur", null=True, editable=False)
-    student_status = models.CharField(max_length=20, choices=StudentStatus.choices, verbose_name="Statut de l'étudiant")
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="+", verbose_name="Utilisateur", help_text="Laisser vide si l'inscrit n'est pas un cotisant", null=True, blank=True)
+    student_status = models.CharField(max_length=20, choices=StudentStatus.choices, verbose_name="Statut de l'étudiant", editable=False)
     first_name = models.CharField(max_length=150, verbose_name="Prénom")
     last_name = models.CharField(max_length=150, verbose_name="Nom")
     email = models.EmailField(verbose_name="Adresse mail personnelle")
     phone = models.CharField(max_length=15, verbose_name="Numéro de téléphone")
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="+", verbose_name="Créateur de cette inscription", editable=False, null=True)
     created_on = models.DateTimeField(auto_now=True, editable=False)
+    paid = models.BooleanField(default=False, verbose_name="A payer")
 
     def __str__(self):
         return f"{self.last_name.upper()} {self.first_name}"
@@ -70,6 +71,9 @@ class Event(AbstractEvent):
         abstract = False
         verbose_name = "Billeterie d'événement"
         verbose_name_plural = "Billeteries d'événement"
+        permissions = (
+            ('event_manager', "Accès à l'interface de gestion des événements pour lesquels l'utilisateur est administrateur"),
+        )
 
     allow_non_contributor_registration = models.BooleanField(default=False, verbose_name="Autoriser l'inscription des non cotisants")
 
@@ -88,7 +92,7 @@ class EventRegistrationType(models.Model):
     name = models.CharField(max_length=75, verbose_name="Nom")
     open_to = models.CharField(max_length=75, choices=OpenTo.choices, verbose_name="Ouvert aux", default=OpenTo.BOTH)
     description = models.CharField(max_length=250, verbose_name="Description", blank=True)
-    price = models.FloatField(blank=True)
+    price = models.FloatField(blank=True, verbose_name="Prix")
     event = models.ForeignKey(Event, related_name="registration_types", on_delete=models.CASCADE)
 
     def __str__(self):

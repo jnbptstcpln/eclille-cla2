@@ -1,1 +1,1 @@
-from cla_ticketing.forms.event import EventRegistrationForm
+from cla_ticketing.forms.event import EventRegistrationForm, AdminEventRegistrationForm

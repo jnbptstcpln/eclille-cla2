@@ -26,3 +26,17 @@ class EventRegistrationForm(forms.ModelForm):
             (EventRegistrationType.OpenTo.CONTRIBUTOR if self.student_status == EventRegistration.StudentStatus.CONTRIBUTOR else EventRegistrationType.OpenTo.NON_CONTRIBUTOR)
         }
         self.fields['type'].queryset = EventRegistrationType.objects.filter(event=self.event, open_to__in=open_to)
+
+
+class AdminEventRegistrationForm(forms.ModelForm):
+    class Meta:
+        model = EventRegistration
+        fields = [
+            'user',
+            'first_name',
+            'last_name',
+            'email',
+            'phone',
+            'type',
+            'paid'
+        ]

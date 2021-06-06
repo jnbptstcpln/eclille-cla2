@@ -41,7 +41,8 @@ class UserInfos(models.Model):
         permissions = (
             ('manage_user_activation', "Accès au processus d'activation des comptes"),
             ('manage_user_validation', "Accès au processus de validation des comptes"),
-            ('manage_user_password', "Accès au processus de réinitialisation des mots de passes")
+            ('manage_user_password', "Accès au processus de réinitialisation des mots de passes"),
+            ('autocomplete_user', "Accès à la fonctionnalité d'autocomplétion sur les champs utilisateur"),
         )
 
     class AccountType(models.TextChoices):

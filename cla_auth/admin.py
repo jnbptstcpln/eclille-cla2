@@ -6,7 +6,7 @@ from django.shortcuts import redirect
 from django.contrib.auth.admin import UserAdmin
 from django.utils.translation import gettext, gettext_lazy as _
 from django.urls import path, reverse
-from django.http import Http404
+from django.http import Http404, HttpRequest
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import resolve_url
 from django.utils.html import mark_safe, escape
@@ -184,6 +184,12 @@ class UserAdmin(UserAdmin):
         self.log_change(req, user, "Password reset link created")
         messages.success(req, "Lien de réinitialisation de mot de passe créé, il est disponible en haut de cette page")
         return redirect(f"{self.admin_site.name}:{user._meta.app_label}_{user._meta.model_name}_change", user.pk)
+
+    def has_view_permission(self, request: HttpRequest, obj: User=None):
+        perm = super().has_view_permission(request, obj)
+        if request.user.has_perm("cla_auth.autocomplete_user"):  # Allow user with `cla_auth:autocomplete_user` to access user list
+            perm = True
+        return perm
 
 
 @admin.register(Service)
