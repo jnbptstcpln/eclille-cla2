@@ -1,5 +1,4 @@
 import json
-from dataclasses import dataclass
 from django import forms
 from django.http import HttpRequest
 from django.shortcuts import render
