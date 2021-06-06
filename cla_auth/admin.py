@@ -228,7 +228,7 @@ class ServiceAdmin(admin.ModelAdmin):
         return mark_safe("<ul style='margin-left: 30px'>{}</ul>".format("".join(
             [
                 f"<li>[{ticket.created_on.strftime('%d/%m/%Y %H:%M')}] {ticket.user.first_name} {ticket.user.last_name}</li>"
-                for ticket in obj.tickets.all()[:20]
+                for ticket in obj.tickets.all().order_by("-created_on")[:20]
             ]
         )))
     last_tickets.short_description = ''
