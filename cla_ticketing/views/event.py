@@ -35,7 +35,8 @@ class EventRegistrationView(generic.CreateView):
                     request,
                     "cla_ticketing/event/registration_done.html",
                     {
-                        'event': self.event
+                        'event': self.event,
+                        'ticketing_href': self.event.non_contributor_ticketing_href
                     }
                 )
 
@@ -45,7 +46,8 @@ class EventRegistrationView(generic.CreateView):
                     request,
                     "cla_ticketing/event/registration_done.html",
                     {
-                        'event': self.event
+                        'event': self.event,
+                        'ticketing_href': self.event.contributor_ticketing_href
                     }
                 )
             elif request.user.infos.college not in self.event.colleges:

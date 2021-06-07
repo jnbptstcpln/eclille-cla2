@@ -15,7 +15,7 @@ from cla_ticketing.forms import AdminEventRegistrationForm
 @admin.register(Event)
 class EventAdmin(admin.ModelAdmin):
     class EventRegistrationTypeInline(admin.TabularInline):
-        fields = ['name', 'open_to', 'description', 'price']
+        fields = ['name', 'description', 'open_to', 'visible', 'price']
         model = EventRegistrationType
         classes = []
         extra = 0
@@ -113,7 +113,7 @@ class EventAdmin(admin.ModelAdmin):
         [
             "Informations supplémentaire",
             {
-                'fields': ('ticketing_href', 'allow_non_contributor_registration', 'colleges', 'description'),
+                'fields': ('contributor_ticketing_href', 'non_contributor_ticketing_href', 'allow_non_contributor_registration', 'colleges', 'description'),
                 'classes': ('collapse',),
             }
         ]

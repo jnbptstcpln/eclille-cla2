@@ -22,7 +22,8 @@ class AbstractEvent(models.Model):
     registration_ends_on = models.DateTimeField(verbose_name="Fermeture des inscriptions")
     colleges = MultiSelectField(choices=UserInfos.Colleges.choices, verbose_name="Collèges autorisés à prendre une place", blank=True)
     places = models.PositiveIntegerField(default=400, verbose_name="Nombre de places")
-    ticketing_href = models.URLField(blank=True, null=True, verbose_name="Lien vers la billeterie d'encaissement", help_text="Laisser vide si aucune")
+    contributor_ticketing_href = models.URLField(blank=True, null=True, verbose_name="Lien vers la billeterie d'encaissement pour les cotisants", help_text="Laisser vide si aucune")
+    non_contributor_ticketing_href = models.URLField(blank=True, null=True, verbose_name="Lien vers la billeterie d'encaissement pour les non cotisants", help_text="Laisser vide si aucune")
     managers = models.ManyToManyField(User, related_name="+", verbose_name="Administrateurs", help_text="Les administrateurs ont la possiblité de modifier les informations de l'événement ainsi que de gérer la liste des inscrits", blank=True)
 
     @property
@@ -100,6 +101,7 @@ class EventRegistrationType(models.Model):
     open_to = models.CharField(max_length=75, choices=OpenTo.choices, verbose_name="Ouvert aux", default=OpenTo.BOTH)
     description = models.CharField(max_length=250, verbose_name="Description", blank=True)
     price = models.FloatField(blank=True, verbose_name="Prix")
+    visible = models.BooleanField(default=True, blank=True, verbose_name="Accessible")
     event = models.ForeignKey(Event, related_name="registration_types", on_delete=models.CASCADE)
 
     def __str__(self):
