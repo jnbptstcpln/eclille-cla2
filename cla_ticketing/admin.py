@@ -250,6 +250,8 @@ class EventRegistrationAdmin(admin.ModelAdmin):
         return event
 
     def save_model(self, request, obj: EventRegistration, form, change):
+        if not change:
+            obj.created_by = request.user
         obj.student_status = EventRegistration.StudentStatus.CONTRIBUTOR if obj.user else EventRegistration.StudentStatus.NON_CONTRIBUTOR
         obj.event = self.get_event_from_request(request)
         super().save_model(request, obj, form, change)

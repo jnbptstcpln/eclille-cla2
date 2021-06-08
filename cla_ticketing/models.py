@@ -55,7 +55,7 @@ class AbstractRegistration(models.Model):
     email = models.EmailField(verbose_name="Adresse mail personnelle")
     phone = models.CharField(max_length=15, verbose_name="Numéro de téléphone")
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="+", verbose_name="Créateur de cette inscription", editable=False, null=True)
-    created_on = models.DateTimeField(auto_now=True, editable=False)
+    created_on = models.DateTimeField(auto_now_add=True, editable=False)
     paid = models.BooleanField(default=False, verbose_name="A payer")
 
     def __str__(self):
