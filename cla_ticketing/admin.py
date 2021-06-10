@@ -103,6 +103,7 @@ class EventAdmin(admin.ModelAdmin):
             {
                 'fields': (
                     ('link_ticketing'),
+                    ('remaining_places'),
                     ('name', 'slug'),
                     ('organizer', 'places'),
                     ('event_starts_on', 'event_ends_on'),
@@ -125,7 +126,7 @@ class EventAdmin(admin.ModelAdmin):
             'classes': ('collapse',),
         }
     ]
-    readonly_fields = ['link_ticketing']
+    readonly_fields = ['link_ticketing', 'remaining_places']
 
     create_inlines = [EventRegistrationTypeInline]
     change_inlines = [EventRegistrationTypeInline, EventRegistrationInline]
@@ -141,8 +142,14 @@ class EventAdmin(admin.ModelAdmin):
             )
         else:
             return ""
-
     link_ticketing.short_description = ''
+
+    def remaining_places(self, obj: Event):
+        if obj.pk:  # Check if the object was created
+            return obj.places - obj.registrations.count()
+        else:
+            return "L'événement n'a pas encore été créé"
+    remaining_places.short_description = 'Nombre de places restant'
 
     def response_add(self, request, obj, post_url_continue=None):
         self.update_managers(request, obj)

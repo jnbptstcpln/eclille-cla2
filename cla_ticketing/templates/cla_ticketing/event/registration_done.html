@@ -9,7 +9,16 @@
                 <div class="text-center">
                     <h1 class="text-x1 text-lg-x2">Inscription : {{ event.name }}</h1>
                     <p class="lead mt-3">
-                        Votre inscription a bien été enregistrée.
+                        Votre inscription a bien été enregistrée.<br>
+                        {% with registration_count=event.registrations.count %}
+                            Vous êtes le
+                            {% if registration_count > 1 %}
+                                {{ event.registrations.count }}ème
+                            {% else %}
+                                {{ event.registrations.count }}er
+                            {% endif %}
+                             à vous inscrire !
+                        {% endwith %}
                     </p>
                 </div>
                 {% if ticketing_href %}
@@ -21,7 +30,7 @@
                         <a class="btn btn-primary btn-lg" target="_blank" href="{{ ticketing_href }}">Accéder à la billeterie</a>
                     </p>
                 {% else %}
-                    <p>
+                    <p class="text-center">
                         <a class="btn btn-primary" href="{% url "cla_public:index" %}">Retour</a>
                     </p>
                 {% endif %}
