@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'cla_auth.apps.ClaAuthConfig',
     'cla_public.apps.ClaPublicConfig',
     'cla_ticketing.apps.ClaTicketingConfig',
+    'cla_registration.apps.ClaRegistrationConfig',
 ]
 
 MIDDLEWARE = [

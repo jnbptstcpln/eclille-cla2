@@ -28,6 +28,7 @@ urlpatterns = [
     path('summernote/', include('django_summernote.urls')),
     path('', include("cla_auth.urls")),
     path('', include("cla_public.urls")),
+    path('', include("cla_registration.urls")),
     path('billeteries/', include("cla_ticketing.urls")),
     path('privacy/', views.flatpage, {'url': '/privacy/'}, name='privacy'),
     path('legal/', views.flatpage, {'url': '/legal/'}, name='legal'),

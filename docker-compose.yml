@@ -1,0 +1,21 @@
+version: "3.6"
+
+services:
+
+  clery-sologne-db:
+    image: mysql:5.7.22
+    container_name: cla-web-db
+    hostname: cla-web-db
+    volumes:
+      - cla-dbdata:/var/lib/postgresql/data
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_DATABASE: cla_web
+      MYSQL_USER: cla-admin
+      MYSQL_PASSWORD: cla-password
+      MYSQL_RANDOM_ROOT_PASSWORD: '1'
+
+volumes:
+  cla-dbdata:
+    driver: local

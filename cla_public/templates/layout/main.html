@@ -58,6 +58,11 @@
                                 <li class="nav-item {% if page_active == "home" %}active{% endif %}">
                                     <a href="{% url "cla_public:index" %}" class="nav-link">Accueil</a>
                                 </li>
+                                {% if not request.user.is_authenticated %}
+                                    <li class="nav-item {% if page_active == "registration" %}active{% endif %}">
+                                        <a href="{% url "cla_registration:register_introduction" %}" class="nav-link">Adhérer</a>
+                                    </li>
+                                {% endif %}
                                 {% if request.user.is_authenticated and request.user.is_staff %}
                                     <li class="nav-item {% if page_active == "admin" %}active{% endif %}">
                                         <a href="/admin" class="nav-link">Administration</a>
