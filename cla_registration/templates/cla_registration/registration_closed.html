@@ -1,0 +1,25 @@
+{% extends "layout/standalone.html" %}
+
+{% block page_title %}Adhérer à CLA{% endblock %}
+
+{% block content %}
+    <div style="max-width: 650px" class="card w-100">
+        <div class="card-body">
+            <div class="mt-4 mt-md-0">
+                <div class="">
+                    <h1 class="text-center text-x1 text-lg-x2">Les inscriptions sont fermées</h1>
+                    <p class="lead mt-3">
+                        Les demandes d'adhésion via notre site internet sont actuellement indisponibles.
+                        Veuillez nous contacter à l'adresse mail suivante pour poursuivre votre demande d'adhésion :
+                    </p>
+                    <p class="lead text-center">
+                        <a href="mailto:cla@centralelille.fr">cla@centralelille.fr</a>
+                    </p>
+                </div>
+                <p class="text-center">
+                    <a class="btn btn-primary" href="{% url "cla_registration:register_introduction" %}">Retour</a>
+                </p>
+            </div>
+        </div>
+    </div>
+{% endblock %}

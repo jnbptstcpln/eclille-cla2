@@ -1,0 +1,32 @@
+{% extends "layout/standalone.html" %}
+
+{% block page_title %}Demande d'adhésion enregistrée !{% endblock %}
+
+{% block content %}
+    <div style="max-width: 650px" class="card w-100">
+        <div class="card-body">
+            <div class="mt-4 mt-md-0">
+                <div class="alert alert-success text-center p-1">
+                    <p class="lead mt-3">
+                        Votre demande d'adhésion a bien été enregistrée !
+                    </p>
+                </div>
+                <p class="text-justify">
+                    Vous pouvez maintenant accéder à la plateforme de paiement pour régler votre cotisation d'adhésion qui s'élève à <b>{{ registration.contribution }}€</b>.<br>
+                    <b>Votre adhésion ne sera effective qu'après ce paiement.</b>
+                </p>
+                <p class="text-center mt-4">
+                    <a class="btn btn-primary btn-lg" target="_blank" href="{{ registration.ticketing_href }}">Accéder à la plateforme de paiement</a>
+                </p>
+                <hr class="mt-4 mb-4">
+                <p class="text-justify">
+                    Vous avez aussi la possiblité de régler votre cotisation d'adhésion par chèque :
+                </p>
+                <p class="text-center mt-4">
+                    <a class="btn btn-secondary btn-lg" target="_blank" href="{% url "cla_registration:register_paiement_check" registration.pk %}">En savoir plus...</a>
+                </p>
+
+            </div>
+        </div>
+    </div>
+{% endblock %}
