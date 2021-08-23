@@ -137,3 +137,6 @@ class Registration(models.Model):
             self.Types.CENTRALE_DD_CLA: self.session.ticketing_href_centrale_dd_cla,
             self.Types.ITEEM_CLA: self.session.ticketing_href_iteem_cla,
         }.get(self.type)
+
+    def __str__(self):
+        return f"{self.last_name.upper()} {self.first_name}"

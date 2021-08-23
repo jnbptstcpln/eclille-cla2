@@ -1,0 +1,103 @@
+<div>
+    <h3>Configuration de la plateforme de paiement</h3>
+    <p>Ce site a été conçue pour fonctionner en tandem avec une plateforme chargée uniquement du paiement.</p>
+    <p>Historiquement, cette plateforme est le système de billeterie fournie par Pumpkin.</p>
+    <p><b>Pour faciliter tous le processus d'adhésion en ligne, il est FORTEMENT recommandé de contacter notre référent chez Pumpkin afin de vérifier que :</b></p>
+    <ul>
+        <li>Demander à faire bénéficier du taux <code>0,6% + 0,06€ HT</code> au moins <b>7 jours avant le début des inscriptions</b> (contrat signé en 2020)</li>
+        <li>S'assurer que la clause de reversement de 1% pour des flux financiers TTC est toujours bien d'actualité, notamment sur ces billeteries (contrat signé en 2020)</li>
+    </ul>
+    <p style="margin-top: 2rem">Pour faciliter le processus d'inscription des étudiants, 6 billeries sont à créer sur Pumpkin à l'aide des informations suivantes :</p>
+    <div style="padding: .5rem; border: 1px #444444 solid; border-radius: 3px; margin-bottom: .75rem; margin-top: .5rem">
+        <dl>
+            <dt>Nom</dt>
+            <dd>[Centrale Lille] Pack Alumni+CLA</dd>
+            <dt>Prix de l'unique billet</dt>
+            <dd>355€</dd>
+            <dt>Description</dt>
+            <dd>
+                Le pack CLA+Alumni comprend la cotisation d'adhésion à Centrale Lille Associations et à Centrale Lille Alumni pour toute la scolarité, respectivement d'une valeur de 270€ et 100€.<br>
+                Plus d'informations sur https://centralelilleassos.fr/adherer
+            </dd>
+            <dt>URL de la billeterie (à configurer à l'aide du slug)</dt>
+            <dd>{{ session.ticketing_href_centrale_pack }}</dd>
+        </dl>
+    </div>
+    <div style="padding: 1rem; border: 1px #444444 solid; border-radius: 3px; margin-bottom: .75rem">
+        <dl>
+            <dt>Nom</dt>
+            <dd>[Centrale Lille] Adhésion CLA</dd>
+            <dt>Prix de l'unique billet</dt>
+            <dd>270€</dd>
+            <dt>Description</dt>
+            <dd>
+                Adhésion à Centrale Lille Associations pour toute la scolarité sans profiter de la réduction sur la cotisation d’adhésion à Centrale Lille Alumni.<br>
+                Plus d'informations sur https://centralelilleassos.fr/adherer
+            </dd>
+            <dt>URL de la billeterie (à configurer à l'aide du slug)</dt>
+            <dd>{{ session.ticketing_href_centrale_cla }}</dd>
+        </dl>
+    </div>
+    <div style="padding: 1rem; border: 1px #444444 solid; border-radius: 3px; margin-bottom: .75rem">
+        <dl>
+            <dt>Nom</dt>
+            <dd>[Centrale Lille][Double diplôme] Pack Alumni+CLA</dd>
+            <dt>Prix de l'unique billet</dt>
+            <dd>265€</dd>
+            <dt>Description</dt>
+            <dd>
+                [Uniquement pour les étudiants en double diplôme à Centrale Lille]<br>
+                Ce pack comprend la cotisation d'adhésion à Centrale Lille Associations et à Centrale Lille Alumni pour toute la scolarité, respectivement d'une valeur de 360€ et 100€.<br>
+                Plus d'informations sur https://centralelilleassos.fr/adherer
+            </dd>
+            <dt>URL de la billeterie (à configurer à l'aide du slug)</dt>
+            <dd>{{ session.ticketing_href_centrale_dd_pack }}</dd>
+        </dl>
+    </div>
+    <div style="padding: 1rem; border: 1px #444444 solid; border-radius: 3px; margin-bottom: .75rem">
+        <dl>
+            <dt>Nom</dt>
+            <dd>[Centrale Lille][Double diplôme] Adhésion CLA</dd>
+            <dt>Prix de l'unique billet</dt>
+            <dd>180€</dd>
+            <dt>Description</dt>
+            <dd>
+                [Uniquement pour les étudiants en double diplôme à Centrale Lille]<br>
+                Cotisation d'adhésion à Centrale Lille Associations pour toute la scolarité sans profiter de la réduction sur la cotisation d’adhésion à Centrale Lille Alumni.<br>
+                Plus d'informations sur https://centralelilleassos.fr/adherer
+            </dd>
+            <dt>URL de la billeterie (à configurer à l'aide du slug)</dt>
+            <dd>{{ session.ticketing_href_centrale_dd_cla }}</dd>
+        </dl>
+    </div>
+    <div style="padding: 1rem; border: 1px #444444 solid; border-radius: 3px; margin-bottom: .75rem">
+        <dl>
+            <dt>Nom</dt>
+            <dd>[ITEEM] Pack Alumni+CLA</dd>
+            <dt>Prix de l'unique billet</dt>
+            <dd>445€</dd>
+            <dt>Description</dt>
+            <dd>
+                Ce pack comprend la cotisation d'adhésion à Centrale Lille Associations et à Centrale Lille Alumni pour toute la scolarité, respectivement d'une valeur de 360€ et 100€.<br>
+                Plus d'informations sur https://centralelilleassos.fr/adherer
+            </dd>
+            <dt>URL de la billeterie (à configurer à l'aide du slug)</dt>
+            <dd>{{ session.ticketing_href_iteem_pack }}</dd>
+        </dl>
+    </div>
+    <div style="padding: 1rem; border: 1px #444444 solid; border-radius: 3px; margin-bottom: .75rem">
+        <dl>
+            <dt>Nom</dt>
+            <dd>[ITEEM] Adhésion CLA</dd>
+            <dt>Prix de l'unique billet</dt>
+            <dd>360€</dd>
+            <dt>Description</dt>
+            <dd>
+                Cotisation d'adhésion à Centrale Lille Associations pour toute la scolarité sans profiter de la réduction sur la cotisation d’adhésion à Centrale Lille Alumni.<br>
+                Plus d'informations sur https://centralelilleassos.fr/adherer
+            </dd>
+            <dt>URL de la billeterie (à configurer à l'aide du slug)</dt>
+            <dd>{{ session.ticketing_href_iteem_pack }}</dd>
+        </dl>
+    </div>
+</div>
