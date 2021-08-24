@@ -96,10 +96,10 @@ class RegistrationSession(models.Model):
                 self.total_nb = self.session.registrations.count()
 
                 self.validated_nb = self.session.registrations.filter(account_id__isnull=False).count()
-                self.validated_pc = round(self.validated_nb/self.total_nb * 100)
+                self.validated_pc = round(self.validated_nb/self.total_nb * 100) if self.total_nb > 0 else 0
 
                 self.pack_nb = self.session.registrations.filter(pack=True).count()
-                self.pack_pc = round(self.pack_nb/self.total_nb * 100)
+                self.pack_pc = round(self.pack_nb/self.total_nb * 100) if self.total_nb > 0 else 0
 
                 self.pack_validated_nb = self.session.registrations.filter(pack=True, account_id__isnull=False).count()
 
