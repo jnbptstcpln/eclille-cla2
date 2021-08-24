@@ -16,6 +16,7 @@ from django.utils import timezone
 
 from cla_web.utils import current_school_year
 from cla_auth.forms.admin_user_form import UserCreationForm, UserChangeForm
+from cla_registration.models import Registration
 from .models import UserInfos, UserMembership, Service, PasswordResetRequest
 
 # Remove default User management interface
@@ -114,7 +115,20 @@ class UserAdmin(UserAdmin):
             else:
                 return queryset
 
-    list_filter = (ValidatedFilter, PromotionFilter, 'is_staff')
+    class SchoolFilter(SimpleListFilter):
+        title = 'école'
+        parameter_name = 'school'
+
+        def lookups(self, request, model_admin):
+            return Registration.SchoolDomains.choices
+
+        def queryset(self, request, queryset):
+            if self.value() is not None:
+                return queryset.filter(infos__email_school__endswith=f"@{self.value()}")
+            else:
+                return queryset
+
+    list_filter = (ValidatedFilter, PromotionFilter, SchoolFilter, 'is_staff')
     search_fields = ('username', 'first_name', 'last_name', 'email')
     form = UserChangeForm
     add_form = UserCreationForm
