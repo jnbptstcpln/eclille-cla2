@@ -19,7 +19,7 @@
                         {% if not field.widget.is_hidden %}
                             {% if field.name == "edit_button" %}
                                 <th class="column-{{ field.name }}">
-                                    <a id='add_id_registrations-0-registration' class='related-widget-wrapper-link add-related' title='Ajouter une demande d adhésion' href='/admin/cla_registration/registration/add/?_to_field=id&amp;_popup=1&amp;session={{ original.pk }}'>
+                                    <a id='add_id_registrations-0-registration' title='Ajouter une demande d adhésion' href='{% url "cla_registration:register_introduction" %}'>
                                         <img src='/static/admin/img/icon-addlink.svg' alt='Ajouter'>
                                     </a>
                                 </th>

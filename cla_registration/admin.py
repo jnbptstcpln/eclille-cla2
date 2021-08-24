@@ -40,10 +40,10 @@ class RegistrationSessionAdmin(admin.ModelAdmin):
         def edit_button(self, obj: Registration):
             if obj.account is not None:
                 return mark_safe(
-                    f"<a id='change_id_registrations-{obj.pk}-registration' title='Voir l\\'utilisateur' target='_blank' href='{resolve_url('admin:auth_user_change', obj.account.pk)}'><img src='/static/admin/img/icon-viewlink.svg' alt='Voir'></a>"
+                    f"<a id='change_id_registrations-{obj.pk}-registration' title='Voir l\\'utilisateur' href='{resolve_url('admin:auth_user_change', obj.account.pk)}'><img src='/static/admin/img/icon-viewlink.svg' alt='Voir'></a>"
                 )
             return mark_safe(
-                f"<a id='change_id_registrations-{obj.pk}-registration' title='Voir l\\'inscription' target='_blank' href='{resolve_url('admin:cla_registration_registrationsession_registration', obj.session.pk, obj.pk)}'><img src='/static/admin/img/icon-viewlink.svg' alt='Voir'></a>"
+                f"<a id='change_id_registrations-{obj.pk}-registration' title='Voir l\\'inscription' href='{resolve_url('admin:cla_registration_registrationsession_registration', obj.session.pk, obj.pk)}'><img src='/static/admin/img/icon-viewlink.svg' alt='Voir'></a>"
             )
 
         edit_button.short_description = "edit_button"
