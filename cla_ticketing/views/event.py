@@ -1,10 +1,6 @@
-import jwt
-import random
-
 from django.views import generic
 from django.shortcuts import render, redirect, reverse, get_object_or_404
 from django.http import HttpRequest, HttpResponseNotAllowed
-from django.utils import timezone
 
 from cla_ticketing.forms import EventRegistrationForm
 from cla_ticketing.models import Event, EventRegistration

@@ -27,14 +27,15 @@ class UserAdmin(UserAdmin):
         model = UserInfos
         verbose_name = "Informations complémentaires"
         fields = (
+            'account_type',
             'email_school',
             'birthdate',
             ('promo', 'cursus'),
             ('activated_on', 'valid_until'),
             'phone',
-            'account_type'
+            'original_school'
         )
-        readonly_fields = 'activated_on', 'valid_until'
+        readonly_fields = 'activated_on', 'valid_until', 'original_school'
         extra = 1
         min_num = 1
         can_delete = False

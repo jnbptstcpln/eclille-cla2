@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.views.generic import CreateView, DetailView
-from .models import RegistrationSession, Registration
-from .forms import RegistrationForm, RegistrationPackForm
+from cla_registration.models import RegistrationSession, Registration
+from cla_registration.forms import RegistrationForm, RegistrationPackForm
 
 
 def register_introduction(req):
@@ -16,6 +16,7 @@ def register_introduction(req):
 
 class AbstractRegistrationView(CreateView):
 
+    is_from_another_school = False
     current_registration_session = None
     model = Registration
     form_class = RegistrationForm
@@ -41,6 +42,8 @@ class AbstractRegistrationView(CreateView):
             registration.school = self.school_domain
             registration.contribution = self.contribution
             registration.pack = self.pack
+            if self.is_from_another_school:
+                registration.original_school = form.cleaned_data.get('original_school')
             registration.save()
         else:
             registration = self.current_registration_session.registrations.filter(email_school=registration.email_school).first()
@@ -50,7 +53,8 @@ class AbstractRegistrationView(CreateView):
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs.update({
-            'school_domain': self.school_domain
+            'school_domain': self.school_domain,
+            'is_from_another_school': self.is_from_another_school
         })
         return kwargs
 
@@ -75,6 +79,7 @@ class CentralePackRegistrationView(AbstractPackRegistrationView):
 
 
 class CentralePackDDRegistrationView(AbstractPackRegistrationView):
+    is_from_another_school = True
     school_domain = Registration.SchoolDomains.CENTRALE
     registration_type = Registration.Types.CENTRALE_DD_PACK
     contribution = 265
@@ -96,6 +101,7 @@ class CentraleCLARegistrationView(AbstractRegistrationView):
 
 
 class CentraleCLADDRegistrationView(AbstractRegistrationView):
+    is_from_another_school = True
     school_domain = Registration.SchoolDomains.CENTRALE
     registration_type = Registration.Types.CENTRALE_DD_CLA
     contribution = 180

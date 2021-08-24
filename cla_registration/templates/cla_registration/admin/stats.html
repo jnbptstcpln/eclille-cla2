@@ -1,0 +1,35 @@
+<div>
+    {% with stats=session.stats %}
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; max-width: 450px; width: 100%;">
+            <dl style="width: 200px">
+                <dt>Nombre total d'adhésions</dt>
+                <dd>{{ stats.total_nb }}</dd>
+            </dl>
+            <dl style="width: 200px">
+                <dt>Nombre d'adhésions validées</dt>
+                <dd>{{ stats.validated_nb }} ({{ stats.validated_pc }}%)</dd>
+            </dl>
+
+        </div>
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; max-width: 450px; width: 100%;">
+            <dl style="width: 200px">
+                <dt>Nombre total de packs</dt>
+                <dd>{{ stats.pack_nb }} ({{ stats.pack_pc }}%)</dd>
+            </dl>
+            <dl style="width: 200px">
+                <dt>Nombre total de packs activés</dt>
+                <dd>{{ stats.pack_validated_nb }}</dd>
+            </dl>
+        </div>
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; max-width: 450px; width: 100%;">
+            <dl style="width: 200px">
+                <dt>Adhésions Centrale</dt>
+                <dd>{{ stats.school_centrale_nb }}</dd>
+            </dl>
+            <dl style="width: 200px">
+                <dt>Adhésions ITEEM</dt>
+                <dd>{{ stats.school_iteem_nb }}</dd>
+            </dl>
+        </div>
+    {% endwith %}
+</div>

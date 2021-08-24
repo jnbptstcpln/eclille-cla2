@@ -39,6 +39,7 @@ if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 admin.site.site_header = "Centrale Lille Associations"
+admin.site.site_title = "Espace d'administration"
 
 handler400 = 'cla_web.error_views.error_400'
 handler403 = 'cla_web.error_views.error_403'

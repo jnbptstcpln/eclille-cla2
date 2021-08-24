@@ -132,6 +132,7 @@ class UserInfos(models.Model):
     birthdate = models.DateField(verbose_name="Date de naissance")
     activated_on = models.DateTimeField(verbose_name="Date d'activation du compte", null=True)
     valid_until = models.DateTimeField(verbose_name="Compte valide jusqu'au", null=True)
+    original_school = models.CharField(max_length=255, null=True, verbose_name="École/université d'origine")
     picture = ResizedImageField(
         verbose_name="Photo de profil",
         upload_to=FilePath.picture,

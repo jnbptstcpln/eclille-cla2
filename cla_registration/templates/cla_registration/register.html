@@ -22,6 +22,9 @@
                     {% include "components/form-group.html" with field=form.birthdate %}
                     {% include "components/form-group.html" with field=form.email %}
                     {% include "components/form-group.html" with field=form.phone %}
+                    {% if form.original_school %}
+                        {% include "components/form-group.html" with field=form.original_school %}
+                    {% endif %}
                     {% include "components/form-group.html" with field=form.email_school %}
 
                     <div class="form-check mt-4">

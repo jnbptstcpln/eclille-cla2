@@ -1,29 +1,51 @@
 from django.contrib import admin
-from django.http import HttpRequest
+from django.contrib.auth.decorators import user_passes_test
 from django.template.loader import render_to_string
+from django.shortcuts import resolve_url, get_object_or_404
+from django.urls import path
 from django.utils.safestring import mark_safe
 
 from .models import RegistrationSession, Registration
+from .views.admin import RegistrationValidationView
 
 
 @admin.register(RegistrationSession)
 class RegistrationSessionAdmin(admin.ModelAdmin):
-
     class RegistrationInline(admin.TabularInline):
-        fields = ['last_name', 'first_name', 'datetime_registration', 'edit_button']
-        readonly_fields = ['last_name', 'first_name', 'datetime_registration', 'edit_button']
+        fields = ['last_name', 'first_name', 'has_pack', 'type', 'datetime_registration', 'is_linked_to_an_account', 'edit_button']
+        readonly_fields = ['last_name', 'first_name', 'datetime_registration', 'is_linked_to_an_account', 'edit_button', 'has_pack', 'type']
         model = Registration
         classes = []
         max_num = 0
+        extra = 0
+        ordering = "last_name",
 
         can_delete = False
         template = "cla_registration/admin/change_registrations.html"
 
+        def is_linked_to_an_account(self, obj: Registration):
+            return obj.account is not None
+        is_linked_to_an_account.short_description = "Compte créé ?"
+        is_linked_to_an_account.boolean = True
+
+        def has_pack(self, obj: Registration):
+            return obj.pack
+        has_pack.short_description = "Pack ?"
+        has_pack.boolean = True
+
+        def type(self, obj: Registration):
+            return obj.type
+        type.short_description = "Type"
+
         def edit_button(self, obj: Registration):
+            if obj.account is not None:
+                return mark_safe(
+                    f"<a id='change_id_registrations-{obj.pk}-registration' title='Voir l\\'utilisateur' target='_blank' href='{resolve_url('admin:auth_user_change', obj.account.pk)}'><img src='/static/admin/img/icon-viewlink.svg' alt='Voir'></a>"
+                )
             return mark_safe(
-                f"<a id='change_id_registrations-{obj.id}-registration' class='related-widget-wrapper-link change-related' data-href-template='/admin/cla_registration/registration/__fk__/change/?_to_field=id&amp;_popup=1' title='Modifier' href='/admin/cla_registration/registration/{obj.id}/change/?_to_field=id&amp;_popup=1&amp;session={obj.session.pk}' onclick='django.jQuery(this).parents(\"tr\").children().css(\"background-color\", \"rgb(255,255,205,.25)\")'><img src='/static/admin/img/icon-changelink.svg' alt='Modification'></a>"+
-                f"<a id='delete_id_registrations-{obj.id}-registration' class='related-widget-wrapper-link delete-related' data-href-template='/admin/cla_registration/registration/__fk__/delete/?_to_field=id&amp;_popup=1' title='Supprimer l\\'inscription' href='/admin/cla_registration/registration/{obj.id}/delete/?_to_field=id&amp;_popup=1' onclick='django.jQuery(this).parents(\"tr\").children().css(\"background-color\", \"rgb(255,0,0,.25)\")'><img src='/static/admin/img/icon-deletelink.svg' alt='Supprimer'></a>"
+                f"<a id='change_id_registrations-{obj.pk}-registration' title='Voir l\\'inscription' target='_blank' href='{resolve_url('admin:cla_registration_registrationsession_registration', obj.session.pk, obj.pk)}'><img src='/static/admin/img/icon-viewlink.svg' alt='Voir'></a>"
             )
+
         edit_button.short_description = "edit_button"
 
     fieldsets = [
@@ -39,7 +61,7 @@ class RegistrationSessionAdmin(admin.ModelAdmin):
         [
             "Configuration de la plateforme de paiement",
             {
-                'fields': ('pumpking_configuration',),
+                'fields': ('pumpkin_configuration',),
                 'classes': ('collapse',),
             }
         ],
@@ -51,10 +73,31 @@ class RegistrationSessionAdmin(admin.ModelAdmin):
             }
         ]
     ]
-    readonly_fields = ['pumpking_configuration']
-    inlines = [RegistrationInline]
+    readonly_fields = ['pumpkin_configuration', 'statistics']
 
-    def pumpking_configuration(self, obj: RegistrationSession):
+    list_display = ("school_year", "date_start", "date_end", "number_of_registrations")
+
+    def get_inlines(self, request, obj):
+        inlines = super().get_inlines(request, obj)
+        if obj is not None:
+            return inlines + [self.RegistrationInline]
+        return inlines
+
+    def get_fieldsets(self, request, obj=None):
+        fieldsets = super().get_fieldsets(request, obj)
+        if obj is not None:
+            return fieldsets + [
+                [
+                    "Statistiques",
+                    {
+                        'fields': ('statistics',),
+                        'classes': ('collapse',),
+                    }
+                ]
+            ]
+        return fieldsets
+
+    def pumpkin_configuration(self, obj: RegistrationSession):
         if obj.pk:  # Check if the object was created
             return mark_safe(
                 render_to_string(
@@ -66,9 +109,41 @@ class RegistrationSessionAdmin(admin.ModelAdmin):
             )
         else:
             return ""
-    pumpking_configuration.short_description = ''
 
+    pumpkin_configuration.short_description = ''
 
-@admin.register(Registration)
-class RegistrationAdmin(admin.ModelAdmin):
-    pass
+    def number_of_registrations(self, obj: RegistrationSession):
+        return obj.registrations.count()
+
+    number_of_registrations.short_description = 'Nombre d\'adhésion'
+
+    def statistics(self, obj: RegistrationSession):
+        if obj.pk:  # Check if the object was created
+            return mark_safe(
+                render_to_string(
+                    "cla_registration/admin/stats.html",
+                    {
+                        'session': obj
+                    }
+                )
+            )
+        return ""
+
+    statistics.short_description = 'Statistiques'
+
+    def get_urls(self):
+        info = self.model._meta.app_label, self.model._meta.model_name
+        print('%s_%s_registration' % info)
+        urls = super().get_urls()
+        my_urls = [
+            path(
+                '<uuid:session_pk>/registrations/<uuid:registration_pk>',
+                self.admin_site.admin_view(RegistrationValidationView.as_view()),
+                name='%s_%s_registration' % info
+            )
+        ]
+        urls = my_urls + urls
+        return urls
+
+    def render_change_form(self, request, context, add=False, change=False, form_url='', obj=None):
+        return super().render_change_form(request, context, add, change, form_url, obj)

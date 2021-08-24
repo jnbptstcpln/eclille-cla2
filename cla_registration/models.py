@@ -14,8 +14,9 @@ class RegistrationSessionManager(models.Manager):
 class RegistrationSession(models.Model):
 
     class Meta:
-        verbose_name = "Session d'inscriptions"
-        verbose_name_plural = "Sessions d'inscriptions"
+        verbose_name = "Session d'adhésion"
+        verbose_name_plural = "Sessions d'adhésion"
+        ordering = "-date_start",
 
     objects = RegistrationSessionManager()
 
@@ -87,15 +88,39 @@ class RegistrationSession(models.Model):
         default=DefaultTicketingHref.ticketing_href_iteem_cla
     )
 
+    def stats(self):
+        class Stats:
+            def __init__(self, session: RegistrationSession):
+                self.session = session
+
+                self.total_nb = self.session.registrations.count()
+
+                self.validated_nb = self.session.registrations.filter(account_id__isnull=False).count()
+                self.validated_pc = round(self.validated_nb/self.total_nb * 100)
+
+                self.pack_nb = self.session.registrations.filter(pack=True).count()
+                self.pack_pc = round(self.pack_nb/self.total_nb * 100)
+
+                self.pack_validated_nb = self.session.registrations.filter(pack=True, account_id__isnull=False).count()
+
+                self.school_centrale_nb = self.session.registrations.filter(school=Registration.SchoolDomains.CENTRALE).count()
+                self.school_iteem_nb = self.session.registrations.filter(school=Registration.SchoolDomains.ITEEM).count()
+
+        return Stats(self)
+
     @property
     def are_registrations_opened(self):
         return self.date_start <= timezone.now() < self.date_end
 
     def __str__(self):
-        return f"Session d'inscriptions {self.school_year}"
+        return f"{self.school_year}"
 
 
 class Registration(models.Model):
+
+    class Meta:
+        verbose_name = "Formulaire d'adhésion"
+        verbose_name_plural = "Formulaires d'adhésion"
 
     class SchoolDomains(models.TextChoices):
         CENTRALE = "centrale.centralelille.fr", "École Centrale de Lille"
@@ -122,6 +147,7 @@ class Registration(models.Model):
     phone = models.CharField(max_length=20, verbose_name="Numéro de téléphone")
     birthdate = models.DateField(verbose_name="Date de naissance")
     school = models.TextField(max_length=255, choices=SchoolDomains.choices, verbose_name="Ecole")
+    original_school = models.CharField(max_length=255, verbose_name="École/université d'origine", null=True)
     pack = models.BooleanField(verbose_name="L'étudiant a choisi de cotiser avec le pack")
     contribution = models.PositiveIntegerField(verbose_name="Montant de cotisation à régler")
     rgpd_agreement = models.BooleanField(verbose_name="L'étudiant a accepté que ses informations soient stockées et utilisées par Centrale Lille Associations")
@@ -139,4 +165,4 @@ class Registration(models.Model):
         }.get(self.type)
 
     def __str__(self):
-        return f"{self.last_name.upper()} {self.first_name}"
+        return f"{self.first_name} {self.last_name.upper()}"
