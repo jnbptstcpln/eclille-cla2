@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.contrib.auth.decorators import user_passes_test
+from django.conf import settings
 from django.template.loader import render_to_string
 from django.shortcuts import resolve_url, get_object_or_404
 from django.urls import path
@@ -58,22 +58,9 @@ class RegistrationSessionAdmin(admin.ModelAdmin):
                 )
             }
         ],
-        [
-            "Configuration de la plateforme de paiement",
-            {
-                'fields': ('pumpkin_configuration',),
-                'classes': ('collapse',),
-            }
-        ],
-        [
-            "Lien vers les billeteries",
-            {
-                'fields': ('ticketing_href_centrale_pack', 'ticketing_href_centrale_cla', 'ticketing_href_centrale_dd_pack', 'ticketing_href_centrale_dd_cla', 'ticketing_href_iteem_pack', 'ticketing_href_iteem_cla'),
-                'classes': ('collapse',),
-            }
-        ]
+
     ]
-    readonly_fields = ['pumpkin_configuration', 'statistics']
+    readonly_fields = ['pumpkin_configuration', 'statistics', 'link_sharing_alumni']
 
     list_display = ("school_year", "date_start", "date_end", "number_of_registrations")
 
@@ -84,9 +71,36 @@ class RegistrationSessionAdmin(admin.ModelAdmin):
         return inlines
 
     def get_fieldsets(self, request, obj=None):
-        fieldsets = super().get_fieldsets(request, obj)
+        _fieldsets = super().get_fieldsets(request, obj)
+        fieldsets = _fieldsets
+
+        if request.user.has_perm("cla_registration.registrationsession_change"):
+            fieldsets += [
+                [
+                    "Partage des informations d'adhésion",
+                    {
+                        'fields': ('link_sharing_alumni',),
+                        'classes': ('collapse',),
+                    }
+                ],
+                [
+                    "Configuration de la plateforme de paiement",
+                    {
+                        'fields': ('pumpkin_configuration',),
+                        'classes': ('collapse',),
+                    }
+                ],
+                [
+                    "Lien vers les billeteries",
+                    {
+                        'fields': ('ticketing_href_centrale_pack', 'ticketing_href_centrale_cla', 'ticketing_href_centrale_dd_pack', 'ticketing_href_centrale_dd_cla', 'ticketing_href_iteem_pack', 'ticketing_href_iteem_cla'),
+                        'classes': ('collapse',),
+                    }
+                ]
+            ]
+
         if obj is not None:
-            return fieldsets + [
+            fieldsets += [
                 [
                     "Statistiques",
                     {
@@ -109,12 +123,10 @@ class RegistrationSessionAdmin(admin.ModelAdmin):
             )
         else:
             return ""
-
     pumpkin_configuration.short_description = ''
 
     def number_of_registrations(self, obj: RegistrationSession):
         return obj.registrations.count()
-
     number_of_registrations.short_description = 'Nombre d\'adhésion'
 
     def statistics(self, obj: RegistrationSession):
@@ -128,8 +140,17 @@ class RegistrationSessionAdmin(admin.ModelAdmin):
                 )
             )
         return ""
-
     statistics.short_description = 'Statistiques'
+
+    def link_sharing_alumni(self, obj: RegistrationSession):
+        return mark_safe(
+            (
+                "<label style='float:none;width:100%'>Transmettez le lien suivant aux représentants de Centrale Lille Alumni pour leur permettre d'accéder à la liste des adhérents ayant accepté de partager leurs informations personnelles avec Centrale Lille Alumni</label>"
+                "<input style='margin-right: .5rem' class='vTextField' value='{link_sharing_alumni}' id='id_link_sharing_alumni'>"
+                "<a class='button' onclick='document.getElementById(\"id_link_sharing_alumni\").select();document.execCommand(\"copy\");return false;','>Copier</a>"
+            ).format(link_sharing_alumni=f"https://{settings.ALLOWED_HOSTS[0]}{resolve_url('cla_registration:registration_sharing_alumni', obj.pk, obj.sharing_uuid_alumni)}")
+        )
+    link_sharing_alumni.short_description = ''
 
     def get_urls(self):
         info = self.model._meta.app_label, self.model._meta.model_name

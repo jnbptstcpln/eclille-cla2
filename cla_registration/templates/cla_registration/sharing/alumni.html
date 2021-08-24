@@ -1,0 +1,30 @@
+{% extends "layout/standalone.html" %}
+
+{% block page_title %}Campagne d'adhésion {{ session.school_year }}{% endblock %}
+
+{% block content %}
+    <div style="max-width: 650px" class="card w-100">
+        <div class="card-body">
+            <div class="mt-4 mt-md-0">
+                <h3 class="text-center">Campagne d'adhésion {{ session.school_year }}</h3>
+                <p class="mt-2 mb-3">
+                    Retrouvez ci-dessous la liste des demandes d'adhésion pour la campagne {{ session.school_year }} pour lesquelles chaque
+                    étudiant a explicitement donné son accord pour ce partage dans le cadre suivant :
+                </p>
+                <blockquote class="mx-auto bg-light border-1-grey-dark p-4 text-justify" style="max-width: 500px">
+                    {{ rgpd_agreement_alumni }}
+                </blockquote>
+                <p>
+                    Si un manquement à ces engagements venait à être constaté, <i>Centrale Lille Associations</i> se
+                    réserve le droit de mettre fin à ce partage pour la protection des données personnelles
+                    de ses adhérents.
+                </p>
+                <form method="post" class="mt-30ms-auto">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary btn-block btn-lg"><i class="far fa-download"></i> Télécharger au format CSV</button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+{% endblock %}

@@ -88,6 +88,8 @@ class RegistrationSession(models.Model):
         default=DefaultTicketingHref.ticketing_href_iteem_cla
     )
 
+    sharing_uuid_alumni = models.UUIDField(default=uuid4, verbose_name="Identifiant de partage avec les Alumni", editable=False)
+
     def stats(self):
         class Stats:
             def __init__(self, session: RegistrationSession):
@@ -166,3 +168,13 @@ class Registration(models.Model):
 
     def __str__(self):
         return f"{self.first_name} {self.last_name.upper()}"
+
+
+class DataSharingLogs(models.Model):
+
+    class Organism(models.TextChoices):
+        ALUMNI = "alumni", "Centrale Lille Alumni"
+
+    session = models.ForeignKey(RegistrationSession, related_name="+", on_delete=models.CASCADE)
+    download_on = models.DateTimeField(auto_now_add=True)
+    download_by = models.CharField(max_length=255, choices=Organism.choices)

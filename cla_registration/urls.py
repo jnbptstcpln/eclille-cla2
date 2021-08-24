@@ -1,5 +1,6 @@
 from django.urls import path
 from .views.user import *
+from .views.sharing import *
 
 app_name = "cla_registration"
 urlpatterns = [
@@ -15,4 +16,6 @@ urlpatterns = [
     # Success and Paiement
     path("adherer/<uuid:pk>", RegistrationPaiementView.as_view(), name="register_paiement"),
     path("adherer/<uuid:pk>/cheque", RegistrationPaiementCheckView.as_view(), name="register_paiement_check"),
+
+    path("adhesion/partenaires/<str:session_pk>/<str:sharing_uuid>", RegistrationsAlumniView.as_view(), name="registration_sharing_alumni"),
 ]

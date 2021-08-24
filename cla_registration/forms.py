@@ -3,6 +3,7 @@ from .models import Registration
 
 from cla_auth.forms.admin_user_form import UserCreationForm
 from cla_auth.models import UserInfos, UserMembership
+from cla_registration.strings import RGPD_AGREEMENT_CLA, RGPD_AGREEMENT_ALUMNI
 
 
 class RegistrationForm(forms.ModelForm):
@@ -48,11 +49,11 @@ class RegistrationForm(forms.ModelForm):
             field.widget.attrs['class'] = field.widget.attrs.get('class', "") + "form-control"
 
     rgpd_agreement = forms.BooleanField(
-        label="J'accepte que mes informations soient utilisées par Centrale Lille Associations tel que décrit et détaillé dans <a href='/privacy/' target='blank'>la charte de confidentialité</a>",
+        label=RGPD_AGREEMENT_CLA,
         required=True
     )
     rgpd_sharing_alumni = forms.BooleanField(
-        label="J’accepte que mes coordonnées soient transmises à Centrale Lille Alumni dans le cadre du partenariat avec Centrale Lille Associations, pour la création de mon compte sur le site du réseau (www.centraliens-lille.org) et l’accès aux services liés (événements, mentorat, offres de stages, etc.)",
+        label=RGPD_AGREEMENT_ALUMNI,
         required=False
     )
 
@@ -68,7 +69,7 @@ class RegistrationForm(forms.ModelForm):
 
 class RegistrationPackForm(RegistrationForm):
     rgpd_sharing_alumni = forms.BooleanField(
-        label="J’accepte que mes coordonnées soient transmises à Centrale Lille Alumni dans le cadre du partenariat avec Centrale Lille Associations, pour la création de mon compte sur le site du réseau (www.centraliens-lille.org) et l’accès aux services liés (événements, mentorat, offres de stages, etc.)",
+        label=RGPD_AGREEMENT_ALUMNI,
         required=True
     )
 
