@@ -2,19 +2,19 @@ import copy
 
 from django.contrib import admin, messages
 from django.contrib.auth.models import User
+from django.contrib.admin import SimpleListFilter
 from django.shortcuts import redirect
 from django.contrib.auth.admin import UserAdmin
-from django.utils.translation import gettext, gettext_lazy as _
-from django.urls import path, reverse
+from django.utils.translation import gettext_lazy as _
+from django.urls import path
 from django.http import Http404, HttpRequest
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import resolve_url
 from django.utils.html import mark_safe, escape
-from django.template.loader import render_to_string
 from django.conf import settings
 from django.utils import timezone
 
-from .models import *
+from .models import UserInfos, UserMembership, Service, PasswordResetRequest
 from cla_auth.forms.admin_user_form import UserCreationForm, UserChangeForm
 
 # Remove default User management interface
@@ -83,7 +83,25 @@ class UserAdmin(UserAdmin):
         MembershipInline,
     ]
     list_display = ('username', 'first_name', 'last_name', 'email_school', 'is_activated', 'is_validated')
-    list_filter = ('is_staff',)
+
+    class ValidatedFilter(SimpleListFilter):
+        title = 'statut'
+        parameter_name = 'validated'
+
+        def lookups(self, request, model_admin):
+            return [(1, "Compte validé"), (2, "Compte activé")]
+            # You can also use hardcoded model name like "Country" instead of
+            # "model_admin.model" if this is not direct foreign key filter
+
+        def queryset(self, request, queryset):
+            if self.value() == 1:
+                return queryset.filter(infos__valid_until__gt=timezone.now())
+            elif self.value() == 2:
+                return queryset.filter(infos__activated_on__isnull=False)
+            else:
+                return queryset
+
+    list_filter = (ValidatedFilter, 'is_staff')
     search_fields = ('username', 'first_name', 'last_name', 'email')
     form = UserChangeForm
     add_form = UserCreationForm
