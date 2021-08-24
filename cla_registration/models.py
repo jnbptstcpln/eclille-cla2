@@ -14,8 +14,8 @@ class RegistrationSessionManager(models.Manager):
 class RegistrationSession(models.Model):
 
     class Meta:
-        verbose_name = "Session d'adhésion"
-        verbose_name_plural = "Sessions d'adhésion"
+        verbose_name = "Campagne d'adhésion"
+        verbose_name_plural = "Campagnes d'adhésion"
         ordering = "-date_start",
 
     objects = RegistrationSessionManager()
