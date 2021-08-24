@@ -14,8 +14,9 @@ from django.utils.html import mark_safe, escape
 from django.conf import settings
 from django.utils import timezone
 
-from .models import UserInfos, UserMembership, Service, PasswordResetRequest
+from cla_web.utils import current_school_year
 from cla_auth.forms.admin_user_form import UserCreationForm, UserChangeForm
+from .models import UserInfos, UserMembership, Service, PasswordResetRequest
 
 # Remove default User management interface
 admin.site.unregister(User)
@@ -82,7 +83,7 @@ class UserAdmin(UserAdmin):
         UserInfosInline,
         MembershipInline,
     ]
-    list_display = ('username', 'first_name', 'last_name', 'email_school', 'is_activated', 'is_validated')
+    list_display = ('username', 'first_name', 'last_name', 'cursus', 'promo', 'is_activated', 'is_validated')
 
     class ValidatedFilter(SimpleListFilter):
         title = 'statut'
@@ -90,8 +91,6 @@ class UserAdmin(UserAdmin):
 
         def lookups(self, request, model_admin):
             return [(1, "Compte validé"), (2, "Compte activé")]
-            # You can also use hardcoded model name like "Country" instead of
-            # "model_admin.model" if this is not direct foreign key filter
 
         def queryset(self, request, queryset):
             if self.value() == 1:
@@ -101,7 +100,21 @@ class UserAdmin(UserAdmin):
             else:
                 return queryset
 
-    list_filter = (ValidatedFilter, 'is_staff')
+    class PromotionFilter(SimpleListFilter):
+        title = 'promotion'
+        parameter_name = 'promo'
+
+        def lookups(self, request, model_admin):
+            y = current_school_year()
+            return [(y+i, y+i) for i in range(6)]
+
+        def queryset(self, request, queryset):
+            if self.value() is not None:
+                return queryset.filter(infos__promo=self.value())
+            else:
+                return queryset
+
+    list_filter = (ValidatedFilter, PromotionFilter, 'is_staff')
     search_fields = ('username', 'first_name', 'last_name', 'email')
     form = UserChangeForm
     add_form = UserCreationForm
@@ -109,6 +122,14 @@ class UserAdmin(UserAdmin):
     def email_school(self, obj: User):
         return obj.infos.email_school
     email_school.short_description = 'Email école'
+
+    def cursus(self, obj: User):
+        return obj.infos.cursus
+    cursus.short_description = 'Cursus'
+
+    def promo(self, obj: User):
+        return obj.infos.promo
+    promo.short_description = 'Promotion'
 
     def is_activated(self, obj: User):
         return obj.infos.activated_on is not None
