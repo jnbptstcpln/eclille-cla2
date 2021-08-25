@@ -26,13 +26,13 @@
                             "click",
                             function (event) {
                                 event.preventDefault();
-                                window.location.href = "?registration_search=" + document.getElementById("registrations-search-input").value
+                                window.location.href = "?registration_search=" + document.getElementById("registrations-search-input").value +"#registration-table"
                             }
                         )
                     })
                 </script>
             </div>
-            <table>
+            <table id="registration-table">
                 <thead>
                 <tr>
                     <th class="original"></th>
