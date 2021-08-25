@@ -4,6 +4,7 @@ from .models import Registration
 from cla_auth.forms.admin_user_form import UserCreationForm
 from cla_auth.models import UserInfos, UserMembership
 from cla_registration.strings import RGPD_AGREEMENT_CLA, RGPD_AGREEMENT_ALUMNI
+from cla_registration.utils import capitalize_name
 
 
 class RegistrationForm(forms.ModelForm):
@@ -65,6 +66,12 @@ class RegistrationForm(forms.ModelForm):
         if email == email_school:
             raise forms.ValidationError('Veuillez indiquer une adresse mail personnelle différente de votre adresse mail fournie par l\'école')
         return email_school
+
+    def clean_first_name(self):
+        return capitalize_name(self.cleaned_data['first_name'])
+
+    def clean_last_name(self):
+        return capitalize_name(self.cleaned_data['last_name'])
 
 
 class RegistrationPackForm(RegistrationForm):
