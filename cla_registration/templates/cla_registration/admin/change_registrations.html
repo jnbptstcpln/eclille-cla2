@@ -17,17 +17,19 @@
                        style="border: 1px solid var(--border-color);font-size: 13px;padding: 4px 8px;margin: 0;vertical-align: middle;background: var(--body-bg);box-shadow: 0 -15px 20px -10px rgba(0, 0, 0, 0.15) inset;cursor: pointer;color: var(--body-fg);"
                        value="Rechercher">
                 <script>
-                    const urlSearchParams = new URLSearchParams(window.location.search);
-                    const params = Object.fromEntries(urlSearchParams.entries());
-                    document.getElementById("registrations-search-input").value = params.registration_search;
+                    document.addEventListener("DOMContentLoaded", function () {
+                        const urlSearchParams = new URLSearchParams(window.location.search);
+                        const params = Object.fromEntries(urlSearchParams.entries());
+                        document.getElementById("registrations-search-input").value = params.registration_search || "";
 
-                    document.getElementById("registrations-search-submit").addEventListener(
-                        "click",
-                        function (event) {
-                            event.preventDefault();
-                            window.location.href = "?registration_search=" + document.getElementById("registrations-search-input").value
-                        }
-                    )
+                        document.getElementById("registrations-search-submit").addEventListener(
+                            "click",
+                            function (event) {
+                                event.preventDefault();
+                                window.location.href = "?registration_search=" + document.getElementById("registrations-search-input").value
+                            }
+                        )
+                    })
                 </script>
             </div>
             <table>
