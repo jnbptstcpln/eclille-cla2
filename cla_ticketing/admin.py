@@ -3,6 +3,7 @@ from copy import deepcopy
 from django import forms
 from django.contrib import admin
 from django.core.exceptions import PermissionDenied
+from django.db.models import Q
 from django.http import HttpRequest
 from django.shortcuts import resolve_url, get_object_or_404
 from django.utils.safestring import mark_safe
@@ -17,7 +18,7 @@ class EventAdmin(admin.ModelAdmin):
     class EventRegistrationTypeInline(admin.TabularInline):
         fields = ['name', 'description', 'open_to', 'visible', 'price']
         model = EventRegistrationType
-        classes = []
+        classes = ["collapse"]
         extra = 0
 
         def has_add_permission(self, request, obj: Event = None):
@@ -91,6 +92,12 @@ class EventAdmin(admin.ModelAdmin):
                 else:
                     perm = True
             return perm
+
+        def get_queryset(self, request):
+            queryset = super().get_queryset(request)
+            if request.GET.get('registration_search') is not None:
+                queryset = queryset.filter(Q(last_name__icontains=request.GET.get('registration_search')) | Q(first_name__icontains=request.GET.get('registration_search')))
+            return queryset
 
     list_display = ("name", "event_starts_on", "organizer", "places")
     change_form_template = "cla_ticketing/admin/change_event.html"
