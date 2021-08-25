@@ -49,15 +49,6 @@ class RegistrationSessionAdmin(admin.ModelAdmin):
         edit_button.short_description = "edit_button"
 
     fieldsets = [
-        [
-            "Informations pratiques",
-            {
-                'fields': (
-                    ('school_year',),
-                    ('date_start', 'date_end'),
-                )
-            }
-        ],
 
     ]
     readonly_fields = ['pumpkin_configuration', 'statistics', 'link_sharing_alumni']
@@ -71,10 +62,18 @@ class RegistrationSessionAdmin(admin.ModelAdmin):
         return inlines
 
     def get_fieldsets(self, request, obj=None):
-        _fieldsets = super().get_fieldsets(request, obj)
-        fieldsets = _fieldsets
-
-        if request.user.has_perm("cla_registration.registrationsession_change"):
+        fieldsets = [
+            [
+                "Informations pratiques",
+                {
+                    'fields': (
+                        ('school_year',),
+                        ('date_start', 'date_end'),
+                    ),
+                }
+            ]
+        ]
+        if request.user.has_perm("cla_registration.change_registrationsession"):
             fieldsets += [
                 [
                     "Partage des informations d'adhésion",
@@ -105,10 +104,11 @@ class RegistrationSessionAdmin(admin.ModelAdmin):
                     "Statistiques",
                     {
                         'fields': ('statistics',),
-                        'classes': ('collapse',),
+                        'classes': ('collapse',)
                     }
                 ]
             ]
+
         return fieldsets
 
     def pumpkin_configuration(self, obj: RegistrationSession):

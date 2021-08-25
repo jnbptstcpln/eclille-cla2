@@ -308,4 +308,115 @@ class EventRegistrationAdmin(admin.ModelAdmin):
 
 @admin.register(DancingParty)
 class DancingPartyAdmin(admin.ModelAdmin):
-    pass
+    list_display = ("name", "event_starts_on", "organizer", "places")
+    change_form_template = "cla_ticketing/admin/change_event.html"
+    filter_horizontal = ('managers',)
+    fieldsets = [
+        [
+            "Informations pratiques",
+            {
+                'fields': (
+                    ('link_ticketing'),
+                    ('remaining_places'),
+                    ('name', 'slug'),
+                    ('organizer', 'places'),
+                    ('event_starts_on', 'event_ends_on'),
+                    ('registration_starts_on', 'registration_ends_on')
+                )
+            }
+        ],
+        [
+            "Informations supplémentaire",
+            {
+                'fields': ('contributor_ticketing_href', 'colleges', 'description'),
+                'classes': ('collapse',),
+            }
+        ]
+    ]
+    fielset_event_administration = [
+        "Administration de l'événement",
+        {
+            'fields': ('managers',),
+            'classes': ('collapse',),
+        }
+    ]
+    readonly_fields = ['link_ticketing', 'remaining_places']
+
+    create_inlines = []
+    change_inlines = []
+
+    def link_ticketing(self, obj: Event):
+        if obj.pk:  # Check if the object was created
+            return mark_safe(
+                (
+                    "<label style='float:none;width:100%'>Voici le lien pour accéder à la billeterie</label>"
+                    "<input style='margin-right: .5rem' class='vTextField' value='{link_ticketing}' id='id_link_ticketing'>"
+                    "<a class='button' onclick='document.getElementById(\"id_link_ticketing\").select();document.execCommand(\"copy\");return false;','>Copier</a>"
+                ).format(link_ticketing=f"https://{settings.ALLOWED_HOSTS[0]}{resolve_url('cla_ticketing:event_ticketing', obj.slug)}")
+            )
+        else:
+            return ""
+
+    link_ticketing.short_description = ''
+
+    def remaining_places(self, obj: Event):
+        if obj.pk:  # Check if the object was created
+            return obj.places - obj.registrations.count()
+        else:
+            return "L'événement n'a pas encore été créé"
+
+    remaining_places.short_description = 'Nombre de places restant'
+
+    def response_add(self, request, obj, post_url_continue=None):
+        self.update_managers(request, obj)
+        return super().response_add(request, obj, post_url_continue)
+
+    def response_change(self, request, obj):
+        self.update_managers(request, obj)
+        return super().response_change(request, obj)
+
+    def update_managers(self, request, obj: Event):
+        # Update manager perms to allow them to access the event
+        if request.user.has_perm('cla_ticketing.add_event'):
+            event_organizer_group = Event.get_or_create_event_organizer_group()
+            for manager in obj.managers.all():
+                manager.is_staff = True
+                manager.save()
+                event_organizer_group.user_set.add(manager)
+                event_organizer_group.save()
+
+        return super()._response_post_save(request, obj)
+
+    def get_fieldsets(self, request: HttpRequest, obj=None):
+        fielsets = deepcopy(super().get_fieldsets(request, obj))
+        if request.user.has_perm("cla_ticketing.add_event"):
+            fielsets.append(self.fielset_event_administration)
+        return fielsets
+
+    def get_inlines(self, request, obj=None):
+        if obj:
+            return self.change_inlines
+        else:
+            return self.create_inlines
+
+    def has_view_permission(self, request, obj=None):
+        perm = super().has_view_permission(request, obj)
+        if not request.user.has_perm('cla_ticketing.add_event') and request.user.has_perm('cla_ticketing.event_manager'):
+            if obj:
+                perm = obj.managers.filter(pk=request.user.pk).count() > 0
+            else:
+                perm = True
+        return perm
+
+    def has_change_permission(self, request: HttpRequest, obj: Event = None):
+        perm = super().has_change_permission(request, obj)
+        if not request.user.has_perm('cla_ticketing.add_event') and request.user.has_perm('cla_ticketing.event_manager'):
+            if obj:
+                perm = obj.managers.filter(pk=request.user.pk).count() > 0
+        return perm
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        if not request.user.has_perm('cla_ticketing.add_event') and request.user.has_perm('cla_ticketing.event_manager'):
+            qs = qs.filter(managers__in=[request.user])
+        return qs
