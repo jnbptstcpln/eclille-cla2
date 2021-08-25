@@ -154,7 +154,6 @@ class RegistrationSessionAdmin(admin.ModelAdmin):
 
     def get_urls(self):
         info = self.model._meta.app_label, self.model._meta.model_name
-        print('%s_%s_registration' % info)
         urls = super().get_urls()
         my_urls = [
             path(
