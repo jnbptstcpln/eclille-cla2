@@ -142,7 +142,7 @@ class RegistrationSessionExportView(UserPassesTestMixin, generic.View):
             "Ecole": lambda x: x.school,
             "Double diplôme entrant": lambda x: f"Oui ({x.original_school})" if x.original_school is not None else "Non",
             "Montant de la cotisation": lambda x: f"{x.contribution}€",
-            "A choisi le pack (a cotisé pour adhérer à Centrale Lille Alumni)": lambda x: "Oui" if x.pack else "Non",
+            "A choisi le pack": lambda x: "Oui" if x.pack else "Non",
             "A réglé sa cotisation": lambda x: "Oui" if x.account is not None else "Non",
             "Référence adhésion": lambda x: x.pk
         }
