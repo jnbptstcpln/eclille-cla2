@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.conf import settings
+from django.db.models import Q
 from django.template.loader import render_to_string
 from django.shortcuts import resolve_url, get_object_or_404
 from django.urls import path
@@ -14,6 +15,7 @@ class RegistrationSessionAdmin(admin.ModelAdmin):
     class RegistrationInline(admin.TabularInline):
         fields = ['last_name', 'first_name', 'has_pack', 'type', 'datetime_registration', 'is_linked_to_an_account', 'edit_button']
         readonly_fields = ['last_name', 'first_name', 'datetime_registration', 'is_linked_to_an_account', 'edit_button', 'has_pack', 'type']
+        filter_horizontal = ['last_name']
         model = Registration
         classes = []
         max_num = 0
@@ -45,14 +47,17 @@ class RegistrationSessionAdmin(admin.ModelAdmin):
             return mark_safe(
                 f"<a id='change_id_registrations-{obj.pk}-registration' title='Voir l\\'inscription' href='{resolve_url('admin:cla_registration_registrationsession_registration', obj.session.pk, obj.pk)}'><img src='/static/admin/img/icon-viewlink.svg' alt='Voir'></a>"
             )
-
         edit_button.short_description = "edit_button"
 
-    fieldsets = [
+        def get_queryset(self, request):
+            queryset = super().get_queryset(request)
+            if request.GET.get('registration_search') is not None:
+                queryset = queryset.filter(Q(last_name__icontains=request.GET.get('registration_search')) | Q(first_name__icontains=request.GET.get('registration_search')))
+            return queryset
 
-    ]
+
+
     readonly_fields = ['pumpkin_configuration', 'statistics', 'link_sharing_alumni']
-
     list_display = ("school_year", "date_start", "date_end", "number_of_registrations")
 
     def get_inlines(self, request, obj):
