@@ -55,8 +55,8 @@ class AbstractRegistration(models.Model):
     email = models.EmailField(verbose_name="Adresse mail personnelle")
     phone = models.CharField(max_length=15, verbose_name="Numéro de téléphone")
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="+", verbose_name="Créateur de cette inscription", editable=False, null=True)
-    created_on = models.DateTimeField(auto_now_add=True, editable=False)
-    paid = models.BooleanField(default=False, verbose_name="A payer")
+    created_on = models.DateTimeField(auto_now_add=True, editable=False, verbose_name="Inscrit le")
+    paid = models.BooleanField(default=False, verbose_name="A payé")
 
     def __str__(self):
         return f"{self.last_name.upper()} {self.first_name}"
@@ -126,6 +126,10 @@ class DancingParty(AbstractEvent):
         verbose_name = "Billeterie de soirée dansante"
         verbose_name_plural = "Billeteries de soirée dansante"
 
+    @property
+    def places_remaining(self):
+        return max(self.places-self.registrations.filter(is_staff=False).count(), 0)
+
 
 class DancingPartyRegistration(AbstractRegistration):
 
@@ -133,7 +137,21 @@ class DancingPartyRegistration(AbstractRegistration):
         abstract = False
         verbose_name = "Inscription"
         verbose_name_plural = "Inscriptions"
+        permissions = (
+            ('dancingparty_manager', "Accès à l'interface de gestion des soirées dansantes pour lesquelles l'utilisateur est administrateur"),
+        )
+        unique_together = [
+            ['user', 'dancing_party', ],  # User can only be registered one time for an event
+        ]
+
+    class Types(models.TextChoices):
+        HARD = "hard", "Avec alcool"
+        SOFT = "soft", "Sans alcool"
 
     dancing_party = models.ForeignKey(DancingParty, on_delete=models.CASCADE, related_name="registrations", verbose_name="Soirée dansante", editable=False)
+    is_staff = models.BooleanField(default=False)
+    type = models.CharField(max_length=255, choices=Types.choices, default=None, verbose_name="Place", null=True)
+    staff_description = models.CharField(max_length=255, null=True, blank=True, verbose_name="Staff")
     home = models.CharField(max_length=100, verbose_name="Logement après la soirée")
     birthdate = models.DateField(verbose_name="Date de naissance")
+    guarantor = models.ForeignKey(User, on_delete=models.DO_NOTHING, to_field="username", related_name="+", verbose_name="Garant", null=True)
