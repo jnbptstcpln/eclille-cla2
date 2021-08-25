@@ -2,6 +2,7 @@ from copy import deepcopy
 
 from django import forms
 from django.contrib import admin
+from django.urls import path
 from django_admin_inline_paginator.admin import TabularInlinePaginated
 from django.core.exceptions import PermissionDenied
 from django.db.models import Q
@@ -12,6 +13,7 @@ from django.conf import settings
 
 from cla_ticketing.models import *
 from cla_ticketing.forms import AdminEventRegistrationForm
+from cla_ticketing.views.admin import EventRegistrationExportView
 
 
 @admin.register(Event)
@@ -212,6 +214,19 @@ class EventAdmin(admin.ModelAdmin):
         if not request.user.has_perm('cla_ticketing.add_event') and request.user.has_perm('cla_ticketing.event_manager'):
             qs = qs.filter(managers__in=[request.user])
         return qs
+
+    def get_urls(self):
+        info = self.model._meta.app_label, self.model._meta.model_name
+        urls = super().get_urls()
+        my_urls = [
+            path(
+                '<int:event_pk>/registrations/export',
+                self.admin_site.admin_view(EventRegistrationExportView.as_view()),
+                name='%s_%s_export' % info
+            )
+        ]
+        urls = my_urls + urls
+        return urls
 
 
 @admin.register(EventRegistrationType)

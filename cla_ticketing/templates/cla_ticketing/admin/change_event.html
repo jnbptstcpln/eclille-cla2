@@ -30,6 +30,13 @@
             {% if change %}{% if not is_popup %}
                 <ul class="object-tools">
                     {% block object-tools-items %}
+                        {% if has_change_permission %}
+                            <li>
+                                <a href="{% url "admin:cla_ticketing_event_export" original.pk %}">
+                                    Exporter
+                                </a>
+                            </li>
+                        {% endif %}
                         {% change_form_object_tools %}
                     {% endblock %}
                 </ul>

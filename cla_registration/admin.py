@@ -1,14 +1,16 @@
+import csv
 from django.contrib import admin
+from django.http import HttpRequest, HttpResponse
 from django_admin_inline_paginator.admin import TabularInlinePaginated
 from django.conf import settings
 from django.db.models import Q
 from django.template.loader import render_to_string
-from django.shortcuts import resolve_url
+from django.shortcuts import resolve_url, get_object_or_404
 from django.urls import path
 from django.utils.safestring import mark_safe
 
 from .models import RegistrationSession, Registration
-from .views.admin import RegistrationValidationView
+from .views.admin import RegistrationValidationView, RegistrationSessionExportView
 
 
 @admin.register(RegistrationSession)
@@ -55,10 +57,9 @@ class RegistrationSessionAdmin(admin.ModelAdmin):
                 queryset = queryset.filter(Q(last_name__icontains=request.GET.get('registration_search')) | Q(first_name__icontains=request.GET.get('registration_search')))
             return queryset
 
-
-
     readonly_fields = ['pumpkin_configuration', 'statistics', 'link_sharing_alumni']
     list_display = ("school_year", "date_start", "date_end", "number_of_registrations")
+    change_form_template = "cla_registration/admin/change_registrationsession.html"
 
     def get_inlines(self, request, obj):
         inlines = super().get_inlines(request, obj)
@@ -165,10 +166,16 @@ class RegistrationSessionAdmin(admin.ModelAdmin):
                 '<uuid:session_pk>/registrations/<uuid:registration_pk>',
                 self.admin_site.admin_view(RegistrationValidationView.as_view()),
                 name='%s_%s_registration' % info
+            ),
+            path(
+                '<uuid:session_pk>/registrations/export',
+                self.admin_site.admin_view(RegistrationSessionExportView.as_view()),
+                name='%s_%s_export' % info
             )
         ]
         urls = my_urls + urls
         return urls
+
 
     def render_change_form(self, request, context, add=False, change=False, form_url='', obj=None):
         return super().render_change_form(request, context, add, change, form_url, obj)

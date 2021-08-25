@@ -1,0 +1,12 @@
+{% extends "admin/change_form.html" %}
+
+{% block object-tools-items %}
+    {% if perms.cla_registration.change_registrationsession %}
+      <li>
+        <a href="{% url "admin:cla_registration_registrationsession_export" original.pk %}">
+         Exporter
+        </a>
+      </li>
+    {% endif %}
+    {{ block.super }}
+{% endblock %}
