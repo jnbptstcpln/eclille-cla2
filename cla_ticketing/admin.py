@@ -92,8 +92,6 @@ class EventAdmin(admin.ModelAdmin):
                     perm = True
             return perm
 
-
-
     list_display = ("name", "event_starts_on", "organizer", "places")
     change_form_template = "cla_ticketing/admin/change_event.html"
     filter_horizontal = ('managers',)
