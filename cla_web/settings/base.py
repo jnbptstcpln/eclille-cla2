@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'django.contrib.flatpages',
     'django_summernote',
+    'django_admin_inline_paginator',
     # cla_web' apps
     'cla_auth.apps.ClaAuthConfig',
     'cla_public.apps.ClaPublicConfig',

@@ -1,8 +1,9 @@
 from django.contrib import admin
+from django_admin_inline_paginator.admin import TabularInlinePaginated
 from django.conf import settings
 from django.db.models import Q
 from django.template.loader import render_to_string
-from django.shortcuts import resolve_url, get_object_or_404
+from django.shortcuts import resolve_url
 from django.urls import path
 from django.utils.safestring import mark_safe
 
@@ -12,10 +13,9 @@ from .views.admin import RegistrationValidationView
 
 @admin.register(RegistrationSession)
 class RegistrationSessionAdmin(admin.ModelAdmin):
-    class RegistrationInline(admin.TabularInline):
+    class RegistrationInline(TabularInlinePaginated):
         fields = ['last_name', 'first_name', 'has_pack', 'type', 'datetime_registration', 'is_linked_to_an_account', 'edit_button']
         readonly_fields = ['last_name', 'first_name', 'datetime_registration', 'is_linked_to_an_account', 'edit_button', 'has_pack', 'type']
-        filter_horizontal = ['last_name']
         model = Registration
         classes = []
         max_num = 0

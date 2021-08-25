@@ -2,6 +2,7 @@ from copy import deepcopy
 
 from django import forms
 from django.contrib import admin
+from django_admin_inline_paginator.admin import TabularInlinePaginated
 from django.core.exceptions import PermissionDenied
 from django.db.models import Q
 from django.http import HttpRequest
@@ -54,12 +55,14 @@ class EventAdmin(admin.ModelAdmin):
                     perm = True
             return perm
 
-    class EventRegistrationInline(admin.TabularInline):
+    class EventRegistrationInline(TabularInlinePaginated):
         fields = ['last_name', 'first_name', 'created_on', 'is_contributor', 'type', 'paid', 'edit_button']
         readonly_fields = ['last_name', 'first_name', 'created_on', 'is_contributor', 'type', 'paid', 'edit_button']
         model = EventRegistration
         classes = []
+        per_page = 10
         max_num = 0
+        ordering = "-created_on",
 
         can_delete = False
         template = "cla_ticketing/admin/change_event_registrations.html"
