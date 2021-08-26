@@ -126,6 +126,8 @@ class DancingParty(AbstractEvent):
         verbose_name = "Billeterie de soirée dansante"
         verbose_name_plural = "Billeteries de soirée dansante"
 
+    scanners = models.ManyToManyField(User, related_name="+", verbose_name="Scanneurs", help_text="Les scanneurs peuvent effectuer les entrées au sein de l'événement", blank=True)
+
     @property
     def places_remaining(self):
         return max(self.places-self.registrations.filter(is_staff=False).count(), 0)

@@ -474,7 +474,7 @@ class DancingPartyAdmin(admin.ModelAdmin):
 
     list_display = ("name", "event_starts_on", "organizer", "places")
     change_form_template = "cla_ticketing/admin/change_party.html"
-    filter_horizontal = ('managers',)
+    filter_horizontal = ('managers', 'scanners')
     readonly_fields = ['link_ticketing', 'remaining_places']
 
     create_inlines = []
@@ -560,7 +560,7 @@ class DancingPartyAdmin(admin.ModelAdmin):
             fieldsets.append([
                 "Administration de l'événement",
                 {
-                    'fields': ('managers',),
+                    'fields': ('managers', 'scanners'),
                     'classes': ('collapse',),
                 }
             ])
