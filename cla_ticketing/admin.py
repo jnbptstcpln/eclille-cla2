@@ -14,7 +14,11 @@ from django.conf import settings
 
 from cla_ticketing.models import *
 from cla_ticketing.forms import AdminEventRegistrationForm
-from cla_ticketing.views.admin import EventRegistrationExportView, DancingPartyRegistrationTooglePaidView
+from cla_ticketing.views.admin import (
+    EventRegistrationTogglePaidView,
+    EventRegistrationExportView,
+    DancingPartyRegistrationTogglePaidView
+)
 
 
 @admin.register(Event)
@@ -59,8 +63,8 @@ class EventAdmin(admin.ModelAdmin):
             return perm
 
     class EventRegistrationInline(TabularInlinePaginated):
-        fields = ['last_name', 'first_name', 'created_on', 'is_contributor', 'type', 'paid', 'edit_button']
-        readonly_fields = ['last_name', 'first_name', 'created_on', 'is_contributor', 'type', 'paid', 'edit_button']
+        fields = ['last_name', 'first_name', 'created_on', 'is_contributor', 'type', 'place_paid', 'edit_button']
+        readonly_fields = ['last_name', 'first_name', 'created_on', 'is_contributor', 'type', 'place_paid', 'edit_button']
         model = EventRegistration
         classes = []
         per_page = 10
@@ -68,20 +72,25 @@ class EventAdmin(admin.ModelAdmin):
         ordering = "-created_on",
 
         can_delete = False
-        template = "cla_ticketing/admin/change_event_registrations.html"
+        template = "cla_ticketing/admin/eventregistrations_inline.html"
 
         def is_contributor(self, obj: EventRegistration):
             return obj.is_contributor
-
         is_contributor.short_description = "Cotisant ?"
         is_contributor.boolean = True
+
+        def place_paid(self, obj: EventRegistration):
+            icon = '<img src="/static/admin/img/icon-yes.svg" alt="True">' if obj.paid else '<img src="/static/admin/img/icon-no.svg" alt="False">'
+            return mark_safe(
+                f"<a class='place-paid' href='{resolve_url('admin:cla_ticketing_event_toggle_paid', obj.event.pk, obj.pk)}'>{icon}</a>"
+            )
+        place_paid.short_description = "Réglée ?"
 
         def edit_button(self, obj: EventRegistration):
             return mark_safe(
                 f"<a id='change_id_registrations-{obj.id}-eventregistration' class='related-widget-wrapper-link change-related' data-href-template='/admin/cla_ticketing/eventregistration/__fk__/change/?_to_field=id&amp;_popup=1' title='Modifier l\\'inscription' href='/admin/cla_ticketing/eventregistration/{obj.id}/change/?_to_field=id&amp;_popup=1&amp;event={obj.event.pk}' onclick='django.jQuery(this).parents(\"tr\").children().css(\"background-color\", \"rgb(255,255,205,.25)\")'><img src='/static/admin/img/icon-changelink.svg' alt='Modification'></a>" +
                 f"<a id='change_id_registrations-{obj.id}-eventregistration' class='related-widget-wrapper-link delete-related' data-href-template='/admin/cla_ticketing/eventregistration/__fk__/delete/?_to_field=id&amp;_popup=1' title='Supprimer l\\'inscription' href='/admin/cla_ticketing/eventregistration/{obj.id}/delete/?_to_field=id&amp;_popup=1' onclick='django.jQuery(this).parents(\"tr\").children().css(\"background-color\", \"rgb(255,0,0,.25)\")'><img src='/static/admin/img/icon-deletelink.svg' alt='Supprimer'></a>"
             )
-
         edit_button.short_description = mark_safe(
             "edit_button"
         )
@@ -220,6 +229,11 @@ class EventAdmin(admin.ModelAdmin):
         info = self.model._meta.app_label, self.model._meta.model_name
         urls = super().get_urls()
         my_urls = [
+            path(
+                '<int:event_pk>/registrations/<int:pk>/paid',
+                self.admin_site.admin_view(EventRegistrationTogglePaidView.as_view()),
+                name='%s_%s_toggle_paid' % info
+            ),
             path(
                 '<int:event_pk>/registrations/export',
                 self.admin_site.admin_view(EventRegistrationExportView.as_view()),
@@ -510,8 +524,8 @@ class DancingPartyAdmin(admin.ModelAdmin):
         urls = super().get_urls()
         my_urls = [
             path(
-                '<int:party_pk>/registrations/<int:pk>',
-                self.admin_site.admin_view(DancingPartyRegistrationTooglePaidView.as_view()),
+                '<int:party_pk>/registrations/<int:pk>/paid',
+                self.admin_site.admin_view(DancingPartyRegistrationTogglePaidView.as_view()),
                 name='%s_%s_toggle_paid' % info
             )
         ]

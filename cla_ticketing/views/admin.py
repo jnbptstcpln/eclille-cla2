@@ -9,8 +9,37 @@ from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.admin.models import LogEntry, CHANGE
 
-from cla_ticketing.models import Event, DancingParty, DancingPartyRegistration
+from cla_ticketing.models import Event, EventRegistration, DancingPartyRegistration
 from cla_ticketing.forms.party import ContributorDancingPartyRegistrationAdminForm, NonContributorDancingPartyRegistrationAdminForm
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class EventRegistrationTogglePaidView(UserPassesTestMixin, generic.View):
+    registration: EventRegistration = None
+
+    def test_func(self):
+        if self.request.user.has_perm("cla_ticketing.add_event"):
+            return True
+        elif self.request.user.has_perm("cla_ticketing.event_manager"):
+            return self.registration.event.managers.filter(pk=self.request.user.pk).count() > 0
+        return False
+
+    def dispatch(self, request, *args, **kwargs):
+        self.registration = get_object_or_404(EventRegistration, pk=kwargs.pop("pk", None), event_id=kwargs.pop("event_pk", None))
+        return super().dispatch(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        self.registration.paid = not self.registration.paid
+        self.registration.save()
+        ct = ContentType.objects.get_for_model(self.registration)
+        LogEntry.objects.log_action(
+            user_id=request.user.id,
+            content_type_id=ct.pk,
+            object_id=self.registration.pk,
+            object_repr=str(self.registration),
+            action_flag=CHANGE,
+            change_message=f"Registration set to PAID={str(self.registration.paid)}")
+        return JsonResponse({'paid': self.registration.paid})
 
 
 class EventRegistrationExportView(UserPassesTestMixin, generic.View):
@@ -55,7 +84,7 @@ class EventRegistrationExportView(UserPassesTestMixin, generic.View):
 
 
 @method_decorator(csrf_exempt, name='dispatch')
-class DancingPartyRegistrationTooglePaidView(UserPassesTestMixin, generic.View):
+class DancingPartyRegistrationTogglePaidView(UserPassesTestMixin, generic.View):
     registration: DancingPartyRegistration = None
 
     def test_func(self):

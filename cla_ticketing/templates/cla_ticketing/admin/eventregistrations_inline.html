@@ -112,6 +112,33 @@
                 {% endfor %}
                 </tbody>
             </table>
+            <script>
+                document.addEventListener("DOMContentLoaded", function () {
+                    const paid_togglers = document.querySelectorAll('a.place-paid');
+                    for (let i in paid_togglers) {
+                        paid_togglers[i].onclick = function (event) {
+                            event.preventDefault();
+                            if (this.dataset.fetching !== "1") {
+                                this.dataset.fetching = "1";
+                                this.innerHTML = '<span style="display: inline-block;width: 12px; height: 12px; border-radius: 50%; background-color: #cccccc; position: relative; top: 2px"></span>';
+                                fetch(this.href, {
+                                    method: 'POST'
+                                })
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        this.dataset.fetching = "0";
+                                        if (data.paid) {
+                                            this.innerHTML = '<img src="/static/admin/img/icon-yes.svg" alt="True">'
+                                        } else {
+                                            this.innerHTML = '<img src="/static/admin/img/icon-no.svg" alt="False">'
+                                        }
+                                    });
+                            }
+                        };
+                    }
+
+                })
+            </script>
             {% include 'admin/tabular_paginator.html' %}
         </fieldset>
     </div>
