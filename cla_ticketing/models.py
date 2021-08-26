@@ -267,6 +267,9 @@ class DancingParty(AbstractEvent):
         abstract = False
         verbose_name = "Billeterie de soirée dansante"
         verbose_name_plural = "Billeteries de soirée dansante"
+        permissions = (
+            ('dancingparty_manager', "Accès à l'interface de gestion des soirées dansantes pour lesquelles l'utilisateur est administrateur"),
+        )
 
     scanners = models.ManyToManyField(User, related_name="+", verbose_name="Scanneurs", help_text="Les scanneurs peuvent effectuer les entrées au sein de l'événement", blank=True)
 
@@ -285,9 +288,6 @@ class DancingPartyRegistration(AbstractRegistration):
         abstract = False
         verbose_name = "Inscription"
         verbose_name_plural = "Inscriptions"
-        permissions = (
-            ('dancingparty_manager', "Accès à l'interface de gestion des soirées dansantes pour lesquelles l'utilisateur est administrateur"),
-        )
         unique_together = [
             ['user', 'dancing_party', ],  # User can only be registered one time for an event
         ]
@@ -313,10 +313,24 @@ class DancingPartyRegistration(AbstractRegistration):
     home = models.CharField(max_length=100, verbose_name="Logement après la soirée")
     birthdate = models.DateField(verbose_name="Date de naissance")
     guarantor = models.ForeignKey(User, on_delete=models.DO_NOTHING, to_field="username", related_name="+", verbose_name="Garant", null=True)
+    checkin_datetime = models.DateTimeField(null=True, verbose_name="Date et heure d'entrée")
 
     @property
     def price(self):
         return self.Types.get_price(self.student_status, self.type)
+
+    @property
+    def ticket_label(self):
+        if self.type:
+            return f"{self.get_student_status_display()} {self.get_type_display().lower()} - {self.price}€"
+        elif self.is_staff:
+            return f"Staff : {self.staff_description}"
+        else:
+            return "Autre"
+
+    @property
+    def is_minor(self):
+        return (timezone.now().date() - self.birthdate).days < 365.25*18
 
 
 class DancingPartyRegistrationCustomFieldValue(AbstractRegistrationCustomFieldValue):

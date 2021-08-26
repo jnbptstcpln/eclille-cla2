@@ -1,0 +1,128 @@
+{% extends "layout/standalone.html" %}
+{% load static %}
+
+{% block css %}
+    {{ block.super }}
+    <style>
+
+        @media (min-width: 1200px) {
+            h1 {
+                font-size: 2rem
+            }
+
+            h3 {
+                font-size: 1.5rem;
+            }
+        }
+
+        h1 {
+            font-size: 1.5rem
+        }
+
+        h2 {
+            text-transform: uppercase;
+            letter-spacing: .05rem;
+            font-size: 1rem;
+            color: #3a3a3a;
+        }
+
+        h3 {
+            font-size: 1.25rem;
+        }
+
+        p {
+            font-size: .85rem;
+        }
+
+        .alert {
+            font-size: .8rem;
+            padding: .33rem;
+        }
+        
+        #main {
+            
+        }
+        @media (max-width: 768px) {
+            #main {
+                height: calc(100% - 1rem);
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block page_title %}{{ party.name }}{% endblock %}
+
+{% block background_image_url %}{% static "cla_ticketing/img/sd1_blur.jpg" %}{% endblock %}
+
+{% block content %}
+    <div id="main" style="max-width: 525px;" class="card w-100">
+        <div class="card-body">
+            <div class="d-flex flex-column justify-content-between h-100">
+                <div class="text-center">
+                    <h2>Billetterie</h2>
+                    <h1>{{ party.name }}</h1>
+                </div>
+                <div style="flex: auto; overflow: auto;">
+                    {% if not registration.paid %}
+                        <div class="alert alert-danger">
+                            Le paiement de la place n'a pas été effectué
+                        </div>
+                    {% else %}
+                        {% if not registration.validated %}
+                            <div class="alert alert-warning">
+                                L'inscription a été payée mais n'a pas été validée
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                    {% if registration.checkin_datetime %}
+                        <div class="alert alert-danger">
+                            L'entrée de cette inscription a déjà été effectuée à {{ registration.checkin_datetime|date:'H:i' }}
+                        </div>
+                    {% endif %}
+
+                    <dl class="">
+                        <dt>Place</dt>
+                        <dd>{{ registration.ticket_label }}</dd>
+                        <dt>Prénom</dt>
+                        <dd>{{ registration.first_name }}</dd>
+                        <dt>Nom</dt>
+                        <dd>{{ registration.last_name }}</dd>
+                        <dt>Date de naissance</dt>
+                        <dd>
+                            {{ registration.birthdate|date:'d/m/Y' }}
+                            {% if registration.is_minor %}
+                                <span class="badge badge-danger">Mineur</span>
+                            {% endif %}
+                        </dd>
+                        <dt>Logement en fin de soirée</dt>
+                        <dd>{{ registration.home }}</dd>
+                        {% if registration.user %}
+                            <dt>Cursus</dt>
+                            <dd>{{ registration.user.infos.get_cursus_display }}</dd>
+                            <dt>Promotion</dt>
+                            <dd>{{ registration.user.infos.promo }}</dd>
+                        {% else %}
+                            <dt>Garant</dt>
+                            <dd>
+                                {{ registration.guarantor.first_name }} {{ registration.guarantor.last_name }}<br>
+                                <span class="small">({{ registration.guarantor.infos.get_cursus_display }})</span>
+                            </dd>
+                        {% endif %}
+                    </dl>
+                </div>
+                <div class="mx-auto mt-4 w-100" style="max-width: 350px;">
+                    <a class="btn btn-blue-dark btn-block btn-lg mt-2 mb-2" href="{% url "cla_ticketing:party_checkin" party.slug %}">Retour à la liste</a>
+                    {% if is_manager %}
+                        <a class="btn btn-dark btn-block btn-lg mt-2 mb-2" href="/admin/cla_ticketing/dancingpartyregistration/{{ registration.pk }}/change/?_to_field=id&amp;dancingparty={{ party.pk }}&amp;redirect=checkin">Modifier la place</a>
+                    {% endif %}
+
+                    <form class="mt-3" method="post">
+                        {% csrf_token %}
+                        <button type="submit" {% if registration.checkin_datetime %}disabled{% endif %} class="btn btn-red-dark btn-block btn-xl">Valider l'entrée</button>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

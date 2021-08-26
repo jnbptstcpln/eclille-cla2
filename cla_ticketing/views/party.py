@@ -1,5 +1,11 @@
-from django.http import HttpRequest, Http404
+from django.contrib.admin.models import LogEntry, CHANGE
+from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin
+from django.contrib.contenttypes.models import ContentType
+from django.db.models import Value, Q
+from django.db.models.functions import Concat
+from django.http import HttpRequest, Http404, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, resolve_url
+from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views.generic import View, CreateView, TemplateView
 
@@ -118,3 +124,94 @@ class NonContributorRegistrationDetailView(AbstractRegistrationDetailView):
 
     def get_registration(self):
         return self.party.registrations.filter(guarantor=self.request.user).first()
+
+
+class CheckInPartyView(UserPassesTestMixin, LoginRequiredMixin, TemplateView):
+    party: DancingParty = None
+    template_name = "cla_ticketing/party/checkin_party.html"
+
+    def setup(self, request, *args, **kwargs):
+        self.party = get_object_or_404(DancingParty, slug=kwargs.pop("party_slug"))
+        super().setup(request, *args, **kwargs)
+
+    def test_func(self):
+        if self.request.user.has_perm("cla_ticketing.dancingparty_manager"):
+            return True
+        elif self.party.managers.filter(pk=self.request.user.pk).count() > 0:
+            return True
+        return self.party.scanners.filter(pk=self.request.user.pk).count() > 0
+
+    def post(self, request: HttpRequest, *args, **kwargs):
+        search_value = request.POST.get('search_value')
+        results = []
+        if len(search_value) > 0:
+            results = [
+                {
+                    'pk': r.pk,
+                    'first_name': r.first_name,
+                    'last_name': r.last_name,
+                    'ticket_label': r.ticket_label,
+                    'checked_in': r.checkin_datetime is not None,
+                    'is_contributor': r.user is not None,
+                    'href': resolve_url("cla_ticketing:party_checkin_registration", self.party.slug, r.pk),
+                } for r in self.party.registrations
+                    .annotate(fullname=Concat('first_name', Value(' '), 'last_name'))
+                    .filter(
+                        Q(first_name__icontains=search_value) |
+                        Q(last_name__icontains=search_value) |
+                        Q(fullname__icontains=search_value)
+                    ).order_by("last_name")[:5]
+            ]
+        return JsonResponse({
+            'success': True,
+            'payload': results
+        })
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'party': self.party,
+            'is_manager': self.request.user.has_perm("cla_ticketing.dancingparty_manager") or self.party.managers.filter(pk=self.request.user.pk).count() > 0
+        })
+        return context
+
+
+class CheckInRegistrationView(UserPassesTestMixin, LoginRequiredMixin, TemplateView):
+    registration: DancingPartyRegistration = None
+    template_name = "cla_ticketing/party/checkin_registration.html"
+
+    def setup(self, request, *args, **kwargs):
+        self.registration = get_object_or_404(DancingPartyRegistration, pk=kwargs.pop("registration_pk"), dancing_party__slug=kwargs.pop("party_slug"))
+        super().setup(request, *args, **kwargs)
+
+    def test_func(self):
+        if self.request.user.has_perm("cla_ticketing.dancingparty_manager"):
+            return True
+        elif self.registration.dancing_party.managers.filter(pk=self.request.user.pk).count() > 0:
+            return True
+        return self.registration.dancing_party.scanners.filter(pk=self.request.user.pk).count() > 0
+
+    def post(self, request: HttpRequest, *args, **kwargs):
+        if self.registration.checkin_datetime is None:
+            self.registration.checkin_datetime = timezone.now()
+            self.registration.save()
+
+            ct = ContentType.objects.get_for_model(self.registration)
+            LogEntry.objects.log_action(
+                user_id=request.user.id,
+                content_type_id=ct.pk,
+                object_id=self.registration.pk,
+                object_repr=str(self.registration),
+                action_flag=CHANGE,
+                change_message=f"Registration was checked in")
+
+        return redirect("cla_ticketing:party_checkin", self.registration.dancing_party.slug)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'party': self.registration.dancing_party,
+            'is_manager': self.request.user.has_perm("cla_ticketing.dancingparty_manager") or self.registration.dancing_party.managers.filter(pk=self.request.user.pk).count() > 0,
+            'registration': self.registration
+        })
+        return context

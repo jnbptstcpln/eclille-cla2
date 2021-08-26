@@ -1,0 +1,213 @@
+{% extends "layout/standalone.html" %}
+{% load static %}
+
+{% block css %}
+    {{ block.super }}
+    <style>
+
+        @media (min-width: 1200px) {
+            h1 {
+                font-size: 2rem
+            }
+
+            h3 {
+                font-size: 1.5rem;
+            }
+        }
+
+        h1 {
+            font-size: 1.5rem
+        }
+
+        h2 {
+            text-transform: uppercase;
+            letter-spacing: .05rem;
+            font-size: 1rem;
+            color: #3a3a3a;
+        }
+
+        h3 {
+            font-size: 1.25rem;
+        }
+
+        p {
+            font-size: .85rem;
+        }
+
+        .alert {
+            font-size: .8rem;
+            padding: .33rem;
+        }
+
+        #main {
+            height: 80vh;
+        }
+
+        .search-item {
+            border-width: 3px;
+            border-style: solid;
+            height: 75px;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: .66rem;
+        }
+
+        .search-item h4 {
+            margin: 0;
+            text-transform: uppercase;
+            font-size: 1rem;
+        }
+
+        .search-item h5 {
+            text-transform: uppercase;
+            font-size: .75rem;
+            margin: .45rem 0 0;
+        }
+
+        .search-item:hover {
+            text-decoration: none;
+            opacity: .95;
+            transition: opacity 200ms;
+        }
+
+        .search-item.checkedin:hover {
+            color: #ffffff !important;
+        }
+
+        .search-item {
+            border-color: #34495e;
+        }
+
+        .search-item.checkedin {
+            background-color: #34495e;
+            color: #ffffff;
+            transition: opacity 150ms;
+        }
+
+        .search-item {
+            color: #34495e;
+        }
+
+        .search-item:hover {
+            color: #34495e;
+        }
+
+        .search-item.noncontributor {
+            border-color: #a10f2b;
+        }
+
+        .search-item.noncontributor.checkedin {
+            background-color: #a10f2b;
+            color: #ffffff;
+            transition: opacity 150ms;
+        }
+
+        .search-item.noncontributor {
+            color: #a10f2b;
+        }
+
+        .search-item.noncontributor:hover {
+            color: #a10f2b;
+        }
+
+        .search-item.loading {
+            border: 0;
+            height: 150px;
+            text-align: center;
+            font-size: 1.5rem;
+        }
+        .search-item.empty {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @media (max-width: 768px) {
+            #main {
+                height: calc(100% - 1rem);
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block page_title %}{{ party.name }}{% endblock %}
+
+{% block background_image_url %}{% static "cla_ticketing/img/sd1_blur.jpg" %}{% endblock %}
+
+{% block content %}
+    <div id="main" style="max-width: 525px;" class="card w-100">
+        <div class="card-body">
+            <div class="d-flex flex-column justify-content-between h-100">
+                <div class="text-center">
+                    <h2>Billetterie</h2>
+                    <h1>{{ party.name }}</h1>
+                    <div class="mx-auto mt-4 w-100" style="max-width: 350px;">
+                        <a href="#" class="btn btn-red-dark btn-block btn-lg mt-2 mb-2"><i class="fas fa-qrcode mr-1"></i> Scanner un QRCode</a>
+                        <p class="text-center mt-3 mb-3">ou bien effectuer une recherche :</p>
+                        <div>
+                            <input type="search" id="search-field" class="form-control" placeholder="Prénom ou nom">
+                        </div>
+                    </div>
+                </div>
+                <div style="flex: auto; overflow: auto;" class="mt-3">
+                    <div id="search-container" class="d-flex flex-column justify-content-between"></div>
+                </div>
+                {% if is_manager %}
+                    <div class="mx-auto mt-4 w-100" style="max-width: 350px;">
+                        <a class="btn btn-blue-dark btn-block btn-lg mt-2 mb-2" href="{% url "admin:cla_ticketing_dancingparty_change" party.pk %}">Gérer l'événement</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block body_js %}
+    {{ block.super }}
+    <script>
+        $(document).ready(function () {
+            var search_timeout;
+            var loading_timeout;
+            var request;
+            const $search_field = $('#search-field');
+            const $search_container = $('#search-container');
+            $search_field.on('input', function (e) {
+                clearTimeout(search_timeout);
+                clearTimeout(loading_timeout);
+                if (request) request.abort();
+                let search_value = this.value;
+                if (search_value.length > 0) {
+                    search_timeout = setTimeout(function () {
+                        $search_container.html("");
+                        loading_timeout = setTimeout(function () {
+                            $search_container.append("<div class='search-item loading'></div>");
+                        }, 300);
+                        $.ajax({
+                            type: 'POST',
+                            data: {"search_value": search_value},
+                            success: function (data) {
+                                console.log(data);
+                                clearTimeout(loading_timeout);
+                                $search_container.html("");
+                                if (data.payload.length > 0) {
+                                    for (let i in data.payload) {
+                                        let r = data.payload[i];
+                                        let classname = (!r.is_contributor ? 'noncontributor' : '');
+                                        classname += (r.checked_in ? " checkedin" : "");
+                                        $search_container.append("<a href='" + r.href + "' class='search-item " + classname + "'><h4>" + r.first_name + " " + r.last_name + "</h4><h5>" + r.ticket_label + "</h5></a>");
+                                    }
+                                } else {
+                                    $search_container.append("<div class='search-item empty'><h4>Aucun résultat</h4></div>");
+                                }
+
+                            },
+                            dataType: 'json'
+                        });
+                    }, 300);
+                } else {
+                    $search_container.html("");
+                }
+            });
+        });
+    </script>
+{% endblock %}

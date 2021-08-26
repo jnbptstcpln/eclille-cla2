@@ -864,7 +864,10 @@ class DancingPartyRegistrationAdmin(admin.ModelAdmin):
         return redirect("admin:cla_ticketing_dancingparty_change", obj.dancing_party.pk)
 
     def response_post_save_change(self, request, obj: DancingPartyRegistration):
-        return redirect("admin:cla_ticketing_dancingparty_change", obj.dancing_party.pk)
+        return {
+            "checkin": redirect("cla_ticketing:party_checkin_registration", obj.dancing_party.slug, obj.pk)
+        }.get(request.GET.get('redirect'), redirect("admin:cla_ticketing_dancingparty_change", obj.dancing_party.pk))
+
 
     def response_delete(self, request, obj_display, obj_id):
         party = self.get_party(request)
