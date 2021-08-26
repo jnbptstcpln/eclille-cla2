@@ -613,7 +613,7 @@ class DancingPartyAdmin(admin.ModelAdmin):
                     "<label style='float:none;width:100%'>Voici le lien pour accéder à la billeterie</label>"
                     "<input style='margin-right: .5rem' class='vTextField' value='{link_ticketing}' id='id_link_ticketing'>"
                     "<a class='button' onclick='document.getElementById(\"id_link_ticketing\").select();document.execCommand(\"copy\");return false;','>Copier</a>"
-                ).format(link_ticketing=f"https://{settings.ALLOWED_HOSTS[0]}{resolve_url('cla_ticketing:party_ticketing', obj.slug)}")
+                ).format(link_ticketing=f"https://{settings.ALLOWED_HOSTS[0]}{resolve_url('cla_ticketing:party_view', obj.slug)}")
             )
         else:
             return ""
@@ -764,7 +764,7 @@ class DancingPartyRegistrationAdmin(admin.ModelAdmin):
         if registration_type == "contributor":
             fields += ['user', 'type', 'home', 'paid']
         elif registration_type == "non_contributor":
-            fields += ['first_name', 'last_name', 'birthdate', 'home', 'type', 'guarantor', 'paid']
+            fields += ['first_name', 'last_name', 'email', 'phone', 'birthdate', 'home', 'type', 'guarantor', 'paid']
         elif registration_type == "staff":
             fields += ['user', 'staff_description', 'paid']
 

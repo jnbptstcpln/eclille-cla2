@@ -141,7 +141,7 @@ class DancingPartyExportView(UserPassesTestMixin, generic.View):
             "Logement en fin de soirée": lambda x: x.home,
             "Date inscription": lambda x: x.created_on.strftime("%Y-%m-%d %H:%M:%S"),
             "Type de place": lambda x: f"{x.get_student_status_display()} {x.get_type_display().lower()}" if not x.is_staff else f"Staff : {x.staff_description}",
-            "Prix de la place": lambda x: str(DancingPartyRegistration.Types.get_price(x.student_status, x.type)) if x.type is not None else 0,
+            "Prix de la place": lambda x: str(x.price) if x.type is not None else 0,
             "A payé": lambda x: "Oui" if x.paid else "Non"
         }
 

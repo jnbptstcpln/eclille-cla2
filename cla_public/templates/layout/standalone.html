@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block body %}
-    <div style="height:100vh; background-image: url('{% static "app/img/rez_blur.jpg" %}'); background-position: center; background-size: cover; overflow-y: hidden;" class="position-relative p-2 p-sm-4">
+    <div style="height:100vh; background-image: url('{% block background_image_url %}{% static "app/img/rez_blur.jpg" %}{% endblock %}'); background-position: center; background-size: cover; overflow-y: hidden;" class="position-relative p-2 p-sm-4">
         <div style="height:100vh; z-index: 5; overflow-y: auto; box-sizing: content-box" class="d-flex {% block content_align %}align-items-start{% endblock %} align-items-md-center justify-content-center">
             {% block content %}{% endblock %}
         </div>

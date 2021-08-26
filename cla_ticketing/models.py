@@ -47,7 +47,7 @@ class AbstractEvent(models.Model):
 
     @property
     def are_registrations_opened(self):
-        return self.registration_starts_on < timezone.now() <= self.registration_ends_on
+        return self.registration_starts_on < timezone.now() <= self.registration_ends_on and self.places_remaining > 0
 
     @property
     def places_remaining(self):
@@ -72,7 +72,7 @@ class AbstractRegistration(models.Model):
     first_name = models.CharField(max_length=150, verbose_name="Prénom")
     last_name = models.CharField(max_length=150, verbose_name="Nom")
     email = models.EmailField(verbose_name="Adresse mail personnelle")
-    phone = models.CharField(max_length=15, verbose_name="Numéro de téléphone")
+    phone = models.CharField(max_length=20, verbose_name="Numéro de téléphone")
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="+", verbose_name="Créateur de cette inscription", editable=False, null=True)
     created_on = models.DateTimeField(auto_now_add=True, editable=False, verbose_name="Inscrit le")
     paid = models.BooleanField(default=False, verbose_name="A payé")
@@ -261,11 +261,6 @@ class EventRegistrationCustomFieldValue(AbstractRegistrationCustomFieldValue):
     field = models.ForeignKey(EventRegistrationCustomField, on_delete=models.CASCADE, related_name="+", editable=False)
 
 
-class EventRegistrationCustomFieldValue(AbstractRegistrationCustomFieldValue):
-    registration = models.ForeignKey(EventRegistration, on_delete=models.CASCADE, related_name="custom_fields", editable=False)
-    field = models.ForeignKey(EventRegistrationCustomField, on_delete=models.CASCADE, related_name="+", editable=False)
-
-
 class DancingParty(AbstractEvent):
 
     class Meta:
@@ -318,6 +313,10 @@ class DancingPartyRegistration(AbstractRegistration):
     home = models.CharField(max_length=100, verbose_name="Logement après la soirée")
     birthdate = models.DateField(verbose_name="Date de naissance")
     guarantor = models.ForeignKey(User, on_delete=models.DO_NOTHING, to_field="username", related_name="+", verbose_name="Garant", null=True)
+
+    @property
+    def price(self):
+        return self.Types.get_price(self.student_status, self.type)
 
 
 class DancingPartyRegistrationCustomFieldValue(AbstractRegistrationCustomFieldValue):

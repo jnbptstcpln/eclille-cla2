@@ -1,0 +1,74 @@
+{% extends "layout/standalone.html" %}
+{% load static %}
+
+{% block css %}
+    {{ block.super }}
+    <style>
+        h1 {
+            font-size: 1.5rem
+        }
+
+        @media (min-width: 1200px) {
+            h1 {
+                font-size: 2rem
+            }
+        }
+
+        h2 {
+            text-transform: uppercase;
+            letter-spacing: .05rem;
+            font-size: 1rem;
+            color: #3a3a3a;
+        }
+
+        p {
+            font-size: .85rem;
+        }
+    </style>
+{% endblock %}
+
+{% block page_title %}{{ party.name }}{% endblock %}
+
+{% block background_image_url %}{% static "cla_ticketing/img/sd1_blur.jpg" %}{% endblock %}
+
+{% block content %}
+    <div style="max-width: 525px" class="card w-100">
+        <div class="card-body">
+            <div>
+                <div class="text-center">
+                    <h2>Billetterie</h2>
+                    <h1>{{ party.name }}</h1>
+                </div>
+                {% if registration_self.paid %}
+                    <p class="text-center">
+                        Le paiement de votre place a bien été confirmé par l'organisateur.
+                    </p>
+                    <p style="font-size: .75rem" class="text-center mt-3 mb-0"><a href="{% url "cla_ticketing:party_view" party.slug %}" style="color: var(--dark)">Revenir</a></p>
+                {% else %}
+                    {% if party.contributor_ticketing_href %}
+                        <p class="text-justify">
+                            <b>Vous pouvez maintenant régler votre place sur la billetterie de l'événement.</b>
+                            Une fois votre paiement effectué l'organisateur de l'événement validera votre inscription et votre place sera assurée.
+                        </p>
+                        <p class="text-center">
+                            <b>Toute place non payée n'est pas réservée.</b>
+                        </p>
+                        <p class="text-center">
+                            <a class="btn btn-blue-dark" href="{{ party.contributor_ticketing_href }}" target="_blank">Accéder à la billetterie</a>
+                        </p>
+                    {% else %}
+                        <p class="text-justify">
+                            <b>Vous pouvez maintenant procéder au règlement de votre place selon les modalités que vous a communiquées l'organisateur.</b>
+                            Une fois votre paiement effectué l'organisateur de l'événement validera l'inscription et sa place sera assurée.
+                        </p>
+                        <p class="text-center">
+                            <b>Toute place non payée n'est pas réservée.</b>
+                        </p>
+                    {% endif %}
+                    <p style="font-size: .75rem" class="text-center mt-3 mb-0"><a href="{% url "cla_ticketing:party_view" party.slug %}" style="color: var(--dark)">Réserver une autre place</a></p>
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends "layout/standalone.html" %}
+
+{% block page_title %}CLA - Validation requise{% endblock %}
+
+{% block content_align %}align-items-center{% endblock %}
+
+{% block content %}
+    <div style="max-width: 450px" class="card w-100">
+        <div class="card-body">
+            <div class="p-2 p-md-4">
+                <h1 class="text-center mb-4">
+                        <span class="cla_logo" style="transform: scale(1.25)">
+                          <span class="cl">Centrale Lille</span>
+                          <span class="a">Associations</span>
+                      </span>
+                </h1>
+                <div class="overflow-auto text-center" style="max-height: 33vh">
+                    <p>
+                        L'accès à cette page nécessite que votre compte soit validé, or
+                        votre compte est arrivé à la limite de sa durée de validation.
+                    </p>
+                    <p class="mb-0">
+                        La validation de votre compte nous permet de vérifier chaque année que vous êtes toujours étudiant
+                        au sein du <i>Centrale Lille Institut</i>. Elle consiste en l'envoi d'un code à six chiffres sur
+                        votre adresse mail en @xxxx.centralelille.fr.
+                    </p>
+                </div>
+
+                <p class="mt-3">
+                    <a href="{% url "cla_auth:validate" %}?next={{ redirect }}" class="btn btn-primary btn-lg btn-block">Valider mon compte</a>
+                </p>
+
+                <div class="mt-3 text-center">
+                    <a href="{% url "faq" %}" target="_blank" class="text-sm text-reset">Besoin d'aide ?</a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+{% endblock %}
