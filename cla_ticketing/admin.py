@@ -762,9 +762,9 @@ class DancingPartyRegistrationAdmin(admin.ModelAdmin):
         registration_type = self.get_registration_type(request, obj)
         fields = []
         if registration_type == "contributor":
-            fields += ['user', 'type', 'home', 'paid']
+            fields += ['user', 'type', 'home', ('paid', 'validated')]
         elif registration_type == "non_contributor":
-            fields += ['first_name', 'last_name', 'email', 'phone', 'birthdate', 'home', 'type', 'guarantor', 'paid']
+            fields += [('first_name', 'last_name'), ('email', 'phone'), 'birthdate', 'home', 'type', 'guarantor', ('paid', 'validated')]
         elif registration_type == "staff":
             fields += ['user', 'staff_description', 'paid']
 
@@ -790,7 +790,7 @@ class DancingPartyRegistrationAdmin(admin.ModelAdmin):
 
         # Set field requirements
         form = context.get('adminform').form
-        non_required_set = {'paid'}.union(set([cf.field_id for cf in party.custom_fields.all()]))
+        non_required_set = {'paid', 'validated'}.union(set([cf.field_id for cf in party.custom_fields.all()]))
         for name, field in form.fields.items():
             field.required = True if name not in non_required_set else False
 
@@ -859,8 +859,6 @@ class DancingPartyRegistrationAdmin(admin.ModelAdmin):
                     DancingPartyRegistrationCustomFieldValue.objects.get_or_create_file(
                         registration=obj, field=custom_field, value=None if not form.cleaned_data[custom_field.field_id] else form.cleaned_data[custom_field.field_id]
                     )
-
-
 
     def response_post_save_add(self, request, obj: DancingPartyRegistration):
         return redirect("admin:cla_ticketing_dancingparty_change", obj.dancing_party.pk)
