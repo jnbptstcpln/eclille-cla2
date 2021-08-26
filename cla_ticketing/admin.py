@@ -1,6 +1,3 @@
-from copy import deepcopy
-
-from django import forms
 from django.contrib import admin, messages
 from django.urls import path
 from django.shortcuts import redirect
@@ -13,7 +10,6 @@ from django.utils.safestring import mark_safe
 from django.conf import settings
 
 from cla_ticketing.models import *
-from cla_ticketing.forms import AdminEventRegistrationForm
 from cla_ticketing.views.admin import (
     EventRegistrationTogglePaidView,
     EventRegistrationExportView,
@@ -29,6 +25,47 @@ class EventAdmin(admin.ModelAdmin):
         model = EventRegistrationType
         classes = ["collapse"]
         extra = 0
+
+        def has_add_permission(self, request, obj: Event = None):
+            perm = super().has_add_permission(request, obj)
+            if request.user.has_perm('cla_ticketing.event_manager'):
+                perm = True
+            return perm
+
+        def has_view_permission(self, request: HttpRequest, obj: Event = None):
+            perm = super().has_view_permission(request, obj)
+            if not request.user.has_perm('cla_ticketing.add_event') and request.user.has_perm('cla_ticketing.event_manager'):
+                if obj:
+                    perm = obj.managers.filter(pk=request.user.pk).count() > 0
+                else:
+                    perm = True
+            return perm
+
+        def has_change_permission(self, request: HttpRequest, obj: Event = None):
+            perm = super().has_change_permission(request, obj)
+            if not request.user.has_perm('cla_ticketing.add_event') and request.user.has_perm('cla_ticketing.event_manager'):
+                if obj:
+                    perm = obj.managers.filter(pk=request.user.pk).count() > 0
+                else:
+                    perm = True
+            return perm
+
+        def has_delete_permission(self, request: HttpRequest, obj: Event = None):
+            perm = super().has_delete_permission(request, obj)
+            if not request.user.has_perm('cla_ticketing.add_event') and request.user.has_perm('cla_ticketing.event_manager'):
+                if obj:
+                    perm = obj.managers.filter(pk=request.user.pk).count() > 0
+                else:
+                    perm = True
+            return perm
+
+    class EventRegistrationCustomFieldInline(admin.StackedInline):
+        fields = [
+            ('type', 'label'), 'help_text', ('required', 'admin_only'), 'options'
+        ]
+        model = EventRegistrationCustomField
+        extra = 0
+        classes = ["collapse"]
 
         def has_add_permission(self, request, obj: Event = None):
             perm = super().has_add_permission(request, obj)
@@ -120,8 +157,8 @@ class EventAdmin(admin.ModelAdmin):
     filter_horizontal = ('managers',)
     readonly_fields = ['link_ticketing', 'remaining_places']
 
-    create_inlines = [EventRegistrationTypeInline]
-    change_inlines = [EventRegistrationTypeInline, EventRegistrationInline]
+    create_inlines = [EventRegistrationTypeInline, EventRegistrationCustomFieldInline]
+    change_inlines = [EventRegistrationInline, EventRegistrationTypeInline, EventRegistrationCustomFieldInline]
 
     def link_ticketing(self, obj: Event):
         if obj.pk:  # Check if the object was created
@@ -312,11 +349,19 @@ class EventRegistrationAdmin(admin.ModelAdmin):
 
     def get_fields(self, request, obj=None):
         registration_type = self.get_registration_type(request, obj)
+        fields = []
         if registration_type == "contributor":
-            return 'user', 'type', 'paid'
+            fields += ['user', 'type', 'paid']
         elif registration_type == "non_contributor":
-            return 'first_name', 'last_name', 'type', 'paid'
-        raise Http404()
+            fields += ['first_name', 'last_name', 'type', 'paid']
+
+        event = self.get_event(request, obj)
+        for custom_field in event.custom_fields.all():
+            # First add custom field to list
+            fields.append(custom_field.field_id)
+            # Then add custom field to the form
+            self.form.declared_fields.update({custom_field.field_id: custom_field.get_field_instance(required=False)})
+        return fields
 
     def render_change_form(self, request, context, add=False, change=False, form_url='', obj=None):
         registration_type = self.get_registration_type(request, obj)
@@ -330,15 +375,32 @@ class EventRegistrationAdmin(admin.ModelAdmin):
             "event": event
         })
 
-        # Set all form field to required
+        # Set field requirements
         form = context.get('adminform').form
+        non_required_set = {'paid'}.union(set([cf.field_id for cf in event.custom_fields.all()]))
         for name, field in form.fields.items():
-            if name not in {'paid'}:
-                field.required = True
+            field.required = True if name not in non_required_set else False
+
         # Customize some field
         if 'user' in form.fields.keys():
             form.fields['user'].label = "Étudiant"
             form.fields['user'].help_text = ""
+
+        # Set event's types
+        form.fields['type'].queryset = event.registration_types
+
+        # Set custom fields initial values
+        if obj is not None:
+            for custom_field in event.custom_fields.all():
+                # First add custom field to list
+                try:
+                    fv = EventRegistrationCustomFieldValue.objects.get(
+                        registration=obj,
+                        field=custom_field
+                    )
+                    form.fields[custom_field.field_id].initial = fv.value
+                except EventRegistrationCustomFieldValue.DoesNotExist:
+                    pass
 
         return super().render_change_form(request, context, add, change, form_url, obj)
 
@@ -352,6 +414,7 @@ class EventRegistrationAdmin(admin.ModelAdmin):
 
     def save_model(self, request, obj: EventRegistration, form, change):
         registration_type = self.get_registration_type(request, obj)
+        event = self.get_event(request, obj)
 
         if not change:
             obj.created_by = request.user
@@ -362,8 +425,29 @@ class EventRegistrationAdmin(admin.ModelAdmin):
             obj.email = obj.user.email
             obj.phone = obj.user.infos.phone
             obj.birthdate = obj.user.infos.birthdate
-        obj.event = self.get_event(request, obj)
+        obj.event = event
+
         super().save_model(request, obj, form, change)
+
+        # Deal with custom fields
+        for custom_field in event.custom_fields.all():
+            if custom_field.type == EventRegistrationCustomField.Type.TEXT:
+                EventRegistrationCustomFieldValue.objects.get_or_create_text(
+                    registration=obj, field=custom_field, value=form.cleaned_data[custom_field.field_id]
+                )
+            elif custom_field.type == EventRegistrationCustomField.Type.SELECT:
+                EventRegistrationCustomFieldValue.objects.get_or_create_text(
+                    registration=obj, field=custom_field, value=form.cleaned_data[custom_field.field_id]
+                )
+            elif custom_field.type == EventRegistrationCustomField.Type.CHECKBOX:
+                EventRegistrationCustomFieldValue.objects.get_or_create_boolean(
+                    registration=obj, field=custom_field, value=form.cleaned_data[custom_field.field_id]
+                )
+            elif custom_field.type == EventRegistrationCustomField.Type.FILE:
+                if form.cleaned_data[custom_field.field_id] is not None:
+                    EventRegistrationCustomFieldValue.objects.get_or_create_file(
+                        registration=obj, field=custom_field, value=None if not form.cleaned_data[custom_field.field_id] else form.cleaned_data[custom_field.field_id]
+                    )
 
     def response_post_save_add(self, request, obj: EventRegistration):
         return redirect("admin:cla_ticketing_event_change", obj.event.pk)
@@ -414,9 +498,51 @@ class EventRegistrationAdmin(admin.ModelAdmin):
 
 @admin.register(DancingParty)
 class DancingPartyAdmin(admin.ModelAdmin):
+
+    class DancingPartyRegistrationCustomFieldInline(admin.StackedInline):
+        fields = [
+            ('type', 'label'), 'help_text', ('required', 'admin_only'), 'options'
+        ]
+        model = DancingPartyRegistrationCustomField
+        extra = 0
+        classes = ["collapse"]
+
+        def has_add_permission(self, request, obj: DancingParty = None):
+            perm = super().has_add_permission(request, obj)
+            if request.user.has_perm('cla_ticketing.dancingparty_manager'):
+                perm = True
+            return perm
+
+        def has_view_permission(self, request: HttpRequest, obj: DancingParty = None):
+            perm = super().has_view_permission(request, obj)
+            if not request.user.has_perm('cla_ticketing.add_dancingparty') and request.user.has_perm('cla_ticketing.dancingparty_manager'):
+                if obj:
+                    perm = obj.managers.filter(pk=request.user.pk).count() > 0
+                else:
+                    perm = True
+            return perm
+
+        def has_change_permission(self, request: HttpRequest, obj: DancingParty = None):
+            perm = super().has_change_permission(request, obj)
+            if not request.user.has_perm('cla_ticketing.add_dancingparty') and request.user.has_perm('cla_ticketing.dancingparty_manager'):
+                if obj:
+                    perm = obj.managers.filter(pk=request.user.pk).count() > 0
+                else:
+                    perm = True
+            return perm
+
+        def has_delete_permission(self, request: HttpRequest, obj: DancingParty = None):
+            perm = super().has_delete_permission(request, obj)
+            if not request.user.has_perm('cla_ticketing.add_dancingparty') and request.user.has_perm('cla_ticketing.dancingparty_manager'):
+                if obj:
+                    perm = obj.managers.filter(pk=request.user.pk).count() > 0
+                else:
+                    perm = True
+            return perm
+
     class DancingPartyRegistrationInline(TabularInlinePaginated):
-        fields = ['last_name', 'first_name', 'place', 'place_paid', 'created_on', 'edit_button']
-        readonly_fields = ['last_name', 'first_name', 'place', 'place_paid', 'created_on', 'edit_button']
+        fields = ['last_name', 'first_name', 'place', 'place_paid', 'validated', 'created_on', 'edit_button']
+        readonly_fields = ['last_name', 'first_name', 'place', 'place_paid', 'validated', 'created_on', 'edit_button']
         model = DancingPartyRegistration
         classes = []
         per_page = 10
@@ -457,7 +583,7 @@ class DancingPartyAdmin(admin.ModelAdmin):
             perms = super().get_model_perms(request)
             return perms
 
-        def has_view_permission(self, request: HttpRequest, obj: Event = None):
+        def has_view_permission(self, request: HttpRequest, obj: DancingParty = None):
             perm = super().has_view_permission(request, obj)
             if not request.user.has_perm('cla_ticketing.add_dancingparty') and request.user.has_perm('cla_ticketing.event_manager'):
                 if obj:
@@ -477,8 +603,8 @@ class DancingPartyAdmin(admin.ModelAdmin):
     filter_horizontal = ('managers', 'scanners')
     readonly_fields = ['link_ticketing', 'remaining_places']
 
-    create_inlines = []
-    change_inlines = [DancingPartyRegistrationInline]
+    create_inlines = [DancingPartyRegistrationCustomFieldInline]
+    change_inlines = [DancingPartyRegistrationInline, DancingPartyRegistrationCustomFieldInline]
 
     def link_ticketing(self, obj: Event):
         if obj.pk:  # Check if the object was created
@@ -618,7 +744,6 @@ class DancingPartyAdmin(admin.ModelAdmin):
 class DancingPartyRegistrationAdmin(admin.ModelAdmin):
     autocomplete_fields = ('user', 'guarantor')
     change_form_template = "cla_ticketing/admin/partyregistration_view.html"
-    event = None
 
     def get_registration_type(self, request: HttpRequest, obj: DancingPartyRegistration):
         if obj is not None and obj.pk is not None:
@@ -635,13 +760,21 @@ class DancingPartyRegistrationAdmin(admin.ModelAdmin):
 
     def get_fields(self, request, obj=None):
         registration_type = self.get_registration_type(request, obj)
+        fields = []
         if registration_type == "contributor":
-            return 'user', 'type', 'home', 'paid'
+            fields += ['user', 'type', 'home', 'paid']
         elif registration_type == "non_contributor":
-            return 'first_name', 'last_name', 'birthdate', 'home', 'type', 'guarantor', 'paid'
+            fields += ['first_name', 'last_name', 'birthdate', 'home', 'type', 'guarantor', 'paid']
         elif registration_type == "staff":
-            return 'user', 'staff_description', 'paid'
-        raise Http404()
+            fields += ['user', 'staff_description', 'paid']
+
+        party = self.get_party(request, obj)
+        for custom_field in party.custom_fields.all():
+            # First add custom field to list
+            fields.append(custom_field.field_id)
+            # Then add custom field to the form
+            self.form.declared_fields.update({custom_field.field_id: custom_field.get_field_instance(required=False)})
+        return fields
 
     def render_change_form(self, request, context, add=False, change=False, form_url='', obj=None):
         registration_type = self.get_registration_type(request, obj)
@@ -655,15 +788,29 @@ class DancingPartyRegistrationAdmin(admin.ModelAdmin):
             "party": party
         })
 
-        # Set all form field to required
+        # Set field requirements
         form = context.get('adminform').form
+        non_required_set = {'paid'}.union(set([cf.field_id for cf in party.custom_fields.all()]))
         for name, field in form.fields.items():
-            if name not in {'paid'}:
-                field.required = True
+            field.required = True if name not in non_required_set else False
+
         # Customize some field
         if 'user' in form.fields.keys():
             form.fields['user'].label = "Étudiant"
             form.fields['user'].help_text = ""
+
+        # Set custom fields initial values
+        if obj is not None:
+            for custom_field in party.custom_fields.all():
+                # First add custom field to list
+                try:
+                    fv = DancingPartyRegistrationCustomFieldValue.objects.get(
+                        registration=obj,
+                        field=custom_field
+                    )
+                    form.fields[custom_field.field_id].initial = fv.value
+                except DancingPartyRegistrationCustomFieldValue.DoesNotExist:
+                    pass
 
         return super().render_change_form(request, context, add, change, form_url, obj)
 
@@ -677,6 +824,7 @@ class DancingPartyRegistrationAdmin(admin.ModelAdmin):
 
     def save_model(self, request, obj: DancingPartyRegistration, form, change):
         registration_type = self.get_registration_type(request, obj)
+        party = self.get_party(request, obj)
 
         if not change:
             obj.created_by = request.user
@@ -688,8 +836,31 @@ class DancingPartyRegistrationAdmin(admin.ModelAdmin):
             obj.phone = obj.user.infos.phone
             obj.birthdate = obj.user.infos.birthdate
         obj.is_staff = registration_type == "staff"
-        obj.dancing_party = self.get_party(request, obj)
+        obj.dancing_party = party
+
         super().save_model(request, obj, form, change)
+
+        # Deal with custom fields
+        for custom_field in party.custom_fields.all():
+            if custom_field.type == DancingPartyRegistrationCustomField.Type.TEXT:
+                DancingPartyRegistrationCustomFieldValue.objects.get_or_create_text(
+                    registration=obj, field=custom_field, value=form.cleaned_data[custom_field.field_id]
+                )
+            elif custom_field.type == DancingPartyRegistrationCustomField.Type.SELECT:
+                DancingPartyRegistrationCustomFieldValue.objects.get_or_create_text(
+                    registration=obj, field=custom_field, value=form.cleaned_data[custom_field.field_id]
+                )
+            elif custom_field.type == DancingPartyRegistrationCustomField.Type.CHECKBOX:
+                DancingPartyRegistrationCustomFieldValue.objects.get_or_create_boolean(
+                    registration=obj, field=custom_field, value=form.cleaned_data[custom_field.field_id]
+                )
+            elif custom_field.type == DancingPartyRegistrationCustomField.Type.FILE:
+                if form.cleaned_data[custom_field.field_id] is not None:
+                    DancingPartyRegistrationCustomFieldValue.objects.get_or_create_file(
+                        registration=obj, field=custom_field, value=None if not form.cleaned_data[custom_field.field_id] else form.cleaned_data[custom_field.field_id]
+                    )
+
+
 
     def response_post_save_add(self, request, obj: DancingPartyRegistration):
         return redirect("admin:cla_ticketing_dancingparty_change", obj.dancing_party.pk)

@@ -1,9 +1,28 @@
+import os
+import uuid
+
 from django.db import models
+from django import forms
+from django.utils.text import slugify
 from multiselectfield import MultiSelectField
 from cla_auth.models import UserInfos
 from django_summernote.fields import SummernoteTextField
 from django.contrib.auth.models import User, Group, Permission
 from django.utils import timezone
+
+
+class FilePath:
+
+    @classmethod
+    def _path(cls, instance, pathlist, filename):
+        ext = filename.split('.')[-1]
+        filename = "%s.%s" % (uuid.uuid4(), ext)
+        pathlist.append(filename)
+        return os.path.join(*pathlist)
+
+    @classmethod
+    def custom_field_file(cls, instance, filename):
+        return cls._path(instance, ["cla_ticketing", "custom_field_file"], filename)
 
 
 class AbstractEvent(models.Model):
@@ -66,6 +85,120 @@ class AbstractRegistration(models.Model):
         return self.student_status == self.StudentStatus.CONTRIBUTOR
 
 
+class AbstractRegistrationCustomField(models.Model):
+
+    class Meta:
+        verbose_name = "Champ additionnel"
+        verbose_name_plural = "Champs additionnels"
+        abstract = True
+
+    class Type(models.TextChoices):
+        TEXT = "text", "Texte"
+        SELECT = "select", "Choix"
+        CHECKBOX = "checkbox", "Case à cocher"
+        FILE = "file", "Fichier"
+
+    type = models.CharField(max_length=255, choices=Type.choices, default=Type.TEXT, verbose_name="Type")
+    admin_only = models.BooleanField(default=False, verbose_name="Disponible seulement du côté administrateur", blank=True)
+    required = models.BooleanField(default=False, verbose_name="Requis", blank=True)
+    label = models.CharField(max_length=255, verbose_name="Nom")
+    help_text = models.CharField(max_length=255, verbose_name="Description", blank=True)
+    options = models.TextField(verbose_name="Options pour le select", help_text="Une valeur par ligne", blank=True, null=True)
+
+    @property
+    def field_id(self):
+        return slugify(self.label).replace('-', '_')
+
+    def get_field_instance(self, **kwargs):
+        return {
+            self.Type.TEXT.value: lambda: forms.CharField(
+                max_length=255,
+                label=self.label,
+                help_text=self.help_text,
+                required=kwargs.pop('required', self.required),
+                **kwargs
+            ),
+            self.Type.SELECT.value: lambda: forms.ChoiceField(
+                choices=[(c.strip(), c.strip()) for c in self.options.split("\n")],
+                label=self.label,
+                help_text=self.help_text,
+                required=kwargs.pop('required', self.required),
+                **kwargs
+            ),
+            self.Type.CHECKBOX.value: lambda: forms.BooleanField(
+                label=self.label,
+                help_text=self.help_text,
+                required=kwargs.pop('required', self.required),
+                **kwargs
+            ),
+            self.Type.FILE.value: lambda: forms.FileField(
+                label=self.label,
+                help_text=self.help_text,
+                required=kwargs.pop('required', self.required),
+                **kwargs
+            ),
+        }.get(self.type)()
+
+    def __str__(self):
+        return f"{self.label} ({self.get_type_display()})"
+
+
+class AbstractRegistrationCustomFieldValueManager(models.Manager):
+
+    def get_or_create_text(self, registration, field, value):
+        fv, created = self.get_or_create(
+            registration=registration,
+            field=field
+        )
+        fv.text_value = value
+        fv.save()
+        return fv
+
+    def get_or_create_boolean(self, registration, field, value):
+        fv, created = self.get_or_create(
+            registration=registration,
+            field=field
+        )
+        fv.boolean_value = value
+        fv.save()
+        return fv
+
+    def get_or_create_file(self, registration, field, value):
+        fv, created = self.get_or_create(
+            registration=registration,
+            field=field
+        )
+        fv.file_value = value
+        fv.save()
+        return fv
+
+
+class AbstractRegistrationCustomFieldValue(models.Model):
+
+    objects = AbstractRegistrationCustomFieldValueManager()
+
+    class Meta:
+        verbose_name = "Champ additionnel"
+        verbose_name_plural = "Champs additionnels"
+        abstract = True
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+    registration: AbstractRegistration = None
+    field: AbstractRegistrationCustomField = None
+    text_value = models.CharField(max_length=255, null=True)
+    boolean_value = models.BooleanField(null=True)
+    file_value = models.FileField(upload_to=FilePath.custom_field_file)
+
+    @property
+    def value(self):
+        return {
+            AbstractRegistrationCustomField.Type.TEXT.value: lambda: self.text_value,
+            AbstractRegistrationCustomField.Type.SELECT.value: lambda: self.text_value,
+            AbstractRegistrationCustomField.Type.CHECKBOX.value: lambda: self.boolean_value,
+            AbstractRegistrationCustomField.Type.FILE.value: lambda: self.file_value
+        }.get(self.field.type)()
+
+
 class Event(AbstractEvent):
 
     class Meta:
@@ -84,6 +217,10 @@ class Event(AbstractEvent):
         return group
 
     allow_non_contributor_registration = models.BooleanField(default=False, verbose_name="Autoriser l'inscription des non cotisants")
+
+
+class EventRegistrationCustomField(AbstractRegistrationCustomField):
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name="custom_fields", verbose_name="Champs additionnels")
 
 
 class EventRegistrationType(models.Model):
@@ -119,6 +256,16 @@ class EventRegistration(AbstractRegistration):
     event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name="registrations", verbose_name="Evénement", editable=False)
 
 
+class EventRegistrationCustomFieldValue(AbstractRegistrationCustomFieldValue):
+    registration = models.ForeignKey(EventRegistration, on_delete=models.CASCADE, related_name="custom_fields", editable=False)
+    field = models.ForeignKey(EventRegistrationCustomField, on_delete=models.CASCADE, related_name="+", editable=False)
+
+
+class EventRegistrationCustomFieldValue(AbstractRegistrationCustomFieldValue):
+    registration = models.ForeignKey(EventRegistration, on_delete=models.CASCADE, related_name="custom_fields", editable=False)
+    field = models.ForeignKey(EventRegistrationCustomField, on_delete=models.CASCADE, related_name="+", editable=False)
+
+
 class DancingParty(AbstractEvent):
 
     class Meta:
@@ -131,6 +278,10 @@ class DancingParty(AbstractEvent):
     @property
     def places_remaining(self):
         return max(self.places-self.registrations.filter(is_staff=False).count(), 0)
+
+
+class DancingPartyRegistrationCustomField(AbstractRegistrationCustomField):
+    dancing_party = models.ForeignKey(DancingParty, on_delete=models.CASCADE, related_name="custom_fields", verbose_name="Champs additionnels")
 
 
 class DancingPartyRegistration(AbstractRegistration):
@@ -160,9 +311,15 @@ class DancingPartyRegistration(AbstractRegistration):
             }.get((student_status, type))
 
     dancing_party = models.ForeignKey(DancingParty, on_delete=models.CASCADE, related_name="registrations", verbose_name="Soirée dansante", editable=False)
+    validated = models.BooleanField(default=False, verbose_name="Validée")
     is_staff = models.BooleanField(default=False)
     type = models.CharField(max_length=255, choices=Types.choices, default=None, verbose_name="Place", null=True)
     staff_description = models.CharField(max_length=255, null=True, blank=True, verbose_name="Staff")
     home = models.CharField(max_length=100, verbose_name="Logement après la soirée")
     birthdate = models.DateField(verbose_name="Date de naissance")
     guarantor = models.ForeignKey(User, on_delete=models.DO_NOTHING, to_field="username", related_name="+", verbose_name="Garant", null=True)
+
+
+class DancingPartyRegistrationCustomFieldValue(AbstractRegistrationCustomFieldValue):
+    registration = models.ForeignKey(DancingPartyRegistration, on_delete=models.CASCADE, related_name="custom_fields", editable=False)
+    field = models.ForeignKey(DancingPartyRegistrationCustomField, on_delete=models.CASCADE, related_name="+", editable=False)

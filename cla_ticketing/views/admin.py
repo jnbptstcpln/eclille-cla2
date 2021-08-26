@@ -10,7 +10,6 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.admin.models import LogEntry, CHANGE
 
 from cla_ticketing.models import Event, EventRegistration, DancingPartyRegistration, DancingParty
-from cla_ticketing.forms.party import ContributorDancingPartyRegistrationAdminForm, NonContributorDancingPartyRegistrationAdminForm
 
 
 @method_decorator(csrf_exempt, name='dispatch')
