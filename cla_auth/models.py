@@ -28,7 +28,7 @@ class FilePath:
 
     @classmethod
     def picture(cls, instance, filename):
-        return cls._path(instance, ["cla_ath", "user", "picture"], filename)
+        return cls._path(instance, ["cla_auth", "user", "picture"], filename)
 
 
 class UserInfos(models.Model):
