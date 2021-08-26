@@ -17,7 +17,8 @@ from cla_ticketing.forms import AdminEventRegistrationForm
 from cla_ticketing.views.admin import (
     EventRegistrationTogglePaidView,
     EventRegistrationExportView,
-    DancingPartyRegistrationTogglePaidView
+    DancingPartyRegistrationTogglePaidView,
+    DancingPartyExportView
 )
 
 
@@ -76,6 +77,7 @@ class EventAdmin(admin.ModelAdmin):
 
         def is_contributor(self, obj: EventRegistration):
             return obj.is_contributor
+
         is_contributor.short_description = "Cotisant ?"
         is_contributor.boolean = True
 
@@ -84,16 +86,15 @@ class EventAdmin(admin.ModelAdmin):
             return mark_safe(
                 f"<a class='place-paid' href='{resolve_url('admin:cla_ticketing_event_toggle_paid', obj.event.pk, obj.pk)}'>{icon}</a>"
             )
-        place_paid.short_description = "Réglée ?"
+
+        place_paid.short_description = "Payée"
 
         def edit_button(self, obj: EventRegistration):
             return mark_safe(
-                f"<a id='change_id_registrations-{obj.id}-eventregistration' class='related-widget-wrapper-link change-related' data-href-template='/admin/cla_ticketing/eventregistration/__fk__/change/?_to_field=id&amp;_popup=1' title='Modifier l\\'inscription' href='/admin/cla_ticketing/eventregistration/{obj.id}/change/?_to_field=id&amp;_popup=1&amp;event={obj.event.pk}' onclick='django.jQuery(this).parents(\"tr\").children().css(\"background-color\", \"rgb(255,255,205,.25)\")'><img src='/static/admin/img/icon-changelink.svg' alt='Modification'></a>" +
-                f"<a id='change_id_registrations-{obj.id}-eventregistration' class='related-widget-wrapper-link delete-related' data-href-template='/admin/cla_ticketing/eventregistration/__fk__/delete/?_to_field=id&amp;_popup=1' title='Supprimer l\\'inscription' href='/admin/cla_ticketing/eventregistration/{obj.id}/delete/?_to_field=id&amp;_popup=1' onclick='django.jQuery(this).parents(\"tr\").children().css(\"background-color\", \"rgb(255,0,0,.25)\")'><img src='/static/admin/img/icon-deletelink.svg' alt='Supprimer'></a>"
+                f"<a title='Modifier l\\'inscription' href='/admin/cla_ticketing/eventregistration/{obj.id}/change/?_to_field=id&amp;event={obj.event.pk}' style='margin-right: 3px'><img src='/static/admin/img/icon-changelink.svg' alt='Modification'></a>"
             )
-        edit_button.short_description = mark_safe(
-            "edit_button"
-        )
+
+        edit_button.short_description = "edit_button"
 
         def get_model_perms(self, request):
             perms = super().get_model_perms(request)
@@ -117,35 +118,6 @@ class EventAdmin(admin.ModelAdmin):
     list_display = ("name", "event_starts_on", "organizer", "places")
     change_form_template = "cla_ticketing/admin/change_event.html"
     filter_horizontal = ('managers',)
-    fieldsets = [
-        [
-            "Informations pratiques",
-            {
-                'fields': (
-                    ('link_ticketing'),
-                    ('remaining_places'),
-                    ('name', 'slug'),
-                    ('organizer', 'places'),
-                    ('event_starts_on', 'event_ends_on'),
-                    ('registration_starts_on', 'registration_ends_on')
-                )
-            }
-        ],
-        [
-            "Informations supplémentaire",
-            {
-                'fields': ('contributor_ticketing_href', 'non_contributor_ticketing_href', 'allow_non_contributor_registration', 'colleges', 'description'),
-                'classes': ('collapse',),
-            }
-        ]
-    ]
-    fielset_event_administration = [
-        "Administration de l'événement",
-        {
-            'fields': ('managers',),
-            'classes': ('collapse',),
-        }
-    ]
     readonly_fields = ['link_ticketing', 'remaining_places']
 
     create_inlines = [EventRegistrationTypeInline]
@@ -162,6 +134,7 @@ class EventAdmin(admin.ModelAdmin):
             )
         else:
             return ""
+
     link_ticketing.short_description = ''
 
     def remaining_places(self, obj: Event):
@@ -169,6 +142,7 @@ class EventAdmin(admin.ModelAdmin):
             return obj.places_remaining
         else:
             return "L'événement n'a pas encore été créé"
+
     remaining_places.short_description = 'Nombre de places restant'
 
     def response_add(self, request, obj, post_url_continue=None):
@@ -192,10 +166,48 @@ class EventAdmin(admin.ModelAdmin):
         return super()._response_post_save(request, obj)
 
     def get_fieldsets(self, request: HttpRequest, obj=None):
-        fielsets = deepcopy(super().get_fieldsets(request, obj))
+        fieldsets = [
+            [
+                "Informations pratiques",
+                {
+                    'fields': (
+                        ('link_ticketing'),
+                        ('remaining_places'),
+                        ('name', 'slug'),
+                        ('organizer', 'places')
+                    ) if obj is not None and obj.pk is not None else (
+                        ('name', 'slug'),
+                        ('organizer', 'places'),
+                        ('event_starts_on', 'event_ends_on'),
+                        ('registration_starts_on', 'registration_ends_on'),
+                    )
+                }
+            ],
+            [
+                "Informations supplémentaire",
+                {
+                    'fields': (
+                        ('event_starts_on', 'event_ends_on'),
+                        ('registration_starts_on', 'registration_ends_on'),
+                        'contributor_ticketing_href', 'non_contributor_ticketing_href', 'allow_non_contributor_registration', 'colleges', 'description'
+                    ) if obj is not None and obj.pk is not None else (
+                        'contributor_ticketing_href', 'non_contributor_ticketing_href', 'allow_non_contributor_registration', 'colleges', 'description'
+                    ),
+                    'classes': ('collapse',),
+                }
+            ]
+        ]
+
         if request.user.has_perm("cla_ticketing.add_event"):
-            fielsets.append(self.fielset_event_administration)
-        return fielsets
+            fieldsets.append([
+                "Administration de l'événement",
+                {
+                    'fields': ('managers',),
+                    'classes': ('collapse',),
+                }
+            ])
+
+        return fieldsets
 
     def get_inlines(self, request, obj=None):
         if obj:
@@ -285,31 +297,85 @@ class EventRegistrationTypeAdmin(admin.ModelAdmin):
 @admin.register(EventRegistration)
 class EventRegistrationAdmin(admin.ModelAdmin):
     autocomplete_fields = ('user',)
-    form = AdminEventRegistrationForm
+    change_form_template = "cla_ticketing/admin/eventregistration_view.html"
     event = None
 
-    def get_event_from_request(self, request):
+    def get_registration_type(self, request: HttpRequest, obj: EventRegistration):
+        if obj is not None and obj.pk is not None:
+            if obj.student_status == EventRegistration.StudentStatus.CONTRIBUTOR:
+                return "contributor"
+            return "non_contributor"
+        if request.method == "POST":
+            return request.POST['registration_type']  # Different name to not collide with EventRegistration.type
+        else:
+            return request.GET['type']
+
+    def get_fields(self, request, obj=None):
+        registration_type = self.get_registration_type(request, obj)
+        if registration_type == "contributor":
+            return 'user', 'type', 'paid'
+        elif registration_type == "non_contributor":
+            return 'first_name', 'last_name', 'type', 'paid'
+        raise Http404()
+
+    def render_change_form(self, request, context, add=False, change=False, form_url='', obj=None):
+        registration_type = self.get_registration_type(request, obj)
+        event = self.get_event(request, obj)
+
+        # Update context with custom properties
+        context.update({
+            "title": "Inscrire un " + {'contributor': "cotisant", 'non_contributor': "non cotisant"}.get(registration_type),
+            "type": registration_type,
+            "event_opts": Event._meta,
+            "event": event
+        })
+
+        # Set all form field to required
+        form = context.get('adminform').form
+        for name, field in form.fields.items():
+            if name not in {'paid'}:
+                field.required = True
+        # Customize some field
+        if 'user' in form.fields.keys():
+            form.fields['user'].label = "Étudiant"
+            form.fields['user'].help_text = ""
+
+        return super().render_change_form(request, context, add, change, form_url, obj)
+
+    def get_event(self, request, obj: EventRegistration = None):
+        if obj is not None and obj.event_id is not None:
+            return obj.event
         event = get_object_or_404(Event, pk=request.GET.get('event', None))
         if not request.user.has_perm('cla_ticketing.add_event') and event.managers.filter(pk=request.user.pk).count() == 0:
             raise PermissionDenied()
         return event
 
     def save_model(self, request, obj: EventRegistration, form, change):
+        registration_type = self.get_registration_type(request, obj)
+
         if not change:
             obj.created_by = request.user
         obj.student_status = EventRegistration.StudentStatus.CONTRIBUTOR if obj.user else EventRegistration.StudentStatus.NON_CONTRIBUTOR
-        obj.event = self.get_event_from_request(request)
+        if obj.student_status == EventRegistration.StudentStatus.CONTRIBUTOR:
+            obj.first_name = obj.user.first_name
+            obj.last_name = obj.user.last_name
+            obj.email = obj.user.email
+            obj.phone = obj.user.infos.phone
+            obj.birthdate = obj.user.infos.birthdate
+        obj.event = self.get_event(request, obj)
         super().save_model(request, obj, form, change)
 
-    def formfield_for_dbfield(self, db_field, request, **kwargs):
-        # Update queryset to only show RegistrationType related to the event
-        if db_field.name == "type":
-            return forms.ModelChoiceField(
-                EventRegistrationType.objects.filter(
-                    event=self.get_event_from_request(request)
-                )
-            )
-        return super().formfield_for_dbfield(db_field, request, **kwargs)
+    def response_post_save_add(self, request, obj: EventRegistration):
+        return redirect("admin:cla_ticketing_event_change", obj.event.pk)
+
+    def response_post_save_change(self, request, obj: EventRegistration):
+        return redirect("admin:cla_ticketing_event_change", obj.event.pk)
+
+    def response_delete(self, request, obj_display, obj_id):
+        event = self.get_event(request)
+        if event is not None:
+            return redirect("admin:cla_ticketing_event_change", event.pk)
+        return redirect("admin:cla_ticketing_event_changelist")
 
     def get_model_perms(self, request):
         return {}
@@ -348,7 +414,6 @@ class EventRegistrationAdmin(admin.ModelAdmin):
 
 @admin.register(DancingParty)
 class DancingPartyAdmin(admin.ModelAdmin):
-
     class DancingPartyRegistrationInline(TabularInlinePaginated):
         fields = ['last_name', 'first_name', 'place', 'place_paid', 'created_on', 'edit_button']
         readonly_fields = ['last_name', 'first_name', 'place', 'place_paid', 'created_on', 'edit_button']
@@ -361,14 +426,6 @@ class DancingPartyAdmin(admin.ModelAdmin):
         can_delete = False
         template = "cla_ticketing/admin/partyregistrations_inline.html"
 
-        def edit_button(self, obj: DancingPartyRegistration):
-            return mark_safe(
-                f"<a title='Modifier l\\'inscription' href='/admin/cla_ticketing/dancingpartyregistration/{obj.id}/change/?_to_field=id&amp;dancingparty={obj.dancing_party.pk}' style='margin-right: 3px'><img src='/static/admin/img/icon-changelink.svg' alt='Modification'></a>"
-            )
-        edit_button.short_description = mark_safe(
-            "edit_button"
-        )
-
         def place(self, obj: DancingPartyRegistration):
             if obj.is_staff:
                 return f"Staff : {obj.staff_description}"
@@ -378,6 +435,7 @@ class DancingPartyAdmin(admin.ModelAdmin):
                 return f"Non cotisant {obj.get_type_display().lower()}"
             else:
                 return "Autre"
+
         place.short_description = "Place"
 
         def place_paid(self, obj: DancingPartyRegistration):
@@ -385,7 +443,15 @@ class DancingPartyAdmin(admin.ModelAdmin):
             return mark_safe(
                 f"<a class='place-paid' href='{resolve_url('admin:cla_ticketing_dancingparty_toggle_paid', obj.dancing_party.pk, obj.pk)}'>{icon}</a>"
             )
-        place_paid.short_description = "Réglée ?"
+
+        place_paid.short_description = "Payée"
+
+        def edit_button(self, obj: DancingPartyRegistration):
+            return mark_safe(
+                f"<a title='Modifier l\\'inscription' href='/admin/cla_ticketing/dancingpartyregistration/{obj.id}/change/?_to_field=id&amp;dancingparty={obj.dancing_party.pk}' style='margin-right: 3px'><img src='/static/admin/img/icon-changelink.svg' alt='Modification'></a>"
+            )
+
+        edit_button.short_description = "edit_button"
 
         def get_model_perms(self, request):
             perms = super().get_model_perms(request)
@@ -409,35 +475,6 @@ class DancingPartyAdmin(admin.ModelAdmin):
     list_display = ("name", "event_starts_on", "organizer", "places")
     change_form_template = "cla_ticketing/admin/change_party.html"
     filter_horizontal = ('managers',)
-    fieldsets = [
-        [
-            "Informations pratiques",
-            {
-                'fields': (
-                    ('link_ticketing'),
-                    ('remaining_places'),
-                    ('name', 'slug'),
-                    ('organizer', 'places'),
-                    ('event_starts_on', 'event_ends_on'),
-                    ('registration_starts_on', 'registration_ends_on')
-                )
-            }
-        ],
-        [
-            "Informations supplémentaire",
-            {
-                'fields': ('contributor_ticketing_href', 'colleges', 'description'),
-                'classes': ('collapse',),
-            }
-        ]
-    ]
-    fielset_event_administration = [
-        "Administration de l'événement",
-        {
-            'fields': ('managers',),
-            'classes': ('collapse',),
-        }
-    ]
     readonly_fields = ['link_ticketing', 'remaining_places']
 
     create_inlines = []
@@ -486,10 +523,49 @@ class DancingPartyAdmin(admin.ModelAdmin):
         return super()._response_post_save(request, obj)
 
     def get_fieldsets(self, request: HttpRequest, obj=None):
-        fielsets = deepcopy(super().get_fieldsets(request, obj))
-        if request.user.has_perm("cla_ticketing.add_dancingparty"):
-            fielsets.append(self.fielset_event_administration)
-        return fielsets
+
+        fieldsets = [
+            [
+                "Informations pratiques",
+                {
+                    'fields': (
+                        ('link_ticketing'),
+                        ('remaining_places'),
+                        ('name', 'slug'),
+                        ('organizer', 'places')
+                    ) if obj is not None and obj.pk is not None else (
+                        ('name', 'slug'),
+                        ('organizer', 'places'),
+                        ('event_starts_on', 'event_ends_on'),
+                        ('registration_starts_on', 'registration_ends_on'),
+                    )
+                }
+            ],
+            [
+                "Informations supplémentaire",
+                {
+                    'fields': (
+                        ('event_starts_on', 'event_ends_on'),
+                        ('registration_starts_on', 'registration_ends_on'),
+                        'contributor_ticketing_href', 'colleges', 'description'
+                    ) if obj is not None and obj.pk is not None else (
+                        'contributor_ticketing_href', 'colleges', 'description'
+                    ),
+                    'classes': ('collapse',),
+                }
+            ]
+        ]
+
+        if request.user.has_perm("cla_ticketing.add_event"):
+            fieldsets.append([
+                "Administration de l'événement",
+                {
+                    'fields': ('managers',),
+                    'classes': ('collapse',),
+                }
+            ])
+
+        return fieldsets
 
     def get_inlines(self, request, obj=None):
         if obj:
@@ -527,6 +603,11 @@ class DancingPartyAdmin(admin.ModelAdmin):
                 '<int:party_pk>/registrations/<int:pk>/paid',
                 self.admin_site.admin_view(DancingPartyRegistrationTogglePaidView.as_view()),
                 name='%s_%s_toggle_paid' % info
+            ),
+            path(
+                '<int:party_pk>/registrations/export',
+                self.admin_site.admin_view(DancingPartyExportView.as_view()),
+                name='%s_%s_export' % info
             )
         ]
         urls = my_urls + urls
@@ -554,18 +635,17 @@ class DancingPartyRegistrationAdmin(admin.ModelAdmin):
 
     def get_fields(self, request, obj=None):
         registration_type = self.get_registration_type(request, obj)
-        print(registration_type)
         if registration_type == "contributor":
-            return 'user', 'type', 'home'
+            return 'user', 'type', 'home', 'paid'
         elif registration_type == "non_contributor":
-            return 'first_name', 'last_name', 'birthdate', 'home', 'type', 'guarantor'
+            return 'first_name', 'last_name', 'birthdate', 'home', 'type', 'guarantor', 'paid'
         elif registration_type == "staff":
-            return 'user', 'staff_description'
+            return 'user', 'staff_description', 'paid'
         raise Http404()
 
     def render_change_form(self, request, context, add=False, change=False, form_url='', obj=None):
         registration_type = self.get_registration_type(request, obj)
-        party = get_object_or_404(DancingParty, pk=request.GET.get('dancingparty'))
+        party = self.get_party(request, obj)
 
         # Update context with custom properties
         context.update({
@@ -575,12 +655,11 @@ class DancingPartyRegistrationAdmin(admin.ModelAdmin):
             "party": party
         })
 
-        print(context)
-
         # Set all form field to required
         form = context.get('adminform').form
-        for field in form.fields.values():
-            field.required = True
+        for name, field in form.fields.items():
+            if name not in {'paid'}:
+                field.required = True
         # Customize some field
         if 'user' in form.fields.keys():
             form.fields['user'].label = "Étudiant"
@@ -588,7 +667,9 @@ class DancingPartyRegistrationAdmin(admin.ModelAdmin):
 
         return super().render_change_form(request, context, add, change, form_url, obj)
 
-    def get_party_from_request(self, request):
+    def get_party(self, request, obj: DancingPartyRegistration = None):
+        if obj is not None and obj.dancing_party_id is not None:
+            return obj.dancing_party
         party = get_object_or_404(DancingParty, pk=request.GET.get('dancingparty', None))
         if not request.user.has_perm('cla_ticketing.add_dancingparty') and party.managers.filter(pk=request.user.pk).count() == 0:
             raise PermissionDenied()
@@ -607,7 +688,7 @@ class DancingPartyRegistrationAdmin(admin.ModelAdmin):
             obj.phone = obj.user.infos.phone
             obj.birthdate = obj.user.infos.birthdate
         obj.is_staff = registration_type == "staff"
-        obj.dancing_party = self.get_party_from_request(request)
+        obj.dancing_party = self.get_party(request, obj)
         super().save_model(request, obj, form, change)
 
     def response_post_save_add(self, request, obj: DancingPartyRegistration):
@@ -617,7 +698,10 @@ class DancingPartyRegistrationAdmin(admin.ModelAdmin):
         return redirect("admin:cla_ticketing_dancingparty_change", obj.dancing_party.pk)
 
     def response_delete(self, request, obj_display, obj_id):
-        return redirect("admin:cla_ticketing_dancingparty_change", self.get_party_from_request(request).pk)
+        party = self.get_party(request)
+        if party is not None:
+            return redirect("admin:cla_ticketing_dancingparty_change", party.pk)
+        return redirect("admin:cla_ticketing_dancingparty_changelist")
 
     def get_model_perms(self, request):
         return {}

@@ -11,26 +11,41 @@
                 <h2>{{ inline_admin_formset.opts.verbose_name_plural|capfirst }}</h2>
             {% endif %}
             {{ inline_admin_formset.formset.non_form_errors }}
-            <div style="margin: .5rem 0; display: flex">
-                <input type="text" id="registrations-search-input" placeholder="Rechercher..." style="height: 19px;border: 1px solid var(--border-color);padding: 2px 5px;margin: 0;vertical-align: top;font-size: 13px;max-width: 30em;flex: auto; margin-right: 3px">
-                <input id="registrations-search-submit" type="submit"
-                       style="border: 1px solid var(--border-color);font-size: 13px;padding: 4px 8px;margin: 0;vertical-align: middle;background: var(--body-bg);box-shadow: 0 -15px 20px -10px rgba(0, 0, 0, 0.15) inset;cursor: pointer;color: var(--body-fg);"
-                       value="Rechercher">
-                <script>
-                    document.addEventListener("DOMContentLoaded", function () {
-                        const urlSearchParams = new URLSearchParams(window.location.search);
-                        const params = Object.fromEntries(urlSearchParams.entries());
-                        document.getElementById("registrations-search-input").value = params.registration_search || "";
+            <div style="margin: .5rem 0; display: flex; flex-wrap: wrap; justify-content: space-between">
+                <div style="display: flex; flex-wrap: nowrap">
+                    <input type="text" id="registrations-search-input" placeholder="Rechercher..."
+                           style="height: 19px;border: 1px solid var(--border-color);padding: 2px 5px;margin: 0;vertical-align: top;font-size: 13px;max-width: 30em;flex: auto; margin-right: 3px">
+                    <input id="registrations-search-submit" type="submit"
+                           style="border: 1px solid var(--border-color);font-size: 13px;padding: 4px 8px;margin: 0;vertical-align: middle;background: var(--body-bg);box-shadow: 0 -15px 20px -10px rgba(0, 0, 0, 0.15) inset;cursor: pointer;color: var(--body-fg);"
+                           value="Rechercher">
+                    <script>
+                        document.addEventListener("DOMContentLoaded", function () {
+                            const urlSearchParams = new URLSearchParams(window.location.search);
+                            const params = Object.fromEntries(urlSearchParams.entries());
+                            document.getElementById("registrations-search-input").value = params.registration_search || "";
 
-                        document.getElementById("registrations-search-submit").addEventListener(
-                            "click",
-                            function (event) {
-                                event.preventDefault();
-                                window.location.href = "?registration_search=" + document.getElementById("registrations-search-input").value +"#registration-table"
-                            }
-                        )
-                    })
-                </script>
+                            document.getElementById("registrations-search-submit").addEventListener(
+                                "click",
+                                function (event) {
+                                    event.preventDefault();
+                                    window.location.href = "?registration_search=" + document.getElementById("registrations-search-input").value + "#registration-table"
+                                }
+                            )
+                        })
+                    </script>
+                </div>
+                <div>
+                    {% if has_change_permission %}
+                        <a href="/admin/cla_ticketing/eventregistration/add/?_to_field=id&amp;event={{ original.pk }}&amp;type=contributor"
+                           style="border: 1px solid var(--border-color);font-size: 13px;padding: 4px 8px;margin: 0;vertical-align: middle;background: var(--body-bg);box-shadow: 0 -15px 20px -10px rgba(0, 0, 0, 0.15) inset;cursor: pointer;color: var(--body-fg); margin-right: 3px">
+                            Inscrire un cotisant
+                        </a>
+                        <a href="/admin/cla_ticketing/eventregistration/add/?_to_field=id&amp;event={{ original.pk }}&amp;type=non_contributor"
+                           style="border: 1px solid var(--border-color);font-size: 13px;padding: 4px 8px;margin: 0;vertical-align: middle;background: var(--body-bg);box-shadow: 0 -15px 20px -10px rgba(0, 0, 0, 0.15) inset;cursor: pointer;color: var(--body-fg);margin-right: 3px">
+                            Inscrire un non cotisant
+                        </a>
+                    {% endif %}
+                </div>
             </div>
             <table id="registration-table">
                 <thead>
@@ -39,11 +54,7 @@
                     {% for field in inline_admin_formset.fields %}
                         {% if not field.widget.is_hidden %}
                             {% if field.name == "edit_button" %}
-                                <th class="column-{{ field.name }}">
-                                    <a id='add_id_registrations-0-eventregistration' class='related-widget-wrapper-link add-related' title='Ajouter une inscription' href='/admin/cla_ticketing/eventregistration/add/?_to_field=id&amp;_popup=1&amp;event={{ original.pk }}'>
-                                        <img src='/static/admin/img/icon-addlink.svg' alt='Ajouter'>
-                                    </a>
-                                </th>
+                                <th class="column-{{ field.name }}"></th>
                             {% else %}
                                 <th class="column-{{ field.name }}{% if field.required %} required{% endif %}">{{ field.label|capfirst }}
                                     {% if field.help_text %}
@@ -53,7 +64,8 @@
                         {% endif %}
                     {% endfor %}
                     {% if inline_admin_formset.formset.can_delete and inline_admin_formset.has_delete_permission %}
-                        <th>{% translate "Delete?" %}</th>{% endif %}
+                        <th>{% translate "Delete?" %}</th>
+                    {% endif %}
                 </tr>
                 </thead>
 
