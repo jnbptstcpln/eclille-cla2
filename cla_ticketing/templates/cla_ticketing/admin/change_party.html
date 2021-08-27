@@ -38,6 +38,11 @@
                             </li>
                         {% endif %}
                         {% change_form_object_tools %}
+                        <li>
+                            <a class="viewsitelink" href="{% url "cla_ticketing:party_checkin" original.slug %}">
+                                Entrées
+                            </a>
+                        </li>
                     {% endblock %}
                 </ul>
             {% endif %}{% endif %}
