@@ -14,8 +14,9 @@ class DancingPartyRegistrationMixin:
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         self.party = get_object_or_404(DancingParty, slug=kwargs.pop("party_slug", None))
-        self.registration_self = self.party.registrations.filter(user=request.user).first()
-        self.registration_friend = self.party.registrations.filter(guarantor=request.user).first()
+        if request.user.is_authenticated:
+            self.registration_self = self.party.registrations.filter(user=request.user).first()
+            self.registration_friend = self.party.registrations.filter(guarantor=request.user).first()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
