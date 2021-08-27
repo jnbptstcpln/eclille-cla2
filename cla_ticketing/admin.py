@@ -557,7 +557,7 @@ class DancingPartyAdmin(admin.ModelAdmin):
                 return f"Staff : {obj.staff_description}"
             elif obj.student_status == DancingPartyRegistration.StudentStatus.CONTRIBUTOR:
                 return f"Cotisant {obj.get_type_display().lower()}"
-            elif obj.student_status == DancingPartyRegistration.StudentStatus.CONTRIBUTOR:
+            elif obj.student_status == DancingPartyRegistration.StudentStatus.NON_CONTRIBUTOR:
                 return f"Non cotisant {obj.get_type_display().lower()}"
             else:
                 return "Autre"
