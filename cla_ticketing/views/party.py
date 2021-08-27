@@ -28,6 +28,10 @@ class AbstractRegistrationCreateView(DancingPartyRegistrationMixin, IsContributo
     def dispatch(self, request: HttpRequest, *args, **kwargs):
         if not self.party.are_registrations_opened:
             return redirect("cla_ticketing:party_view", self.party.slug)
+        if self.is_contributor and self.registration_self is not None:
+            return redirect("cla_ticketing:party_view", self.party.slug)
+        if not self.is_contributor and self.registration_friend is not None:
+            return redirect("cla_ticketing:party_view", self.party.slug)
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
@@ -109,10 +113,15 @@ class AbstractRegistrationDetailView(DancingPartyRegistrationMixin, IsContributo
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({
-            'registration': self.registration
+            'registration': self.registration,
+            'back_href': self.get_back_href()
         })
         return context
 
+    def get_back_href(self):
+        if self.request.GET.get('redirect') == "lobby":
+            return resolve_url("cla_ticketing:event_ticketing")
+        return resolve_url("cla_ticketing:party_view", self.party.slug)
 
 class ContributorRegistrationDetailView(AbstractRegistrationDetailView):
     template_name = "cla_ticketing/party/view_registration_contributor.html"
