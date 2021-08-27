@@ -277,8 +277,8 @@ class DancingParty(AbstractEvent):
             ('dancingparty_manager', "Accès à l'interface de gestion des soirées dansantes pour lesquelles l'utilisateur est administrateur"),
         )
 
+    allow_non_contributor_registration = models.BooleanField(default=True, verbose_name="Autoriser l'inscription des non cotisants par les cotisants")
     scanners = models.ManyToManyField(User, related_name="+", verbose_name="Scanneurs", help_text="Les scanneurs peuvent effectuer les entrées au sein de l'événement", blank=True)
-    place_index = models.IntegerField(default=0)
 
     @property
     def places_remaining(self):

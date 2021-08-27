@@ -12,17 +12,18 @@ from django.utils.decorators import method_decorator
 from django.views.generic import View, CreateView, TemplateView
 
 from cla_auth.mixins import IsContributorMixin
-from cla_ticketing.mixins.party import DancingPartyRegistrationMixin
+from cla_ticketing.mixins.party import DancingPartyRegistrationMixin, DancingPartyCollegeMixin
 from cla_ticketing.models import DancingParty, DancingPartyRegistration, DancingPartyRegistrationCustomField, DancingPartyRegistrationCustomFieldValue
 from cla_ticketing.forms.party import ContributorRegistrationForm, NonContributorRegistrationForm
 
 
-class DancingPartyView(DancingPartyRegistrationMixin, IsContributorMixin, TemplateView):
+class DancingPartyView(IsContributorMixin, DancingPartyCollegeMixin, DancingPartyRegistrationMixin, TemplateView):
     template_name = "cla_ticketing/party/view_party.html"
 
 
-class AbstractRegistrationCreateView(DancingPartyRegistrationMixin, IsContributorMixin, CreateView):
+class AbstractRegistrationCreateView(IsContributorMixin, DancingPartyCollegeMixin, DancingPartyRegistrationMixin, CreateView):
     is_contributor = False
+    dancing_party_college_redirect = True
     model = DancingPartyRegistration
 
     def dispatch(self, request: HttpRequest, *args, **kwargs):
@@ -115,11 +116,16 @@ class NonContributorRegistrationCreateView(AbstractRegistrationCreateView):
     template_name = "cla_ticketing/party/register_noncontributor.html"
     form_class = NonContributorRegistrationForm
 
+    def dispatch(self, request: HttpRequest, *args, **kwargs):
+        if not self.party.allow_non_contributor_registration:
+            return redirect("cla_ticketing:party_view", self.party.slug)
+        return super().dispatch(request, *args, **kwargs)
+
     def get_success_url(self):
         return resolve_url("cla_ticketing:party_detail_noncontributor", self.party.slug)
 
 
-class AbstractRegistrationDetailView(DancingPartyRegistrationMixin, IsContributorMixin, TemplateView):
+class AbstractRegistrationDetailView(IsContributorMixin, DancingPartyRegistrationMixin, TemplateView):
     registration: DancingPartyRegistration = None
 
     def get_registration(self):
@@ -141,7 +147,7 @@ class AbstractRegistrationDetailView(DancingPartyRegistrationMixin, IsContributo
 
     def get_back_href(self):
         if self.request.GET.get('redirect') == "lobby":
-            return resolve_url("cla_ticketing:event_ticketing")
+            return resolve_url("cla_member:ticketing")
         return resolve_url("cla_ticketing:party_view", self.party.slug)
 
 

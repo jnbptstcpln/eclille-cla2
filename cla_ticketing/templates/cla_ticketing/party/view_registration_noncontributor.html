@@ -85,6 +85,9 @@
                         <p class="text-center">
                             <a class="btn btn-red-dark" href="{{ party.contributor_ticketing_href }}" target="_blank">Accéder à la billetterie</a>
                         </p>
+                        <p class="text-justify" style="font-size: .75rem">
+                            Si vous avez bien payé votre place <b>pas de panique</b>, ce message s'affiche jusqu'à la validation du paiement par l'organisateur.
+                        </p>
                     {% else %}
                         <p class="text-justify">
                             <b>Vous pouvez maintenant procéder au règlement de la place de votre invité selon les modalités que vous a communiquées l'organisateur.</b>
@@ -92,6 +95,9 @@
                         </p>
                         <p class="text-center">
                             <b>Toute place non payée n'est pas réservée.</b>
+                        </p>
+                        <p class="text-justify" style="font-size: .75rem">
+                            Si vous avez bien payé votre place <b>pas de panique</b>, ce message s'affiche jusqu'à la validation du paiement par l'organisateur.
                         </p>
                     {% endif %}
                     <p style="font-size: .75rem" class="text-center mt-3 mb-0"><a href="{{ back_href }}" style="color: var(--dark)">Retour</a></p>

@@ -1,8 +1,6 @@
-from django.shortcuts import get_object_or_404
-from django.utils.decorators import method_decorator
-from django.views.generic import View, CreateView, TemplateView
+from django.http import HttpRequest
+from django.shortcuts import get_object_or_404, render, redirect
 
-from cla_auth.mixins import IsContributorMixin
 from cla_ticketing.models import DancingParty, DancingPartyRegistration
 
 
@@ -26,3 +24,14 @@ class DancingPartyRegistrationMixin:
             'registration_friend': self.registration_friend
         })
         return context
+
+
+class DancingPartyCollegeMixin:
+    dancing_party_college_redirect = False
+
+    def dispatch(self, request: HttpRequest, *args, **kwargs):
+        if request.user.infos.college not in self.party.colleges:
+            if self.dancing_party_college_redirect:
+                return redirect("cla_ticketing:party_view", self.party.slug)
+            return render(request, "cla_ticketing/party/unauthorized.html", self.get_context_data())
+        return super().dispatch(request, *args, **kwargs)

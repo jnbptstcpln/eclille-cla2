@@ -172,61 +172,33 @@
                         {{ party.description|safe }}
                     </div>
                 {% endif %}
-                <div class="registration-container">
 
-                    {% if registration_self %}
-                        <a href="{% url "cla_ticketing:party_detail_contributor" party.slug %}" class="registration registration-self ticket">
-                            <h3>
-                                <span class="label">Ma place</span>
-                                <span class="status">{{ registration_self.first_name }}</span>
-                                <span class="type">{{ registration_self.get_type_display }}</span>
-                            </h3>
-                            <h4><i class="fas fa-qrcode"></i></h4>
-                        </a>
-                    {% else %}
-                        {% if party.are_registrations_opened %}
-                            <a href="{% url "cla_ticketing:party_register_contributor" party.slug %}" class="registration registration-self open">
-                                <span>Prendre ma place</span>
+                {% if registration_self or registration_friend %}
+                    <div class="registration-container">
+                        {% if registration_self %}
+                            <a href="{% url "cla_ticketing:party_detail_contributor" party.slug %}" class="registration registration-self ticket">
+                                <h3>
+                                    <span class="label">Ma place</span>
+                                    <span class="status">{{ registration_self.first_name }}</span>
+                                    <span class="type">{{ registration_self.get_type_display }}</span>
+                                </h3>
+                                <h4><i class="fas fa-qrcode"></i></h4>
                             </a>
-                        {% else %}
                         {% endif %}
-                    {% endif %}
-
-                    {% if registration_friend %}
-                        <a href="{% url "cla_ticketing:party_detail_noncontributor" party.slug %}" class="registration registration-friend ticket">
-                            <h3>
-                                <span class="label">J'invite</span>
-                                <span class="status">{{ registration_friend.first_name }}</span>
-                                <span class="type">{{ registration_friend.get_type_display }}</span>
-                            </h3>
-                            <h4><i class="fas fa-qrcode"></i></h4>
-                        </a>
-                    {% else %}
-                        {% if party.allow_non_contributor_registration %}
-                            {% if party.are_registrations_opened %}
-                                <a href="{% url "cla_ticketing:party_register_noncontributor" party.slug %}" class="registration registration-friend open">
-                                    <span>Inviter un exté</span>
-                                </a>
-                            {% endif %}
+                        {% if registration_friend %}
+                            <a href="{% url "cla_ticketing:party_detail_noncontributor" party.slug %}" class="registration registration-friend ticket">
+                                <h3>
+                                    <span class="label">J'invite</span>
+                                    <span class="status">{{ registration_friend.first_name }}</span>
+                                    <span class="type">{{ registration_friend.get_type_display }}</span>
+                                </h3>
+                                <h4><i class="fas fa-qrcode"></i></h4>
+                            </a>
                         {% endif %}
-                    {% endif %}
-
-                    {% if not registration_self and not registration_friend and not party.are_registrations_opened %}
-                        <a class="registration registration-friend closed">
-                            <span>Billetterie fermée</span>
-                        </a>
-                    {% endif %}
-
-                </div>
-                {% if party.are_registrations_opened %}
-                    {% if party.allow_non_contributor_registration and not registration_friend %}
-                        <p class="mt-3 mb-0 mx-auto text-center" style="font-size: 0.7rem; max-width: 350px">
-                            Chaque cotisant a la possibilité de se porter garant d'une personne non-cotisante pour l'inviter, en plus de sa propre place.
-                        </p>
-                    {% endif %}
-                {% elif registration_self or registration_friend %}
-                    <p class="mt-3 mb-0 mx-auto text-center" style="font-size: 0.7rem; max-width: 400px">
-                        La billetterie est fermée
+                    </div>
+                {% else %}
+                    <p class="mx-auto text-center" style="max-width: 300px">
+                        <b>Votre compte ne vous permet pas d'accéder à cette billetterie</b>
                     </p>
                 {% endif %}
             </div>
