@@ -744,6 +744,7 @@ class DancingPartyAdmin(admin.ModelAdmin):
 class DancingPartyRegistrationAdmin(admin.ModelAdmin):
     autocomplete_fields = ('user', 'guarantor')
     change_form_template = "cla_ticketing/admin/partyregistration_view.html"
+    readonly_fields = ['ticket_label']
 
     def get_registration_type(self, request: HttpRequest, obj: DancingPartyRegistration):
         if obj is not None and obj.pk is not None:
@@ -762,11 +763,11 @@ class DancingPartyRegistrationAdmin(admin.ModelAdmin):
         registration_type = self.get_registration_type(request, obj)
         fields = []
         if registration_type == "contributor":
-            fields += ['user', 'type', 'home', ('paid', 'validated')]
+            fields += ['ticket_label', 'user', 'type', 'home', ('paid', 'validated')]
         elif registration_type == "non_contributor":
-            fields += [('first_name', 'last_name'), ('email', 'phone'), 'birthdate', 'home', 'type', 'guarantor', ('paid', 'validated')]
+            fields += ['ticket_label', ('first_name', 'last_name'), ('email', 'phone'), 'birthdate', 'home', 'type', 'guarantor', ('paid', 'validated')]
         elif registration_type == "staff":
-            fields += ['user', 'staff_description', 'paid']
+            fields += ['ticket_label', 'user', 'staff_description', 'paid']
 
         party = self.get_party(request, obj)
         for custom_field in party.custom_fields.all():
@@ -874,6 +875,12 @@ class DancingPartyRegistrationAdmin(admin.ModelAdmin):
         if party is not None:
             return redirect("admin:cla_ticketing_dancingparty_change", party.pk)
         return redirect("admin:cla_ticketing_dancingparty_changelist")
+
+    def ticket_label(self, obj: DancingPartyRegistration):
+        if obj.pk is not None:
+            return obj.ticket_label
+        return "L'inscription n'a pas encore été enregistrée"
+    ticket_label.short_description = "Place"
 
     def get_model_perms(self, request):
         return {}
