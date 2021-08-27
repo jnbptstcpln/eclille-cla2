@@ -79,6 +79,9 @@ body .header {
 
 @media (min-width: 768px) {
     /* Medium devices (768px and up). Mixin: media-breakpoint-up(md) */
+    .container {
+        max-width: 100%;
+    }
 }
 
 @media (min-width: 992px) {
@@ -87,6 +90,10 @@ body .header {
 
 @media (min-width: 1200px) {
     /* X-Large devices (1200px and up). Mixin: media-breakpoint-up(xl) */
+    /* Medium devices (768px and up). Mixin: media-breakpoint-up(md) */
+    .container {
+        max-width: 1250px;
+    }
 }
 
 /* max-width */
@@ -183,6 +190,10 @@ body .header {
     .cla_logo > span.a {
         font-size: 19px;
     }
+}
+
+.header-upper {
+    height: 29px;
 }
 
 .form-group.is-invalid .invalid-feedback {
