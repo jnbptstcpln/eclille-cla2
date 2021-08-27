@@ -6,7 +6,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db.models import Value, Q
 from django.db.models.functions import Concat
 from django.http import HttpRequest, Http404, JsonResponse
-from django.shortcuts import get_object_or_404, redirect, resolve_url
+from django.shortcuts import get_object_or_404, redirect, resolve_url, render
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views.generic import View, CreateView, TemplateView
@@ -26,13 +26,21 @@ class AbstractRegistrationCreateView(DancingPartyRegistrationMixin, IsContributo
     model = DancingPartyRegistration
 
     def dispatch(self, request: HttpRequest, *args, **kwargs):
-        if not self.party.are_registrations_opened:
-            return redirect("cla_ticketing:party_view", self.party.slug)
         if self.is_contributor and self.registration_self is not None:
             return redirect("cla_ticketing:party_view", self.party.slug)
         if not self.is_contributor and self.registration_friend is not None:
             return redirect("cla_ticketing:party_view", self.party.slug)
         return super().dispatch(request, *args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        if not self.party.are_registrations_opened:
+            return redirect("cla_ticketing:party_view", self.party.slug)
+        return super().get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        if not self.party.are_registrations_opened:
+            return render(request, "cla_ticketing/party/register_failed.html", {'party': self.party, 'message': "La dernière place vient d'être vendue..."})
+        return super().post(request, *args, **kwargs)
 
     def form_valid(self, form):
         registration: DancingPartyRegistration = form.save(commit=False)
@@ -48,7 +56,20 @@ class AbstractRegistrationCreateView(DancingPartyRegistrationMixin, IsContributo
         else:
             registration.student_status = DancingPartyRegistration.StudentStatus.NON_CONTRIBUTOR
             registration.guarantor = self.request.user
-        registration.save()
+
+        try:
+            # Lock registration table to ensure no registration overshoot the limit
+            DancingPartyRegistration.objects.lock()
+
+            if self.party.are_registrations_opened:
+                registration.save()
+
+        finally:
+            DancingPartyRegistration.objects.unlock()
+
+        # If the registration was not added, redirect to `party_view`
+        if not registration.pk:
+            return render(self.request, "cla_ticketing/party/register_failed.html", {'party': self.party, 'message': "La dernière place vient d'être vendue..."})
 
         # Deal with custom fields
         for custom_field in self.party.custom_fields.all():
@@ -123,6 +144,7 @@ class AbstractRegistrationDetailView(DancingPartyRegistrationMixin, IsContributo
             return resolve_url("cla_ticketing:event_ticketing")
         return resolve_url("cla_ticketing:party_view", self.party.slug)
 
+
 class ContributorRegistrationDetailView(AbstractRegistrationDetailView):
     template_name = "cla_ticketing/party/view_registration_contributor.html"
 
@@ -166,12 +188,12 @@ class CheckInPartyView(UserPassesTestMixin, LoginRequiredMixin, TemplateView):
                     'is_contributor': r.user is not None,
                     'href': resolve_url("cla_ticketing:party_checkin_registration", self.party.slug, r.pk),
                 } for r in self.party.registrations
-                    .annotate(fullname=Concat('first_name', Value(' '), 'last_name'))
-                    .filter(
-                        Q(first_name__icontains=search_value) |
-                        Q(last_name__icontains=search_value) |
-                        Q(fullname__icontains=search_value)
-                    ).order_by("last_name")[:5]
+                               .annotate(fullname=Concat('first_name', Value(' '), 'last_name'))
+                               .filter(
+                    Q(first_name__icontains=search_value) |
+                    Q(last_name__icontains=search_value) |
+                    Q(fullname__icontains=search_value)
+                ).order_by("last_name")[:5]
             ]
         return JsonResponse({
             'success': True,

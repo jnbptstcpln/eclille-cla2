@@ -20,6 +20,7 @@
             font-size: 1rem;
             color: #3a3a3a;
         }
+
         h3 {
             font-size: 1.2rem;
             text-transform: uppercase;
@@ -29,6 +30,7 @@
             margin-top: 0;
             margin-bottom: .25rem;
         }
+
         h4 {
             font-size: .9rem;
             text-transform: uppercase;
@@ -37,6 +39,11 @@
             color: #34495e;
             margin-top: 0;
             margin-bottom: .75rem;
+        }
+
+        #qrcode-container {
+            max-width: 300px;
+            margin: auto;
         }
 
         p {
@@ -58,7 +65,7 @@
                     <h1>{{ party.name }}</h1>
                 </div>
                 {% if registration_self.paid %}
-                    <p class="text-center mt-4 mb-3">
+                    <p class="text-center mt-3 mb-3">
                         Veuillez présenter le QRCode suivant à l'entrée :
                     </p>
                     <div id="qrcode-container">
@@ -66,10 +73,13 @@
                              alt="QR Code d'inscription"
                              style="width: 100%; pointer-events: none; user-select: none;">
                     </div>
-                    <h3>{{ registration.first_name }} {{ registration.last_name }}</h3>
-                    <h4>{{ registration.ticket_label }}</h4>
+                    <div>
+                        <h3>{{ registration.first_name }} {{ registration.last_name }}</h3>
+                        <h4>{{ registration.ticket_label }}</h4>
+                    </div>
+
                     <p class="text-center mt-4 mb-0">
-                        <a class="btn btn-outline-dark" href="{% url "cla_ticketing:party_view" party.slug %}" >Revenir</a>
+                        <a class="btn btn-outline-dark" href="{{ back_href }}">Retour</a>
                     </p>
                 {% else %}
                     {% if party.contributor_ticketing_href %}
@@ -92,7 +102,7 @@
                             <b>Toute place non payée n'est pas réservée.</b>
                         </p>
                     {% endif %}
-                    <p style="font-size: .75rem" class="text-center mt-3 mb-0"><a href="{% url "cla_ticketing:party_view" party.slug %}" style="color: var(--dark)">Réserver une autre place</a></p>
+                    <p style="font-size: .75rem" class="text-center mt-3 mb-0"><a href="{{ back_href }}" style="color: var(--dark)">Retour</a></p>
                 {% endif %}
 
             </div>

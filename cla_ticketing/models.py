@@ -6,12 +6,15 @@ import jwt
 from django.conf import settings
 from django.db import models
 from django import forms
+from django.db.models import F
 from django.utils.text import slugify
 from multiselectfield import MultiSelectField
 from cla_auth.models import UserInfos
 from django_summernote.fields import SummernoteTextField
 from django.contrib.auth.models import User, Group, Permission
 from django.utils import timezone
+
+from cla_ticketing.utils import LockingManager
 
 
 class FilePath:
@@ -275,10 +278,14 @@ class DancingParty(AbstractEvent):
         )
 
     scanners = models.ManyToManyField(User, related_name="+", verbose_name="Scanneurs", help_text="Les scanneurs peuvent effectuer les entrées au sein de l'événement", blank=True)
+    place_index = models.IntegerField(default=0)
 
     @property
     def places_remaining(self):
-        return max(self.places-self.registrations.filter(is_staff=False).count(), 0)
+        return max(self.places-self.get_counted_registrations().count(), 0)
+
+    def get_counted_registrations(self):
+        return self.registrations.filter(is_staff=False)
 
 
 class DancingPartyRegistrationCustomField(AbstractRegistrationCustomField):
@@ -286,6 +293,8 @@ class DancingPartyRegistrationCustomField(AbstractRegistrationCustomField):
 
 
 class DancingPartyRegistration(AbstractRegistration):
+
+    objects = LockingManager()
 
     class Meta:
         abstract = False

@@ -71,7 +71,7 @@
                     <h3>{{ registration.first_name }} {{ registration.last_name }}</h3>
                     <h4>{{ registration.ticket_label }}</h4>
                     <p class="text-center mt-4 mb-0">
-                        <a class="btn btn-outline-dark" href="{% url "cla_ticketing:party_view" party.slug %}">Revenir</a>
+                        <a class="btn btn-outline-dark" href="{{ back_href }}">Retour</a>
                     </p>
                 {% else %}
                     {% if party.contributor_ticketing_href %}
@@ -94,7 +94,7 @@
                             <b>Toute place non payée n'est pas réservée.</b>
                         </p>
                     {% endif %}
-                    <p style="font-size: .75rem" class="text-center mt-3 mb-0"><a href="{% url "cla_ticketing:party_view" party.slug %}" style="color: var(--dark)">Réserver une autre place</a></p>
+                    <p style="font-size: .75rem" class="text-center mt-3 mb-0"><a href="{{ back_href }}" style="color: var(--dark)">Retour</a></p>
                 {% endif %}
             </div>
         </div>
