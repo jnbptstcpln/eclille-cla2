@@ -15,5 +15,6 @@ urlpatterns = [
     path("<str:party_slug>/cotisant", party.ContributorRegistrationDetailView.as_view(), name="party_detail_contributor"),
     path("<str:party_slug>/non-cotisant", party.NonContributorRegistrationDetailView.as_view(), name="party_detail_noncontributor"),
     path("<str:party_slug>/entree", party.CheckInPartyView.as_view(), name="party_checkin"),
-    path("<str:party_slug>/entree/<int:registration_pk>", party.CheckInRegistrationView.as_view(), name="party_checkin_registration"),
+    path("<str:party_slug>/entree/qrcode/<str:token>", party.CheckInQRCodeView.as_view(), name="party_checkin_qrcode"),
+    path("<str:party_slug>/entree/pk/<int:registration_pk>", party.CheckInRegistrationView.as_view(), name="party_checkin_registration"),
 ]

@@ -41,9 +41,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
     'django.contrib.flatpages',
+    # Addons
     'django_summernote',
     'django_admin_inline_paginator',
-    # cla_web' apps
+    'qr_code',
+    # CLA-Web's apps
     'cla_auth.apps.ClaAuthConfig',
     'cla_public.apps.ClaPublicConfig',
     'cla_ticketing.apps.ClaTicketingConfig',

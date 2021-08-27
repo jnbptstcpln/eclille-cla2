@@ -1,6 +1,9 @@
+import json
 import os
 import uuid
 
+import jwt
+from django.conf import settings
 from django.db import models
 from django import forms
 from django.utils.text import slugify
@@ -331,6 +334,15 @@ class DancingPartyRegistration(AbstractRegistration):
     @property
     def is_minor(self):
         return (timezone.now().date() - self.birthdate).days < 365.25*18
+
+    @property
+    def qrcode_jwt(self):
+        payload = {'pk': self.pk}
+        return jwt.encode(
+            payload=payload,
+            key=settings.SECRET_KEY,
+            algorithm="HS256"
+        )
 
 
 class DancingPartyRegistrationCustomFieldValue(AbstractRegistrationCustomFieldValue):

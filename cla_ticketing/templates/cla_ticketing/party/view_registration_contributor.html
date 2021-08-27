@@ -1,5 +1,5 @@
 {% extends "layout/standalone.html" %}
-{% load static %}
+{% load static qr_code %}
 
 {% block css %}
     {{ block.super }}
@@ -43,6 +43,11 @@
                     <p class="text-center">
                         Le paiement de votre place a bien été confirmé par l'organisateur.
                     </p>
+                    <div id="qrcode-container">
+                        <img src="{% qr_url_from_text registration.qrcode_jwt size=8 version=10 image_format='png' %}"
+                             alt="QR Code d'inscription"
+                             style="width: 100%; pointer-events: none; user-select: none;">
+                    </div>
                     <p style="font-size: .75rem" class="text-center mt-3 mb-0"><a href="{% url "cla_ticketing:party_view" party.slug %}" style="color: var(--dark)">Revenir</a></p>
                 {% else %}
                     {% if party.contributor_ticketing_href %}

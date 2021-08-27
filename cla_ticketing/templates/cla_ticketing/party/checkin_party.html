@@ -116,17 +116,30 @@
             text-align: center;
             font-size: 1.5rem;
         }
+
         .search-item.empty {
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
+        #main, #qrcode-container {
+            max-width: 525px;
+            width: 100%;
+        }
+
+        #qrcode-container {
+            display: none;
+            position: relative;
+            background-color: white;
+        }
+
         @media (max-width: 768px) {
-            #main {
+            #main, #qrcode-container {
                 height: calc(100% - 1rem);
             }
         }
+
     </style>
 {% endblock %}
 
@@ -135,14 +148,14 @@
 {% block background_image_url %}{% static "cla_ticketing/img/sd1_blur.jpg" %}{% endblock %}
 
 {% block content %}
-    <div id="main" style="max-width: 525px;" class="card w-100">
+    <div id="main" class="card">
         <div class="card-body">
             <div class="d-flex flex-column justify-content-between h-100">
                 <div class="text-center">
                     <h2>Billetterie</h2>
                     <h1>{{ party.name }}</h1>
                     <div class="mx-auto mt-4 w-100" style="max-width: 350px;">
-                        <a href="#" class="btn btn-red-dark btn-block btn-lg mt-2 mb-2"><i class="fas fa-qrcode mr-1"></i> Scanner un QRCode</a>
+                        <a id="qrcode-start" href="#" class="btn btn-red-dark btn-block btn-lg mt-2 mb-2"><i class="fas fa-qrcode mr-1"></i> Scanner un QRCode</a>
                         <p class="text-center mt-3 mb-3">ou bien effectuer une recherche :</p>
                         <div>
                             <input type="search" id="search-field" class="form-control" placeholder="Prénom ou nom">
@@ -160,15 +173,26 @@
             </div>
         </div>
     </div>
+    <div id="qrcode-container">
+        <div id="qrcode-reader"></div>
+        <div class="pos-absolute pos-b-1 w-100 px-2">
+            <a id="qrcode-stop" href="#" class="btn btn-light btn-block btn-lg mx-auto">Annuler</a>
+        </div>
+    </div>
+
 {% endblock %}
 
 {% block body_js %}
     {{ block.super }}
+    <script src="https://unpkg.com/html5-qrcode@2.0.9/dist/html5-qrcode.min.js"></script>
     <script>
         $(document).ready(function () {
             var search_timeout;
             var loading_timeout;
             var request;
+            var qrcode_scanner;
+            const $main = $('#main');
+            const $qrcode_container = $('#qrcode-container');
             const $search_field = $('#search-field');
             const $search_container = $('#search-container');
             $search_field.on('input', function (e) {
@@ -207,6 +231,44 @@
                 } else {
                     $search_container.html("");
                 }
+            });
+            $('#qrcode-start').on('click', function (event) {
+                event.preventDefault()
+                $main.hide();
+                $qrcode_container.show();
+
+                let loading = false;
+
+                qrcode_scanner = new Html5Qrcode("qrcode-reader");
+                const qrCodeSuccessCallback = (decodedText, decodedResult) => {
+                    console.log(`Code scanned = ${decodedText}`, decodedResult);
+                    if (!loading) {
+                        loading = true;
+                        $.ajax({
+                            url: '{% url "cla_ticketing:party_checkin" party.slug %}/qrcode/'+decodedText,
+                            type: 'GET',
+                            success: function (data) {
+                                loading = false;
+                                qrcode_scanner.stop()
+                                window.location.href = data.href;
+                            },
+                            error: function (jqXHR, textStatus,errorThrown) {
+                                loading = false;
+                                alert('Le QRCode scanné est invalide')
+                            },
+                            dataType: 'json'
+                        });
+                    }
+                };
+                const config = {fps: 10, qrbox: 250, aspectRatio: $qrcode_container.width() / $qrcode_container.height()};
+                qrcode_scanner.start({facingMode: {exact: "environment"}}, config, qrCodeSuccessCallback);
+            });
+            $('#qrcode-stop').on('click', function (event) {
+                event.preventDefault();
+                $qrcode_container.hide();
+                $main.show();
+                qrcode_scanner.stop();
+                qrcode_scanner = null;
             });
         });
     </script>

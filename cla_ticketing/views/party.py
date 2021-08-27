@@ -1,3 +1,5 @@
+import jwt
+from django.conf import settings
 from django.contrib.admin.models import LogEntry, CHANGE
 from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin
 from django.contrib.contenttypes.models import ContentType
@@ -174,6 +176,46 @@ class CheckInPartyView(UserPassesTestMixin, LoginRequiredMixin, TemplateView):
             'is_manager': self.request.user.has_perm("cla_ticketing.dancingparty_manager") or self.party.managers.filter(pk=self.request.user.pk).count() > 0
         })
         return context
+
+
+class CheckInQRCodeView(UserPassesTestMixin, LoginRequiredMixin, View):
+    party: DancingParty = None
+
+    def setup(self, request, *args, **kwargs):
+        self.party = get_object_or_404(DancingParty, slug=kwargs.pop("party_slug"))
+        super().setup(request, *args, **kwargs)
+
+    def test_func(self):
+        if self.request.user.has_perm("cla_ticketing.dancingparty_manager"):
+            return True
+        elif self.party.managers.filter(pk=self.request.user.pk).count() > 0:
+            return True
+        return self.party.scanners.filter(pk=self.request.user.pk).count() > 0
+
+    def get(self, request: HttpRequest, *args, **kwargs):
+        try:
+            payload = jwt.decode(
+                jwt=kwargs.pop("token"),
+                key=settings.SECRET_KEY,
+                algorithms=["HS256"]
+            )
+        except jwt.DecodeError:
+            return JsonResponse({
+                'success': False,
+                'message': "Invalid token"
+            }, status=400)
+
+        try:
+            r = DancingPartyRegistration.objects.get(pk=payload.get('pk', None), dancing_party=self.party)
+            return JsonResponse({
+                'success': True,
+                'href': resolve_url("cla_ticketing:party_checkin_registration", self.party.slug, r.pk)
+            })
+        except DancingPartyRegistration.DoesNotExist:
+            return JsonResponse({
+                'success': False,
+                'message': "No matched"
+            }, status=404)
 
 
 class CheckInRegistrationView(UserPassesTestMixin, LoginRequiredMixin, TemplateView):

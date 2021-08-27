@@ -25,11 +25,18 @@ from cla_auth.views.session import login
 urlpatterns = [
     path("admin/login/", login),  # Override default login
     path('admin/', admin.site.urls),
+
+    # Dependencies
     path('summernote/', include('django_summernote.urls')),
+    path('qr_code/', include('qr_code.urls', namespace="qr_code")),
+
+    # Project's apps
     path('', include("cla_auth.urls")),
     path('', include("cla_public.urls")),
     path('', include("cla_registration.urls")),
     path('billetteries/', include("cla_ticketing.urls")),
+
+    # Flat pages
     path('privacy/', views.flatpage, {'url': '/privacy/'}, name='privacy'),
     path('legal/', views.flatpage, {'url': '/legal/'}, name='legal'),
     path('faq/', views.flatpage, {'url': '/faq/'}, name='faq'),
