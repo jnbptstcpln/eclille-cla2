@@ -68,7 +68,7 @@
                 <div style="flex: auto; overflow: auto;">
                     {% if not registration.paid %}
                         <div class="alert alert-danger">
-                            Le paiement de la place n'a pas été effectué
+                            L'inscription n'a pas été payée
                         </div>
                     {% else %}
                         {% if not registration.validated %}
@@ -79,7 +79,7 @@
                     {% endif %}
                     {% if registration.checkin_datetime %}
                         <div class="alert alert-danger">
-                            L'entrée de cette inscription a déjà été effectuée à {{ registration.checkin_datetime|date:'H:i' }}
+                            Entrée déjà effectuée à {{ registration.checkin_datetime|date:'H:i' }}
                         </div>
                     {% endif %}
 
