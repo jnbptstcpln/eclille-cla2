@@ -142,7 +142,8 @@ class DancingPartyExportView(UserPassesTestMixin, generic.View):
             "Date inscription": lambda x: x.created_on.strftime("%Y-%m-%d %H:%M:%S"),
             "Type de place": lambda x: f"{x.get_student_status_display()} {x.get_type_display().lower()}" if not x.is_staff else f"Staff : {x.staff_description}",
             "Prix de la place": lambda x: str(x.price) if x.type is not None else 0,
-            "A payé": lambda x: "Oui" if x.paid else "Non"
+            "A payé": lambda x: "Oui" if x.paid else "Non",
+            "Date et heure d'entrée": lambda x: x.checkin_datetime.strftime("%Y-%m-%d %H:%M:%S") if x.checkin_datetime is not None else "Non enregistré"
         }
 
         writer = csv.writer(response)
