@@ -262,7 +262,7 @@
                         });
                     }
                 };
-                const config = {fps: 10, qrbox: 250, aspectRatio: $qrcode_container.width() / $qrcode_container.height()};
+                const config = {fps: 10, qrbox: 250};
                 qrcode_scanner.start({facingMode: {exact: "environment"}}, config, qrCodeSuccessCallback);
             });
             $('#qrcode-stop').on('click', function (event) {
