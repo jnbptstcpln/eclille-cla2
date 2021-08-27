@@ -40,11 +40,14 @@
         }
         
         #main {
-            
+            height: 100%;
+            max-height: 80vh;
+            max-width: 525px;
+            width: 100%;
         }
         @media (max-width: 768px) {
             #main {
-                height: calc(100% - 1rem);
+                max-height: calc(100% - 1rem);
             }
         }
     </style>
@@ -55,7 +58,7 @@
 {% block background_image_url %}{% static "cla_ticketing/img/sd1_blur.jpg" %}{% endblock %}
 
 {% block content %}
-    <div id="main" style="max-width: 525px;" class="card w-100">
+    <div id="main" class="card w-100">
         <div class="card-body">
             <div class="d-flex flex-column justify-content-between h-100">
                 <div class="text-center">

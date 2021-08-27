@@ -124,6 +124,8 @@
         }
 
         #main, #qrcode-container {
+            height: 100%;
+            max-height: 80vh;
             max-width: 525px;
             width: 100%;
         }
@@ -136,7 +138,7 @@
 
         @media (max-width: 768px) {
             #main, #qrcode-container {
-                height: calc(100% - 1rem);
+                max-height: calc(100% - 1rem);
             }
         }
 
@@ -162,8 +164,8 @@
                         </div>
                     </div>
                 </div>
-                <div style="flex: auto; overflow: auto;" class="mt-3">
-                    <div id="search-container" class="d-flex flex-column justify-content-between"></div>
+                <div style="flex: auto; overflow: auto;" class="mt-4">
+                    <div id="search-container" class="d-flex flex-column justify-content-between mx-auto" style="max-width: 350px;"></div>
                 </div>
                 {% if is_manager %}
                     <div class="mx-auto mt-4 w-100" style="max-width: 350px;">

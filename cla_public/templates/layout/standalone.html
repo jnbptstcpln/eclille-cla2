@@ -1,9 +1,35 @@
 {% extends "layout/_base.html" %}
 {% load static %}
 
+{% block css %}
+    {{ block.super }}
+    <style>
+        body {
+            height: 100%;
+        }
+        html {
+            height: 100%
+        }
+
+        #wrapper1 {
+            height: 100%;
+            background-position: center;
+            background-size: cover;
+            overflow-y: hidden;
+        }
+
+        #wrapper2 {
+            height: 100%;
+            z-index: 5;
+            overflow-y: auto;
+            box-sizing: content-box
+        }
+    </style>
+{% endblock %}
+
 {% block body %}
-    <div style="height:100vh; background-image: url('{% block background_image_url %}{% static "app/img/rez_blur.jpg" %}{% endblock %}'); background-position: center; background-size: cover; overflow-y: hidden;" class="position-relative p-2 p-sm-4">
-        <div style="height:100vh; z-index: 5; overflow-y: auto; box-sizing: content-box" class="d-flex {% block content_align %}align-items-start{% endblock %} align-items-md-center justify-content-center">
+    <div id="wrapper1" style="background-image: url('{% block background_image_url %}{% static "app/img/rez_blur.jpg" %}{% endblock %}'); " class="position-relative p-2 p-sm-4">
+        <div id="wrapper2" class="d-flex {% block content_align %}align-items-start{% endblock %} align-items-md-center justify-content-center">
             {% block content %}{% endblock %}
         </div>
     </div>
