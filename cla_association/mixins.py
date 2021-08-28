@@ -44,7 +44,7 @@ class AssociationManageMixin:
         if self.association.is_club_or_commission:
             sections.append({
                 'id': "handover",
-                'label': "Passation",
+                'label': "Passations",
                 'href': resolve_url("cla_association:manage:handover", self.association.slug)
             })
         return sections
