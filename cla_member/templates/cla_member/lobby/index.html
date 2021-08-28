@@ -74,11 +74,11 @@
                                 <div class="mt-2 d-flex align-items-center" style="height: 64px">
                                     <div class="w-100">
                                         <a href="{{ website.href }}" class="btn btn-red-dark btn-block">
-                                            Visiter <i class="far fa-link ml-1"></i>
+                                            Visiter le site <i class="far fa-link ml-1"></i>
                                         </a>
                                         {% if website.service %}
                                             <a href="{% url "cla_auth:service_authenticate" website.service.identifier %}" class="btn btn-red-dark btn-block mt-1">
-                                                Se connecter <i class="far fa-sign-in ml-1"></i>
+                                                Se connecter avec CLA <i class="far fa-sign-in ml-1"></i>
                                             </a>
                                         {% endif %}
                                     </div>
