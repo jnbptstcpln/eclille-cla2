@@ -49,7 +49,7 @@
                         <div class="overlay-hover-content overlay-op-9 text-white pb-5">
                             <p class="text-justify" style="font-size: .75rem">{{ association.description|linebreaksbr }}</p>
                             <p class="text-center pos-absolute" style="bottom: 0">
-                                <a href="{% url "cla_association:detail" association.slug %}" class="btn btn-dark">En savoir plus</a>
+                                <a href="{% url "cla_association:public:detail" association.slug %}" class="btn btn-dark">En savoir plus</a>
                             </p>
                         </div>
                     </div>

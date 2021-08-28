@@ -16,7 +16,7 @@ class FilePath:
     @classmethod
     def _path(cls, instance, pathlist, filename):
         ext = filename.split('.')[-1]
-        filename = "%s-%s.%s" % (uuid.uuid4(), instance.pk, ext)
+        filename = "%s-%s.%s" % (uuid.uuid4(), instance.slug, ext)
         pathlist.append(filename)
         return os.path.join(*pathlist)
 
@@ -69,7 +69,14 @@ class Association(models.Model):
     active = models.BooleanField(default=True, verbose_name="Active", help_text="Une association active peut effectuer des demandes de réservation du foyer, du synthé, du barbecue...")
 
     def get_absolute_url(self):
-        return resolve_url("cla_association:detail", self.slug)
+        return resolve_url("cla_association:public:detail", self.slug)
+
+    @property
+    def is_club_or_commission(self):
+        return self.type in {
+            self.Types.CLUB,
+            self.Types.COMMISSION
+        }
 
     def __str__(self):
         return self.name

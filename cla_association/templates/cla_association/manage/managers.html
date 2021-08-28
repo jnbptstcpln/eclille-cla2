@@ -1,0 +1,34 @@
+{% extends "cla_association/manage/_layout.html" %}
+
+{% block page_title %}Responsables | {{ association.name }} | Associations | CLA{% endblock %}
+
+{% block section_title %}Responsables{% endblock %}
+
+{% block section_content %}
+    <p class="text-justify">
+        Retrouvez ci-dessous la liste des responsables enregistrés pour cette association.
+    </p>
+    <p class="text-justify">
+        Chacun d'entre eux peut accéder à cet espace et modifier les informations de l'association ainsi que réserver le foyer, le barbecue
+        ou le terrain synthétique pour l'association.
+    </p>
+    <p class="text-justify mx-auto mb-4" style="max-width: 550px">
+        <b>La modification de cette liste doit être effectuée par un administrateur, contactez <a href="mailto:cla@centralelille.fr">cla@centralelille.fr</a> pour en savoir plus.</b>
+    </p>
+
+    <div class="row">
+        {% for member in association.members.all %}
+            <div class="col-12 col-lg-6 ">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h5 class="text-uppercase text-gray-500" style="font-size: 1rem; letter-spacing: .05rem">{{ member.role }}</h5>
+                        <h4>{{ member.user.first_name }} {{ member.user.last_name }}</h4>
+                        <p class="mb-0" style="font-size: .75rem">
+                            <a href="mailto:{{ member.user.infos.email_school }}">{{ member.user.infos.email_school }}</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

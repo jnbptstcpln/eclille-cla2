@@ -1,0 +1,42 @@
+{% extends "cla_association/manage/_layout.html" %}
+
+{% block page_title %}Passations | {{ association.name }} | Associations | CLA{% endblock %}
+
+{% block section_title %}Passations{% endblock %}
+
+{% block section_content %}
+    <p class="text-justify">
+        Cette page regroupe tous les dossiers de passations de votre association.
+    </p>
+    <p class="text-justify">
+        À chaque fin de mandat, les bureaux des clubs et commissions de <i>Centrale Lille Associations</i> sont invités à remplir un dossier
+        proposant un bilan de leur action dans l'association, permettant ainsi de conserver un historique des activités de l'association.
+    </p>
+    <p class="text-justify">
+        En temps voulu vous serez à votre tour aussi invité à déposer votre dossier lors de la prochaine campagne de passation.
+    </p>
+
+    <div class="row mt-5">
+        {% for folder in association.handover_folders.all %}
+            <div class="col-12 col-lg-4">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h5 class="text-uppercase text-gray-500" style="font-size: 1rem; letter-spacing: .05rem">{{ member.role }}</h5>
+                        <h4>{{ member.user.first_name }} {{ member.user.last_name }}</h4>
+                        <p class="mb-0" style="font-size: .75rem">
+                            <a href="mailto:{{ member.user.infos.email_school }}">{{ member.user.infos.email_school }}</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12 col-lg-6 offset-lg-3">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h4 class="mb-0" style="font-size: 1rem">Aucun dossier disponible</h4>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}
