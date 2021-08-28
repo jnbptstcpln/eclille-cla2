@@ -10,28 +10,44 @@ from django.shortcuts import render, redirect, reverse, get_object_or_404
 from django.http import HttpRequest, HttpResponseNotAllowed, Http404, HttpResponse
 from django.utils import timezone
 
-from cla_member.models import Website
-from cla_ticketing.models import Event, DancingParty, DancingPartyRegistration
+from cla_association.models import Association
 
 
 from cla_member.mixins import ClaMemberModuleMixin
 
 
-class IndexView(ClaMemberModuleMixin, TemplateView):
-    template_name = "cla_association/public/index.html"
+class ListView(TemplateView):
+    template_name = "cla_association/public/list.html"
 
     def get_associations(self):
-        events = Event.objects.filter(
-            registration_starts_on__lte=timezone.now(),
-            registration_ends_on__gt=timezone.now(),
-        )
-        return [
-            event for event in events if self.request.user.infos.college in event.colleges
-        ]
+        return Association.objects.filter(
+            display=True
+        ).order_by("name")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({
-            'associations': self.get_associations()
+            'associations': self.get_associations(),
+            'categories': Association.Category.choices
+        })
+        return context
+
+
+class DetailView(TemplateView):
+    association: Association = None
+    template_name = "cla_association/public/detail.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        self.association = get_object_or_404(Association, slug=kwargs.pop("slug"), display=True)
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_members(self):
+        return self.association.members.filter(user_id__isnull=False)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'association': self.association,
+            'members': self.get_members()
         })
         return context

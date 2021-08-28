@@ -1,0 +1,135 @@
+{% extends 'layout/main.html' %}
+
+{% block page_title %}{{ association.name }} | Associations | CLA{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <p class="text-center">
+            <a href="{% url "cla_association:list" %}">Retourner à la liste des associations</a>
+        </p>
+        <div class="row justify-content-center">
+            <div class="row col-auto">
+                <div class="pt-3 px-3">
+                    {% if association.logo %}
+                        <div style="height: 200px; width: 200px; background-image: url('{{ association.logo.url }}'); background-size: contain; background-repeat: no-repeat; background-position: center"></div>
+                    {% else %}
+                        <div class="d-flex align-items-center justify-content-center" style="height: 200px; width: 200px; background-color: #aaaaaa">
+                            <h4 class="m-0 text-uppercase text-gray-700" style="font-size: 1rem">{{ association.name }}</h4>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="row col-auto align-items-center flex-column flex-md-row justify-content-center justify-content-md-start ml-md-3">
+                <div>
+                    <div class="row align-items-center flex-column flex-md-row justify-content-center justify-content-md-start">
+                        <h1 class="col-auto pr-md-1">{{ association.name }}</h1>
+                        <div class="col-auto pl-md-1" style="font-size: .80rem">
+                            <div class="d-inline d-md-block">
+                                {% if association.type == "bdx" %}
+                                    <span class="badge bg-primary-dark text-white">Association loi 1901</span>
+                                {% elif association.type == "club" %}
+                                    <span class="badge bg-blue text-white">{{ association.get_type_display }}</span>
+                                {% elif association.type == "commission" %}
+                                    <span class="badge bg-blue-dark text-white">{{ association.get_type_display }}</span>
+                                {% else %}
+                                    <span class="badge badge-secondary text-white">{{ association.get_type_display }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="d-inline d-md-block">
+                                <span class="badge badge-warning">{{ association.get_category_display }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% if association.subtitle %}
+                        <h2 class="text-gray-500 text-center text-md-left" style="font-size: 1rem">{{ association.subtitle }}</h2>
+                    {% endif %}
+                    {% for link in association.links.all %}
+                        {% if link.type_value == link.Types.WEBSITE %}
+                            <a class="btn btn-sm btn-blue-dark" href="{{ link.href }}" target="_blank">
+                                <i class="fas fa-globe-europe"></i>
+                            </a>
+                        {% elif link.type_value == link.Types.FACEBOOK %}
+                            <a class="btn btn-sm btn-blue-dark bg-brand-facebook" href="{{ link.href }}" target="_blank">
+                                <i class="fab fa-facebook-square"></i>
+                            </a>
+                        {% elif link.type_value == link.Types.TWITTER %}
+                            <a class="btn btn-sm btn-blue bg-brand-twitter" href="{{ link.href }}" target="_blank">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                        {% elif link.type_value == link.Types.INSTAGRAM %}
+                            <a class="btn btn-sm btn-slate bg-brand-instagram" href="{{ link.href }}" target="_blank">
+                                <i class="fab fa-instagram-square"></i>
+                            </a>
+                        {% elif link.type_value == link.Types.TIKTOK %}
+                            <a class="btn btn-sm btn-blue-dark bg-dark" href="{{ link.href }}" target="_blank">
+                                <i class="fab fa-tiktok"></i>
+                            </a>
+                        {% elif link.type_value == link.Types.TWITCH %}
+                            <a class="btn btn-sm btn-purple" href="{{ link.href }}" target="_blank">
+                                <i class="fab fa-twitch"></i>
+                            </a>
+                        {% elif link.type_value == link.Types.YOUTUBE %}
+                            <a class="btn btn-sm btn-red bg-brand-youtube" href="{{ link.href }}" target="_blank">
+                                <i class="fab fa-youtube-square"></i>
+                            </a>
+                        {% else %}
+                            <a class="btn btn-sm btn-grey-dark" href="{{ link.href }}" target="_blank">
+                                {{ link.type }}
+                                <i class="fas fa-external-link"></i>
+                            </a>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+
+        <div class="mt-4" style="min-height: 50vh">
+            {% if request.user.is_authenticated and members %}
+
+
+                <ul class="nav nav-tabs flex-column flex-lg-row" role="tablist">
+                    <li class="nav-item"><a class="nav-link active" data-toggle="tab" href="#presentation" role="tab" aria-selected="true">Presentation</a></li>
+                    <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#responsables" role="tab" aria-selected="false">Responsables</a></li>
+                </ul>
+                <div class="tab-content py-3">
+                    <div class="tab-pane show active" id="presentation" role="tabpanel">
+                        {% if association.presentation_html %}
+                            {% if association.presentation_html %}
+                                {{ association.presentation_html|safe }}
+                            {% else %}
+                                {{ association.description|linebreaks }}
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                    <div class="tab-pane" id="responsables" role="tabpanel">
+                        <div class="row">
+                            {% for member in members %}
+                                <div class="col-6 col-lg-4 ">
+                                    <div class="card">
+                                        <div class="card-body text-center">
+                                            <h5 class="text-uppercase text-gray-500" style="font-size: 1rem; letter-spacing: .05rem">{{ member.role }}</h5>
+                                            <h4>{{ member.user.first_name }} {{ member.user.last_name }}</h4>
+                                            <p class="mb-0" style="font-size: .75rem">
+                                                <a href="mailto:{{ member.user.infos.email_school }}">{{ member.user.infos.email_school }}</a>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                </div>
+
+            {% else %}
+                {% if association.presentation_html %}
+                    {{ association.presentation_html|safe }}
+                {% else %}
+                    {{ association.description|linebreaks }}
+                {% endif %}
+            {% endif %}
+    </div>
+
+    </div>
+{% endblock %}

@@ -9,7 +9,7 @@
                     <nav class="nav nav-sm header-block-flex">
                         {% if not request.user.is_authenticated %}
                             <a class="nav-link d-md-none" href="{% url "cla_auth:login" %}"><i class="fa fa-user"></i></a>
-                            <a class="nav-link text-xs text-uppercase d-none d-md-block" href="{% url "cla_auth:login" %}">Connexion</a>
+                            <a class="nav-link text-xs text-uppercase d-none d-md-block" href="{% url "cla_auth:login" %}?next={{ request.path }}">Connexion</a>
                         {% else %}
                             <a class="nav-link d-md-none" href="{% url "cla_member:account" %}"><i class="fa fa-user"></i></a>
                             <a class="nav-link text-xs text-uppercase d-none d-md-block" href="{% url "cla_member:account" %}">Mon compte</a>
@@ -59,7 +59,7 @@
                                     <a href="{% url "cla_public:index" %}" class="nav-link">Accueil</a>
                                 </li>
                                 <li class="nav-item {% if page_active == "associations" %}active{% endif %}">
-                                    <a href="#" class="nav-link">Associations</a>
+                                    <a href="{% url "cla_association:list" %}" class="nav-link">Associations</a>
                                 </li>
                                 <li class="nav-item">
                                     <a href="https://bds-centralelille.fr" class="nav-link">Sports</a>

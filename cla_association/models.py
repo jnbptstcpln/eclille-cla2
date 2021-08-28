@@ -56,6 +56,7 @@ class Association(models.Model):
         OTHER = "other", "Autre"
 
     name = models.CharField(max_length=100, verbose_name="Nom de l'association")
+    subtitle = models.CharField(max_length=100, verbose_name="Sous-titre", null=True, blank=True)
     slug = models.SlugField(verbose_name="Identifiant unique de l'association")
     type = models.CharField(max_length=250, choices=Types.choices, verbose_name="Forme juridique")
     category = models.CharField(max_length=250, choices=Category.choices, verbose_name="Catégorie")
@@ -116,12 +117,18 @@ class AssociationLink(models.Model):
         TWITTER = "020_twitter", "Twitter"
         INSTAGRAM = "030_instagram", "Instagram"
         TIKTOK = "040_tiktok", "Tiktok"
+        TWITCH = "050_twitch", "Twitch"
+        YOUTUBE = "060_youtube", "YouTube"
         CUSTOM = "999_custom", "Personnalisé"
 
     association = models.ForeignKey(Association, on_delete=models.CASCADE, related_name="links")
     _type = models.CharField(max_length=250, choices=Types.choices, verbose_name="Poste")
     _type_custom = models.CharField(max_length=250, null=True, blank=True, verbose_name="Type personnalisé", help_text="A indiquer avec le type \"Personnalisé\"")
     href = models.URLField(verbose_name="Lien")
+
+    @property
+    def type_value(self):
+        return self._type
 
     @property
     def type(self):
