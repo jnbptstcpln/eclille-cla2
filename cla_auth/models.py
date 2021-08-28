@@ -89,6 +89,7 @@ class UserInfos(models.Model):
         G3 = "G3", "G3"
         G3_GEC = "G3-GEC", "G3 en mobilité intercentrale"
         G3_DD_EDHEC = "G3-DD-EDHEC", "Double diplôme avec l'EDHEC"
+        G3_DD_SCIENCESPO = "G3-DD-SCIENCESPO", "Double diplôme avec Sciences Po"
         G3_DD_INTERNATIONAL = "DD-INTERNATIONAL", "Double diplôme internationnal"
         G3_DD_FRANCE = "DD-FRANCE", "Double diplôme en France"
 
@@ -213,143 +214,154 @@ class UserInfos(models.Model):
     def next_cursus_choices(self):
         if self.cursus == self.CursusChoices.G1:
             class NextCursusChoices(models.TextChoices):
-                G1P = self.CursusChoices.G1P
-                G2 = self.CursusChoices.G2
+                G1P = self.CursusChoices.G1P.value, self.CursusChoices.G1P.label
+                G2 = self.CursusChoices.G2.value, self.CursusChoices.G2.label
 
             return NextCursusChoices
 
         elif self.cursus == self.CursusChoices.G1_DD_EDHEC:
             class NextCursusChoices(models.TextChoices):
-                G1P_DD_EDHEC = self.CursusChoices.G1P_DD_EDHEC
-                G2_DD_EDHEC = self.CursusChoices.G2_DD_EDHEC
+                G1P_DD_EDHEC = self.CursusChoices.G1P_DD_EDHEC.value, self.CursusChoices.G1P_DD_EDHEC.label
+                G2_DD_EDHEC = self.CursusChoices.G2_DD_EDHEC.value, self.CursusChoices.G2_DD_EDHEC.label
 
             return NextCursusChoices
 
         elif self.cursus == self.CursusChoices.G1_DD_INTERNATIONAL:
             class NextCursusChoices(models.TextChoices):
-                G1P_DD_INTERNATIONAL = self.CursusChoices.G1P_DD_INTERNATIONAL
-                G2_DD_INTERNATIONAL = self.CursusChoices.G2_DD_INTERNATIONAL
+                G1P_DD_INTERNATIONAL = self.CursusChoices.G1P_DD_INTERNATIONAL.value, self.CursusChoices.G1P_DD_INTERNATIONAL.label
+                G2_DD_INTERNATIONAL = self.CursusChoices.G2_DD_INTERNATIONAL.value, self.CursusChoices.G2_DD_INTERNATIONAL.label
 
             return NextCursusChoices
 
         elif self.cursus == self.CursusChoices.G1P:
             class NextCursusChoices(models.TextChoices):
-                G2 = self.CursusChoices.G2
+                G2 = self.CursusChoices.G2.value, self.CursusChoices.G2.label
 
             return NextCursusChoices
 
         elif self.cursus == self.CursusChoices.G1P_DD_EDHEC:
             class NextCursusChoices(models.TextChoices):
-                G2_DD_EDHEC = self.CursusChoices.G2_DD_EDHEC
+                G2_DD_EDHEC = self.CursusChoices.G2_DD_EDHEC.value, self.CursusChoices.G2_DD_EDHEC.label
 
             return NextCursusChoices
 
         elif self.cursus == self.CursusChoices.G1P_DD_INTERNATIONAL:
             class NextCursusChoices(models.TextChoices):
-                G1P_DD_INTERNATIONAL = self.CursusChoices.G1P_DD_INTERNATIONAL
+                G1P_DD_INTERNATIONAL = self.CursusChoices.G1P_DD_INTERNATIONAL.value, self.CursusChoices.G1P_DD_INTERNATIONAL.label
 
             return NextCursusChoices
 
-        elif self.cursus == self.CursusChoices.G2 or self.cursus == self.CursusChoices.G2P:
+        elif self.cursus in {self.CursusChoices.G2, self.CursusChoices.G2P}:
             class NextCursusChoices(models.TextChoices):
-                G2P = self.CursusChoices.G2P
-                G3 = self.CursusChoices.G3
-                G3_DD_EDHEC = self.CursusChoices.G3_DD_EDHEC
-                G3_DD_INTERNATIONAL = self.CursusChoices.G3_DD_INTERNATIONAL
-                G2_CESURE_FEV = self.CursusChoices.G2_CESURE_FEV
-                G2_CESURE_SEPT = self.CursusChoices.G2_CESURE_SEPT
+                G2P = self.CursusChoices.G2P.value, self.CursusChoices.G2P.label
+                G3 = self.CursusChoices.G3.value, self.CursusChoices.G3.label
+                G3_DD_EDHEC = self.CursusChoices.G3_DD_EDHEC.value, self.CursusChoices.G3_DD_EDHEC.label
+                G3_DD_SCIENCESPO = self.CursusChoices.G3_DD_SCIENCESPO.value, self.CursusChoices.G3_DD_SCIENCESPO.label
+                G3_DD_FRANCE = self.CursusChoices.G3_DD_FRANCE.value, self.CursusChoices.G3_DD_FRANCE.label
+                G3_DD_INTERNATIONAL = self.CursusChoices.G3_DD_INTERNATIONAL.value, self.CursusChoices.G3_DD_INTERNATIONAL.label
+                G2_CESURE_FEV = self.CursusChoices.G2_CESURE_FEV.value, self.CursusChoices.G2_CESURE_FEV.label
+                G2_CESURE_SEPT = self.CursusChoices.G2_CESURE_SEPT.value, self.CursusChoices.G2_CESURE_SEPT.label
 
             return NextCursusChoices
 
-        elif self.cursus == self.CursusChoices.G2_DD_EDHEC or self.cursus == self.CursusChoices.G2P_DD_EDHEC:
+        elif self.cursus in {self.CursusChoices.G2_DD_EDHEC, self.CursusChoices.G2P_DD_EDHEC}:
             class NextCursusChoices(models.TextChoices):
-                G2P_DD_EDHEC = self.CursusChoices.G2P_DD_EDHEC
-                G3_DIPLOME_DD_EDHEC = self.CursusChoices.G3_DIPLOME_DD_EDHEC
+                G2P_DD_EDHEC = self.CursusChoices.G2P_DD_EDHEC.value, self.CursusChoices.G2P_DD_EDHEC.label
+                G3_DIPLOME_DD_EDHEC = self.CursusChoices.G3_DIPLOME_DD_EDHEC.value, self.CursusChoices.G3_DIPLOME_DD_EDHEC.label
 
             return NextCursusChoices
 
-        elif self.cursus == self.CursusChoices.G2_DD_INTERNATIONAL or self.cursus == self.CursusChoices.G2P_DD_INTERNATIONAL:
+        elif self.cursus in {self.CursusChoices.G2_DD_INTERNATIONAL, self.CursusChoices.G2P_DD_INTERNATIONAL}:
             class NextCursusChoices(models.TextChoices):
-                G2P_DD_INTERNATIONAL = self.CursusChoices.G2P_DD_INTERNATIONAL
-                G3_DIPLOME_DD_INTERNATIONAL = self.CursusChoices.G3_DIPLOME_DD_INTERNATIONAL
+                G2P_DD_INTERNATIONAL = self.CursusChoices.G2P_DD_INTERNATIONAL.value, self.CursusChoices.G2P_DD_INTERNATIONAL.label
+                G3_DIPLOME_DD_INTERNATIONAL = self.CursusChoices.G3_DIPLOME_DD_INTERNATIONAL.value, self.CursusChoices.G3_DIPLOME_DD_INTERNATIONAL.label
 
             return NextCursusChoices
 
-        elif self.cursus == self.CursusChoices.G2_CESURE_FEV or self.CursusChoices.G2_CESURE_SEPT:
+        elif self.cursus in {self.CursusChoices.G2_CESURE_FEV, self.CursusChoices.G2_CESURE_SEPT}:
             class NextCursusChoices(models.TextChoices):
-                G2P = self.CursusChoices.G2P
-                G3 = self.CursusChoices.G3
-                G3_DD_EDHEC = self.CursusChoices.G3_DD_EDHEC
-                G3_DD_INTERNATIONAL = self.CursusChoices.G3_DD_INTERNATIONAL
+                G2P = self.CursusChoices.G2P.value, self.CursusChoices.G2P.label
+                G3 = self.CursusChoices.G3.value, self.CursusChoices.G3.label
+                G3_DD_EDHEC = self.CursusChoices.G3_DD_EDHEC.value, self.CursusChoices.G3_DD_EDHEC.label
+                G3_DD_SCIENCESPO = self.CursusChoices.G3_DD_SCIENCESPO.value, self.CursusChoices.G3_DD_SCIENCESPO.label
+                G3_DD_FRANCE = self.CursusChoices.G3_DD_FRANCE.value, self.CursusChoices.G3_DD_FRANCE.label
+                G3_DD_INTERNATIONAL = self.CursusChoices.G3_DD_INTERNATIONAL.value, self.CursusChoices.G3_DD_INTERNATIONAL.label
 
             return NextCursusChoices
 
         elif self.cursus == self.CursusChoices.G3:
             class NextCursusChoices(models.TextChoices):
-                G3 = self.CursusChoices.G3
-                G3_DIPLOME = self.CursusChoices.G3_DIPLOME
+                G3 = self.CursusChoices.G3.value, self.CursusChoices.G3.label
+                G3_DIPLOME = self.CursusChoices.G3_DIPLOME.value, self.CursusChoices.G3_DIPLOME.label
 
             return NextCursusChoices
 
         elif self.cursus == self.CursusChoices.G3_DD_EDHEC:
             class NextCursusChoices(models.TextChoices):
-                G3_DD_EDHEC = self.CursusChoices.G3_DD_EDHEC
-                G3_DIPLOME = self.CursusChoices.G3_DIPLOME
+                G3_DD_EDHEC = self.CursusChoices.G3_DD_EDHEC.value, self.CursusChoices.G3_DD_EDHEC.label
+                G3_DIPLOME = self.CursusChoices.G3_DIPLOME.value, self.CursusChoices.G3_DIPLOME.label
+
+            return NextCursusChoices
+
+        elif self.cursus == self.CursusChoices.G3_DD_SCIENCESPO:
+            class NextCursusChoices(models.TextChoices):
+                G3_DD_SCIENCESPO = self.CursusChoices.G3_DD_SCIENCESPO.value, self.CursusChoices.G3_DD_SCIENCESPO.label
+                G3_DIPLOME = self.CursusChoices.G3_DIPLOME.value, self.CursusChoices.G3_DIPLOME.label
 
             return NextCursusChoices
 
         elif self.cursus == self.CursusChoices.G3_DD_INTERNATIONAL:
             class NextCursusChoices(models.TextChoices):
-                G3_DD_INTERNATIONAL = self.CursusChoices.G3_DD_INTERNATIONAL
-                G3_DIPLOME = self.CursusChoices.G3_DIPLOME
+                G3_DD_INTERNATIONAL = self.CursusChoices.G3_DD_INTERNATIONAL.value, self.CursusChoices.G3_DD_INTERNATIONAL.label
+                G3_DIPLOME = self.CursusChoices.G3_DIPLOME.value, self.CursusChoices.G3_DIPLOME.label
 
             return NextCursusChoices
 
         elif self.cursus == self.CursusChoices.G3_DD_FRANCE:
             class NextCursusChoices(models.TextChoices):
-                G3_DD_FRANCE = self.CursusChoices.G3_DD_FRANCE
-                G3_DIPLOME = self.CursusChoices.G3_DIPLOME
+                G3_DD_FRANCE = self.CursusChoices.G3_DD_FRANCE.value, self.CursusChoices.G3_DD_FRANCE.label
+                G3_DIPLOME = self.CursusChoices.G3_DIPLOME.value, self.CursusChoices.G3_DIPLOME.label
 
             return NextCursusChoices
 
         if self.cursus in {self.CursusChoices.IE1, self.CursusChoices.IE1P}:
             class NextCursusChoices(models.TextChoices):
-                IE2 = self.CursusChoices.IE2
-                IE1P = self.CursusChoices.IE1P
+                IE2 = self.CursusChoices.IE2.value, self.CursusChoices.IE2.label
+                IE1P = self.CursusChoices.IE1P.value, self.CursusChoices.IE1P.label
 
             return NextCursusChoices
 
         elif self.cursus in {self.CursusChoices.IE2, self.CursusChoices.IE2P}:
             class NextCursusChoices(models.TextChoices):
-                IE3 = self.CursusChoices.IE3
-                IE2P = self.CursusChoices.IE2P
+                IE3 = self.CursusChoices.IE3.value, self.CursusChoices.IE3.label
+                IE2P = self.CursusChoices.IE2P.value, self.CursusChoices.IE2P.label
 
             return NextCursusChoices
 
         elif self.cursus in {self.CursusChoices.IE3, self.CursusChoices.IE3P}:
             class NextCursusChoices(models.TextChoices):
-                IE4 = self.CursusChoices.IE4
-                IE3P = self.CursusChoices.IE3P
+                IE4 = self.CursusChoices.IE4.value, self.CursusChoices.IE4.label
+                IE3P = self.CursusChoices.IE3P.value, self.CursusChoices.IE3P.label
 
             return NextCursusChoices
 
         elif self.cursus in {self.CursusChoices.IE4, self.CursusChoices.IE4P}:
             class NextCursusChoices(models.TextChoices):
-                IE5 = self.CursusChoices.IE5
-                IE4P = self.CursusChoices.IE4P
+                IE5 = self.CursusChoices.IE5.value, self.CursusChoices.IE5.label
+                IE4P = self.CursusChoices.IE4P.value, self.CursusChoices.IE4P.label
 
             return NextCursusChoices
 
         elif self.cursus in {self.CursusChoices.IE5, self.CursusChoices.IE5}:
             class NextCursusChoices(models.TextChoices):
-                IE5 = self.CursusChoices.IE5
-                IE5_DIPLOME = self.CursusChoices.IE5_DIPLOME
+                IE5 = self.CursusChoices.IE5.value, self.CursusChoices.IE5.label
+                IE5_DIPLOME = self.CursusChoices.IE5_DIPLOME.value, self.CursusChoices.IE5_DIPLOME.label
 
             return NextCursusChoices
 
         # Fallback next cursus choices
         class NextCursusChoices(models.TextChoices):
-            AUTRE = self.CursusChoices.AUTRE
+            AUTRE = self.CursusChoices.AUTRE.value, self.CursusChoices.AUTRE.label
 
         return NextCursusChoices
 

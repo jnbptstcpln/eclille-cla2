@@ -24,17 +24,24 @@ def validate(req):
 
     # Only deal with non management users
     if not hasattr(user, 'infos'):
-        return redirect(req.session.get('next', 'cla_public:index'))
+        return redirect(req.session.get('next', 'cla_member:account'))
+
+    # Redirect the user if its account is not activated
+    if user.infos.activated_on is None:
+        return redirect(req.session.get('next', 'cla_member:account'))
 
     # Redirect the user if its account is validated
-    if user.infos.valid_until > timezone.now():
-        return redirect(req.session.get('next', 'cla_public:index'))
+    if user.infos.valid_until is not None and user.infos.valid_until > timezone.now():
+        return redirect(req.session.get('next', 'cla_member:account'))
 
     validation_request = user.infos.validation_request
 
     if req.method == "POST":
         form = ValidationForm(req.POST, user=req.user)
         if form.is_valid():
+            validation_request.used = True
+            validation_request.save()
+
             # Set valid_until to a random date between 10th September and 25th September
             # The lower boundaries (10/09) is set to not create to much problems on the first "soirée dansante"
             # With people who wouldn't get their place because of account validation delay
@@ -46,14 +53,14 @@ def validate(req):
                 req,
                 "cla_auth/validation/validate_success_standalone.html",
                 {
-                    'redirect': resolve_url(req.session.get('next', 'cla_public:index'))
+                    'redirect': resolve_url(req.session.get('next', 'cla_member:account'))
                 }
             )
     else:
         # Only send the email when it has not been sent or has been sent more than 1 hour ago
-        if validation_request.sent_on is None or validation_request.sent_on + timezone.timedelta(hours=1) > timezone.now():
+        if validation_request.sent_on is None or validation_request.sent_on + timezone.timedelta(hours=1) < timezone.now():
             send_mail(
-                subject='[CLA] Activation de votre compte',
+                subject='[CLA] Validation de votre compte',
                 from_email=settings.EMAIL_HOST_FROM,
                 recipient_list=[user.infos.email_school],
                 message=f"Voici le code à indiquer pour valider votre compte : {validation_request.code}",
@@ -76,6 +83,6 @@ def validate(req):
         'cla_auth/validation/validate_standalone.html',
         {
             'form': form,
-            'redirect': resolve_url(req.session.get('next', 'cla_public:index'))
+            'redirect': resolve_url(req.session.get('next', 'cla_member:account'))
         }
     )

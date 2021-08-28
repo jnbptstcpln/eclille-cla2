@@ -5,13 +5,19 @@ from cla_auth.models import Service
 
 
 class ValidationForm(forms.Form):
-
-    rgpd_agreement = forms.BooleanField(
-        label="J\'accepte que mes informations soient utilisées par Centrale Lille Associations tel que décrit et détaillé dans la charte de confidentialité.",
+    validation_code = forms.BooleanField(
+        label="Code à six chiffres",
         required=True,
-        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
+        widget=forms.TextInput(attrs={'class': 'form-control'})
     )
 
-    def __init__(self, *args, service: Service, **kwargs):
+    def __init__(self, *args, **kwargs):
+        self.user: User = kwargs.pop('user')
         super().__init__(*args, **kwargs)
-        self.fields['rgpd_agreement'].label.format(service.domain)
+
+        self.fields['cursus'] = forms.ChoiceField(
+            label="Votre cursus actuel",
+            choices=self.user.infos.next_cursus_choices.choices,
+            required=True,
+            widget=forms.Select(attrs={'class': 'form-control'})
+        )

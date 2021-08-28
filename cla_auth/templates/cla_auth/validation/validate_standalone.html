@@ -15,21 +15,24 @@
                           <span class="a">Associations</span>
                       </span>
                 </h1>
-                <div class="overflow-auto" style="max-height: 33vh">
+                <div class="overflow-auto" style="max-height: 50vh">
                     <p>
-                        Veuillez indiquer ci-dessous le code que vous avez reçu à l'adresse {{ request.user.infos.email_school }}
+                        Veuillez indiquer ci-dessous le code que vous avez reçu à l'adresse :
                     </p>
-                    <p class="mb-0 text-center">
+                    <p class="text-center" style="font-size: 0.75rem">
+                        <b>{{ request.user.infos.email_school }}</b>
+                    </p>
+                    <p class="mb-3 text-center">
                         <a href="https://mail.ec-lille.fr" target="_blank">Accéder à mail.ec-lille.fr</a>
                     </p>
+
+                    {% include "components/form-errors.html" with form=form %}
+                    {% include "components/form-group.html" with field=form.validation_code %}
+                    {% include "components/form-group.html" with field=form.cursus %}
                 </div>
 
-                {% include "components/form-errors.html" with form=form %}
-                {% include "components/form-group.html" with field=form.validation_code %}
-                {% include "components/form-group.html" with field=form.cursus %}
-
                 <p class="mt-3">
-                    <a href="#" class="btn btn-primary btn-lg btn-block">Valider mon compte</a>
+                    <button type="submit" class="btn btn-primary btn-lg btn-block">Valider mon compte</button>
                     <a href="{{ redirect }}" class="btn btn-secondary btn-lg btn-block">Je verrai ça plus tard</a>
                 </p>
 

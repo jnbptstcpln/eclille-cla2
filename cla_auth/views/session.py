@@ -16,7 +16,7 @@ from cla_auth.forms.session import LoginForm, ForgotForm
 def login(req):
 
     if req.user.is_authenticated:
-        return redirect(req.GET.get('next', 'cla_public:index'))
+        return redirect(req.GET.get('next', 'cla_member:lobby'))
 
     if req.method == 'POST':
         form = LoginForm(req.POST)
@@ -28,7 +28,7 @@ def login(req):
             if user is not None:
                 auth.login(req, user)
 
-                response = redirect(req.session.get('next', 'cla_public:index'))
+                response = redirect(req.session.get('next', 'cla_member:lobby'))
 
                 if hasattr(user, "infos"):
                     # Check if the account lost its validation since last login
@@ -37,7 +37,7 @@ def login(req):
                             req,
                             "cla_auth/validation/validate_alert_standalone.html",
                             {
-                                'redirect': resolve_url(req.session.get('next', 'cla_public:index'))
+                                'redirect': resolve_url(req.session.get('next', 'cla_member:lobby'))
                             }
                         )
 
@@ -50,7 +50,7 @@ def login(req):
             else:
                 form.add_error(None, "Combinaison identifiant/mot de passe incorrecte")
     else:
-        req.session['next'] = req.GET.get('next', 'cla_public:index')
+        req.session['next'] = req.GET.get('next', 'cla_member:lobby')
         req.session['validation_alert'] = req.GET.get('validation_alert', '1') == '1'
         form = LoginForm(initial={'redirect': req.session['next']})
 
@@ -66,7 +66,7 @@ def login(req):
 def forgot(req):
 
     if req.user.is_authenticated:
-        return redirect('cla_public:index')
+        return redirect('cla_member:lobby')
 
     return render(
         req,
@@ -77,7 +77,7 @@ def forgot(req):
 def forgot_username(req):
 
     if req.user.is_authenticated:
-        return redirect('cla_public:index')
+        return redirect('cla_member:lobby')
 
     if req.method == "POST":
         form = ForgotForm(req.POST)
@@ -104,7 +104,7 @@ def forgot_username(req):
 def forgot_password(req):
 
     if req.user.is_authenticated:
-        return redirect('cla_public:index')
+        return redirect('cla_member:lobby')
 
     error = None
     warning = None
@@ -157,4 +157,3 @@ def logout(req):
     response = redirect("cla_public:index")
     response.delete_cookie("stay_logged_in")
     return response
-
