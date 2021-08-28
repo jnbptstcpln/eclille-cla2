@@ -51,7 +51,7 @@
                             <div class="pt-3 px-3">
                                 {% if website.visual %}
                                     <div
-                                        class="bg-gray-100" style="height: 100px; background-image: url('{{ website.visual.url }}'); background-size: contain; background-repeat: no-repeat; background-position: center"
+                                        style="height: 100px; background-image: url('{{ website.visual.url }}'); background-size: contain; background-repeat: no-repeat; background-position: center"
                                         data-toggle="popover" data-placement="top" data-trigger="hover" title="" data-html="true" data-content="<p class='text-justify'>{{ website.description|linebreaksbr }}</p>" data-original-title="{{ website.name }}"
                                     ></div>
                                 {% else %}
