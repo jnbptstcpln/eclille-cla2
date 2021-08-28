@@ -56,7 +56,7 @@
             <h3 class="mt-0 mb-3" style="font-size: 1.25rem">Sites web associatifs</h3>
             <div class="row">
                 {% for website in websites %}
-                    <div class="col-12 col-sm-6 col-md-4 customer type-media">
+                    <div class="col-12 col-md-6 customer type-media">
                         <div class="card mb-4 bg-gradient bg-shadow">
                             <div class="pt-3 px-3">
                                 {% if website.visual %}
@@ -67,9 +67,9 @@
                                     </div>
                                 {% endif %}
                             </div>
-                            <div class="card-body p-2">
+                            <div class="card-body">
                                 <div style="height: 75px; overflow: auto; font-size: .75rem">
-                                    <p class="card-text text-justify">{{ website.description }}</p>
+                                    <p class="card-text text-justify">{{ website.description|linebreaksbr }}</p>
                                 </div>
                                 <div class="mt-2 d-flex align-items-center" style="height: 64px">
                                     <div class="w-100">

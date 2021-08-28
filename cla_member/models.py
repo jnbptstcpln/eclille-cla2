@@ -28,7 +28,7 @@ class Website(models.Model):
         verbose_name_plural = "Sites partenaires"
 
     name = models.CharField(max_length=100, verbose_name="Nom du site")
-    description = models.TextField(max_length=500, verbose_name="Description")
+    description = models.TextField(max_length=240, verbose_name="Description")
     href = models.CharField(max_length=250, verbose_name="Lien vers le site")
     colleges = MultiSelectField(choices=UserInfos.Colleges.choices, verbose_name="Collèges concernés", blank=True)
     contributor_only = models.BooleanField(default=False, verbose_name="Afficher seulement aux comptes validés")
