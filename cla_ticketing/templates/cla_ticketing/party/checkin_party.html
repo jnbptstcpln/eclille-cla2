@@ -44,12 +44,20 @@
         }
 
         .search-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
             border-width: 3px;
             border-style: solid;
             height: 75px;
             padding: 1rem;
             border-radius: 10px;
             margin-bottom: .66rem;
+        }
+
+        .search-item .status {
+            width: 30px;
+            text-align: center;
         }
 
         .search-item h4 {
@@ -68,46 +76,19 @@
             text-decoration: none;
             opacity: .95;
             transition: opacity 200ms;
-        }
-
-        .search-item.checkedin:hover {
             color: #ffffff !important;
         }
 
         .search-item {
-            border-color: #34495e;
-        }
-
-        .search-item.checkedin {
             background-color: #34495e;
             color: #ffffff;
             transition: opacity 150ms;
         }
 
-        .search-item {
-            color: #34495e;
-        }
-
-        .search-item:hover {
-            color: #34495e;
-        }
-
         .search-item.noncontributor {
-            border-color: #a10f2b;
-        }
-
-        .search-item.noncontributor.checkedin {
             background-color: #a10f2b;
             color: #ffffff;
             transition: opacity 150ms;
-        }
-
-        .search-item.noncontributor {
-            color: #a10f2b;
-        }
-
-        .search-item.noncontributor:hover {
-            color: #a10f2b;
         }
 
         .search-item.loading {
@@ -219,8 +200,8 @@
                                     for (let i in data.payload) {
                                         let r = data.payload[i];
                                         let classname = (!r.is_contributor ? 'noncontributor' : '');
-                                        classname += (r.checked_in ? " checkedin" : "");
-                                        $search_container.append("<a href='" + r.href + "' class='search-item " + classname + "'><h4>" + r.first_name + " " + r.last_name + "</h4><h5>" + r.ticket_label + "</h5></a>");
+                                        let icon = (r.checked_in ? "<i class='fas fa-user-check'></i>" : "<i class='fas fa-user'></i>");
+                                        $search_container.append("<a href='" + r.href + "' class='search-item " + classname + "'><div class='infos'><h4>" + r.first_name + " " + r.last_name + "</h4><h5>" + r.ticket_label + "</h5></div><div class='status'>"+icon+"</div></a>");
                                     }
                                 } else {
                                     $search_container.append("<div class='search-item empty'><h4>Aucun résultat</h4></div>");
