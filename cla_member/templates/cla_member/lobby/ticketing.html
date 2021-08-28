@@ -1,0 +1,92 @@
+{% extends 'cla_member/lobby/_layout.html' %}
+
+{% block page_title %}Billetteries{% endblock %}
+
+{% block section_title %}Billetteries{% endblock %}
+
+{% block section_content %}
+    <div>
+        {% if staffed_parties %}
+            <div class="mt-4">
+                <h3 class="mt-0 mb-3" style="font-size: 1.25rem">Mes événements</h3>
+                <div class="row">
+                    {% for party in staffed_parties %}
+                        <div class="col-md-6">
+                            <div class="card card-body">
+                                <h4 class="card-title text-center">
+                                    {{ party.name }}
+                                </h4>
+                                <div class="px-3 row mb-3">
+                                    <div class="col-6">
+                                        <b>
+                                            {% with counted_registrations=party.counted_registrations %}
+                                                {{ counted_registrations }} participant{{ counted_registrations|pluralize }}
+                                            {% endwith %}
+                                        </b>
+                                    </div>
+                                    <div class="col-6">
+                                        <b>
+                                            {% with checked_registrations=party.checked_registrations %}
+                                                {{ checked_registrations }} entrée{{ checked_registrations|pluralize }}
+                                            {% endwith %}
+                                        </b>
+                                    </div>
+                                </div>
+                                <a href="{% url "cla_ticketing:party_checkin" party.slug %}" class="btn btn-red-dark">Effectuer l'entrée</a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+
+        <div class="mt-4">
+            <h3 class="mt-0 mb-3" style="font-size: 1.25rem">Mes places réservées</h3>
+            <div class="row">
+                {% for registration in registrations %}
+                    <div class="col-md-6">
+                        <div class="card card-body">
+                            {% if registration.paid %}
+                                <div class="card-ribbon card-ribbon-top card-ribbon-left bg-green text-white">Confirmée</div>
+                            {% else %}
+                                <div class="card-ribbon card-ribbon-top card-ribbon-left bg-grey-dark text-white">En attente</div>
+                            {% endif %}
+                            <h4 class="card-title text-center">
+                                {{ registration.dancing_party.name }}
+                            </h4>
+                            <div class="p-2">
+                                {% if registration.user %}
+                                    <a href="{% url "cla_ticketing:party_detail_contributor" registration.dancing_party.slug %}" class="registration registration-self ticket mx-auto">
+                                        <h3>
+                                            <span class="label">Ma place</span>
+                                            <span class="status">{{ registration.first_name }}</span>
+                                            <span class="type">{{ registration.get_type_display }}</span>
+                                        </h3>
+                                        <h4><i class="fas fa-qrcode"></i></h4>
+                                    </a>
+                                {% else %}
+                                    <a href="{% url "cla_ticketing:party_detail_noncontributor" registration.dancing_party.slug %}" class="registration registration-friend ticket mx-auto">
+                                        <h3>
+                                            <span class="label">J'invite</span>
+                                            <span class="status">{{ registration.first_name }}</span>
+                                            <span class="type">{{ registration.get_type_display }}</span>
+                                        </h3>
+                                        <h4><i class="fas fa-qrcode"></i></h4>
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="col-md-6">
+                        <div class="card card-body">
+                            <h4 class="card-title text-center mb-0">
+                                Aucune place à afficher
+                            </h4>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

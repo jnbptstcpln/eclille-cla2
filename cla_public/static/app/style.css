@@ -210,3 +210,79 @@ body .header {
     background-position: right calc(.375em + .1875rem) center;
     background-size: calc(.75em + .375rem) calc(.75em + .375rem);
 }
+
+/* REGISTRATION */
+.registration {
+    width: 100%;
+    border-width: 5px;
+    border-style: solid;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    margin: 5px;
+    height: 125px;
+    overflow: hidden;
+    max-width: 325px;
+}
+
+.registration h3 {
+    width: 75%;
+    text-transform: uppercase;
+    margin: 0;
+}
+
+.registration h3 span.label {
+    display: block;
+    margin-bottom: .25rem;
+    font-size: 0.85rem;
+}
+
+.registration h3 span.status {
+    display: block;
+    margin-bottom: .1rem;
+    font-size: 1.33rem;
+}
+
+.registration h3 span.type {
+    display: block;
+    color: white;
+    font-size: .95rem;
+}
+
+.registration h4 {
+    width: 25%;
+    font-size: 3rem;
+    text-align: center;
+    margin: 0;
+}
+
+.registration:hover {
+    text-decoration: none;
+    opacity: .95;
+    transition: opacity 200ms;
+}
+
+.registration.ticket:hover {
+    color: #ffffff;
+}
+
+.registration-self {
+    border-color: #34495e;
+}
+
+.registration-self.ticket {
+    background-color: #34495e;
+    color: #ffffff;
+    transition: opacity 150ms;
+}
+
+.registration-friend {
+    border-color: #a10f2b;
+}
+
+.registration-friend.ticket {
+    background-color: #a10f2b;
+    color: #ffffff;
+    transition: opacity 150ms;
+}

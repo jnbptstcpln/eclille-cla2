@@ -32,14 +32,15 @@ def login(req):
 
                 if hasattr(user, "infos"):
                     # Check if the account lost its validation since last login
-                    if user.last_login <= user.infos.valid_until <= timezone.now() and req.session.get('validation_alert', True):
-                        response = render(
-                            req,
-                            "cla_auth/validation/validate_alert_standalone.html",
-                            {
-                                'redirect': resolve_url(req.session.get('next', 'cla_member:lobby'))
-                            }
-                        )
+                    if user.infos.valid_until is not None:
+                        if user.last_login <= user.infos.valid_until <= timezone.now() and req.session.get('validation_alert', True):
+                            response = render(
+                                req,
+                                "cla_auth/validation/validate_alert_standalone.html",
+                                {
+                                    'redirect': resolve_url(req.session.get('next', 'cla_member:lobby'))
+                                }
+                            )
 
                 # Handle stay_logged_in
                 if form.cleaned_data['stay_logged_in']:

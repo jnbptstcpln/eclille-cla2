@@ -63,6 +63,11 @@
                                         <a href="{% url "cla_registration:register_introduction" %}" class="nav-link">Adhérer</a>
                                     </li>
                                 {% endif %}
+                                {% if request.user.infos %}
+                                    <li class="nav-item {% if page_active == "cla_member" %}active{% endif %}">
+                                        <a href="{% url "cla_member:lobby" %}" class="nav-link">Espace adhérent</a>
+                                    </li>
+                                {% endif %}
                                 {% if request.user.is_authenticated and request.user.is_staff %}
                                     <li class="nav-item {% if page_active == "admin" %}active{% endif %}">
                                         <a href="/admin" class="nav-link">Administration</a>

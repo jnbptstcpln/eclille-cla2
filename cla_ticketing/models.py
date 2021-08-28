@@ -281,6 +281,14 @@ class DancingParty(AbstractEvent):
     scanners = models.ManyToManyField(User, related_name="+", verbose_name="Scanneurs", help_text="Les scanneurs peuvent effectuer les entrées au sein de l'événement", blank=True)
 
     @property
+    def counted_registrations(self):
+        return self.get_counted_registrations().count()
+
+    @property
+    def checked_registrations(self):
+        return self.get_counted_registrations().filter(checkin_datetime__isnull=False).count()
+
+    @property
     def places_remaining(self):
         return max(self.places-self.get_counted_registrations().count(), 0)
 

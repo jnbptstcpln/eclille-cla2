@@ -17,7 +17,7 @@ from decouple import config
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 # Project Version
-PROJECT_VERSION = "0.1"
+PROJECT_VERSION = "0.2"
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'cla_public.apps.ClaPublicConfig',
     'cla_ticketing.apps.ClaTicketingConfig',
     'cla_registration.apps.ClaRegistrationConfig',
+    'cla_member.apps.ClaMemberConfig',
 ]
 
 MIDDLEWARE = [

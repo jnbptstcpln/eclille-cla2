@@ -1,0 +1,59 @@
+{% extends 'cla_member/lobby/_layout.html' %}
+
+{% block page_title %}Mon compte{% endblock %}
+
+{% block section_title %}<a class="text-gray-500" href="{% url "cla_member:account" %}">Mon compte &rsaquo;</a> Validation{% endblock %}
+
+{% block section_content %}
+    <div>
+        <div class="mt-4 mb-4">
+            {% if user.infos.is_valid %}
+                <div class="card bg-success text-white">
+                    <div class="card-body">
+                        <h3 class="text-center" style="font-size: 1.5rem">Votre compte est actuellement validé</h3>
+                        <p class="text-justify mx-auto mb-0" style="max-width: 500px">
+                            Vous pouvez accéder à tous les services accessibles à travers votre compte CLA ainsi
+                            qu'aux billetteries et votes des élections BDX.
+                        </p>
+                    </div>
+                </div>
+            {% else %}
+                <div class="card bg-danger text-white">
+                    <div class="card-body">
+                        <h3 class="text-center" style="font-size: 1.45rem">Votre compte est actuellement non validé</h3>
+                        <p class="text-justify mx-auto mb-0" style="max-width: 525px">
+                            Vous pouvez toujours accéder à votre compte et à certains services, mais d'autres seront
+                            inaccessibles comme par exemple les billetteries ou les votes des élections BDX.
+                        </p>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+        <p>
+            Votre adhésion à <i>Centrale Lille Associations</i> couvre toutes vos années d'études au sein du Centrale Lille Institut.
+        </p>
+        <p>
+            Ainsi votre compte CLA vous accompagne aussi pendant toute votre vie au sein de l'univers associatif de notre école, mais aussi
+            au-delà, car il reste accessible après l'obtention de votre diplôme pour vous permettre, par exemple, d'accéder aux vidéos uniquement
+            accessibles aux étudiants du Centrale Lille Institut sur <a href="https://my.le-clap.fr">myCLAP</a>.
+        </p>
+        Néanmoins, l'obtention de votre diplôme entraine la fin de votre scolarité au sein du Centrale Lille Institut et ainsi de votre statut
+        de cotisant au sein de Centrale Lille Associations.
+        </p>
+        <p>
+            Afin d'être toujours à jour sur votre situation et de vous proposer les services adaptés, votre compte devra être validé au début de
+            chaque année de votre scolarité. Ce processus de validation consiste simplement en l'envoi d'un code sur votre adresse mail scolaire
+            (<u>{{ user.infos.email_school }}</u>) pour s'assurer que vous êtes toujours étudiant.
+        </p>
+        {% if not user.infos.is_valid %}
+            <div class="mt-4 card">
+                <div class="card-body">
+                    <p class="text-center">Vous êtes toujours étudiant ou étudiante ou sein du Centrale Lille Institut ?</p>
+                    <div>
+                        <a class="btn btn-red-dark btn-lg btn-block mx-auto" style="max-width: 400px" href="{% url "cla_auth:validate" %}">Procéder à la validation de votre compte</a>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
