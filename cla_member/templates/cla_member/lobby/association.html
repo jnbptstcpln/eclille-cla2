@@ -1,0 +1,38 @@
+{% extends 'cla_member/lobby/_layout.html' %}
+
+{% block page_title %}Mes associations{% endblock %}
+
+{% block section_title %}Mes associations{% endblock %}
+
+{% block section_content %}
+    <div>
+        <div class="mt-4">
+            <div class="row">
+                {% for membership in association_memberships %}
+                    <div class="col-6 col-md-4 customer type-media">
+                        <div class="card mb-4 bg-gradient bg-shadow">
+                            <div class="pt-3 px-3">
+                                {% if membership.association.logo %}
+                                    <div style="height: 120px; background-image: url('{{ membership.association.logo.url }}'); background-size: contain; background-repeat: no-repeat; background-position: center"></div>
+                                {% else %}
+                                    <div class="d-flex align-items-center justify-content-center" style="height: 120px; background-color: #aaaaaa">
+                                        <h4 class="m-0 text-uppercase text-gray-700" style="font-size: 1rem">{{ membership.association.name }}</h4>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="card-body py-2 px-4">
+                                <div class="d-flex align-items-center">
+                                    <div class="w-100">
+                                        <a href="#" class="btn btn-red-dark btn-block">
+                                            Interface de gestion <i class="far fa-tools ml-1"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
