@@ -16,34 +16,24 @@
             <h3 class="mt-0 mb-3" style="font-size: 1.25rem">Inscriptions aux événements</h3>
             <div class="row">
                 {% for event in events %}
-                    <div class="col-md-6">
+                    <div class="col-6 col-lg-4">
                         <div class="card card-body bg-gradient bg-shadow">
                             <h5 class="text-center text-grey" style="font-size: .95rem; letter-spacing: .05rem;">{{ event.event_starts_on|date:"d/m/Y H:i" }}</h5>
-                            <h4 class="card-title text-center">
+                            <h4 class="card-title mb-3 text-center">
                                 {{ event.name }}
                             </h4>
-                            {% if event.description|striptags|length > 0 %}
-                                <div class="mt-1 mb-3 mx-auto {% if event.description|striptags|length < 100 %}text-center{% endif %}" style="max-width: 400px">
-                                    {{ event.description|safe }}
-                                </div>
-                            {% endif %}
-                            <a href="{% url "cla_ticketing:event_ticketing" event.slug %}" class="btn btn-red-dark">Prendre ma place</a>
+                            <a href="{% url "cla_ticketing:event_ticketing" event.slug %}" target="_blank" class="btn btn-red-dark">Prendre ma place <i class="fas fa-ticket-alt ml-1"></i></a>
                         </div>
                     </div>
                 {% endfor %}
                 {% for party in parties %}
-                    <div class="col-md-6">
+                    <div class="col-6 col-lg-4">
                         <div class="card card-body bg-gradient bg-shadow">
                             <h5 class="text-center text-grey-dark" style="font-size: .90rem; letter-spacing: .05rem;">{{ party.event_starts_on|date:"d/m/Y H:i" }}</h5>
-                            <h4 class="card-title text-center">
+                            <h4 class="card-title mb-3 text-center">
                                 {{ party.name }}
                             </h4>
-                            {% if party.description|striptags|length > 0 %}
-                                <div class="mt-1 mb-2 mx-auto {% if party.description|striptags|length < 100 %}text-center{% endif %}" style="max-width: 400px">
-                                    {{ party.description|safe }}
-                                </div>
-                            {% endif %}
-                            <a href="{% url "cla_ticketing:party_view" party.slug %}" class="btn btn-red-dark">Prendre ma place</a>
+                            <a href="{% url "cla_ticketing:party_view" party.slug %}" target="_blank" class="btn btn-red-dark">Prendre ma place <i class="fas fa-ticket-alt ml-1"></i></a>
                         </div>
                     </div>
                 {% endfor %}
@@ -56,29 +46,32 @@
             <h3 class="mt-0 mb-3" style="font-size: 1.25rem">Sites web associatifs</h3>
             <div class="row">
                 {% for website in websites %}
-                    <div class="col-12 col-md-6 customer type-media">
+                    <div class="col-6 col-lg-4 customer type-media">
                         <div class="card mb-4 bg-gradient bg-shadow">
                             <div class="pt-3 px-3">
                                 {% if website.visual %}
-                                    <div style="height: 60px; background-image: url('{{ website.visual.url }}'); background-size: contain; background-repeat: no-repeat; background-position: center"></div>
+                                    <div
+                                        class="bg-gray-100" style="height: 100px; background-image: url('{{ website.visual.url }}'); background-size: contain; background-repeat: no-repeat; background-position: center"
+                                        data-toggle="popover" data-placement="top" data-trigger="hover" title="" data-html="true" data-content="<p class='text-justify'>{{ website.description|linebreaksbr }}</p>" data-original-title="{{ website.name }}"
+                                    ></div>
                                 {% else %}
-                                    <div class="d-flex align-items-center justify-content-center" style="height: 60px; background-color: #aaaaaa">
-                                        <h4 class="m-0 text-uppercase text-gray-700" style="font-size: 1rem">{{ website.name }}</h4>
+                                    <div
+                                        class="d-flex align-items-center justify-content-center bg-gray-200" style="height: 100px"
+                                        data-toggle="popover" data-placement="top" data-trigger="hover" title="" data-html="true" data-content="<p class='text-justify'>{{ website.description|linebreaksbr }}</p>" data-original-title="{{ website.name }}"
+                                    >
+                                        <h4 class="m-0 text-uppercase text-gray-700 text-center" style="font-size: 1rem">{{ website.name }}</h4>
                                     </div>
                                 {% endif %}
                             </div>
-                            <div class="card-body">
-                                <div style="height: 75px; overflow: auto; font-size: .75rem">
-                                    <p class="card-text text-justify">{{ website.description|linebreaksbr }}</p>
-                                </div>
-                                <div class="mt-2 d-flex align-items-center" style="height: 64px">
+                            <div class="card-body py-2 px-2 px-md-4">
+                                <div class="d-flex align-items-center" style="height: 69px">
                                     <div class="w-100">
                                         <a href="{{ website.href }}" class="btn btn-red-dark btn-block">
                                             Visiter le site <i class="far fa-link ml-1"></i>
                                         </a>
                                         {% if website.service %}
-                                            <a href="{% url "cla_auth:service_authenticate" website.service.identifier %}" class="btn btn-red-dark btn-block mt-1">
-                                                Se connecter avec CLA <i class="far fa-sign-in ml-1"></i>
+                                            <a href="{% url "cla_auth:service_authenticate" website.service.identifier %}" class="btn btn-blue-dark btn-block mt-1">
+                                                Se connecter <span class="d-none d-sm-none d-md-none d-xl-inline">avec CLA</span> <i class="far fa-user ml-1"></i>
                                             </a>
                                         {% endif %}
                                     </div>
