@@ -11,8 +11,8 @@
                             <a class="nav-link d-md-none" href="{% url "cla_auth:login" %}"><i class="fa fa-user"></i></a>
                             <a class="nav-link text-xs text-uppercase d-none d-md-block" href="{% url "cla_auth:login" %}">Connexion</a>
                         {% else %}
-                            <a class="nav-link d-md-none" href="#"><i class="fa fa-user"></i></a>
-                            <a class="nav-link text-xs text-uppercase d-none d-md-block" href="#" data-toggle="modal">Mon compte</a>
+                            <a class="nav-link d-md-none" href="{% url "cla_member:account" %}"><i class="fa fa-user"></i></a>
+                            <a class="nav-link text-xs text-uppercase d-none d-md-block" href="{% url "cla_member:account" %}">Mon compte</a>
                             <span class="nav-divider"></span>
                             <a class="nav-link text-xs text-uppercase d-none d-md-block" href="{% url "cla_auth:logout" %}">Déconnexion</a>
                         {% endif %}

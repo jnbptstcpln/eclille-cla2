@@ -10,7 +10,7 @@
             <div class="row justify-content-center">
                 <div class="col-auto row justify-content-center p-2 rounded-10 border-1-grey">
                     <div class="col-12 col-md-auto offset-md-0 d-flex justify-content-center justify-content-md-end">
-                        <div class="rounded-circle bg-red-dark d-flex justify-content-center align-items-center text-x2 text-white user-select-none" style="width: 100px; height: 100px; font-family: 'Montserrat', sans-serif;">
+                        <div class="rounded-circle bg-red-dark d-flex justify-content-center align-items-center text-x2 text-white user-select-none" style="width: 125px; height: 125px; font-family: 'Montserrat', sans-serif;">
                             <span>{{ user.first_name|make_list|first }}{{ user.last_name|make_list|first }}</span>
                         </div>
                     </div>
@@ -25,6 +25,11 @@
                                     <span class="text-red-dark">Votre compte n'est plus validé <a href="{% url "cla_member:account_validation" %}" class="text-red-dark"><i class="far fa-question-circle"></i></a></span>
                                 {% endif %}
                             </h5>
+                            <div class="mt-2">
+                                <div class="mx-auto" style="max-width: 400px">
+                                    <a class="btn btn-light btn-sm btn-block" href="{% url "cla_auth:logout" %}">Me déconnecter</a>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

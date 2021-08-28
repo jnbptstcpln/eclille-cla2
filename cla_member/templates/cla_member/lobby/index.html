@@ -6,13 +6,18 @@
 
 {% block section_content %}
 
+    <p>
+        À partir de cet espace, vous avez accès aux différents services en ligne proposés par <i>Centrale Lille Associations</i> tels que les billetteries,
+        la gestion de votre compte ou encore la réservation du foyer pour votre association.
+    </p>
+
     {% if events or parties %}
         <div class="mt-4">
             <h3 class="mt-0 mb-3" style="font-size: 1.25rem">Inscriptions aux événements</h3>
             <div class="row">
                 {% for event in events %}
                     <div class="col-md-6">
-                        <div class="card card-body">
+                        <div class="card card-body bg-gradient bg-shadow">
                             <h5 class="text-center text-grey" style="font-size: .95rem; letter-spacing: .05rem;">{{ event.event_starts_on|date:"d/m/Y H:i" }}</h5>
                             <h4 class="card-title text-center">
                                 {{ event.name }}
@@ -28,7 +33,7 @@
                 {% endfor %}
                 {% for party in parties %}
                     <div class="col-md-6">
-                        <div class="card card-body">
+                        <div class="card card-body bg-gradient bg-shadow">
                             <h5 class="text-center text-grey-dark" style="font-size: .90rem; letter-spacing: .05rem;">{{ party.event_starts_on|date:"d/m/Y H:i" }}</h5>
                             <h4 class="card-title text-center">
                                 {{ party.name }}
@@ -45,5 +50,47 @@
             </div>
         </div>
     {% endif %}
+
+    {% if websites %}
+        <div class="mt-4">
+            <h3 class="mt-0 mb-3" style="font-size: 1.25rem">Sites web associatifs</h3>
+            <div class="row">
+                {% for website in websites %}
+                    <div class="col-12 col-sm-6 col-md-4 customer type-media">
+                        <div class="card mb-4 bg-gradient bg-shadow">
+                            <div class="pt-3 px-3">
+                                {% if website.visual %}
+                                    <div style="height: 60px; background-image: url('{{ website.visual.url }}'); background-size: contain; background-repeat: no-repeat; background-position: center"></div>
+                                {% else %}
+                                    <div class="d-flex align-items-center justify-content-center" style="height: 60px; background-color: #aaaaaa">
+                                        <h4 class="m-0 text-uppercase text-gray-700" style="font-size: 1rem">{{ website.name }}</h4>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="card-body p-2">
+                                <div style="height: 75px; overflow: auto; font-size: .75rem">
+                                    <p class="card-text text-justify">{{ website.description }}</p>
+                                </div>
+                                <div class="mt-2 d-flex align-items-center" style="height: 64px">
+                                    <div class="w-100">
+                                        <a href="{{ website.href }}" class="btn btn-red-dark btn-block">
+                                            Visiter <i class="far fa-link ml-1"></i>
+                                        </a>
+                                        {% if website.service %}
+                                            <a href="{% url "cla_auth:service_authenticate" website.service.identifier %}" class="btn btn-red-dark btn-block mt-1">
+                                                Se connecter <i class="far fa-sign-in ml-1"></i>
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+
+
 
 {% endblock %}

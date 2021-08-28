@@ -10,6 +10,7 @@ from django.shortcuts import render, redirect, reverse, get_object_or_404
 from django.http import HttpRequest, HttpResponseNotAllowed, Http404, HttpResponse
 from django.utils import timezone
 
+from cla_member.models import Website
 from cla_ticketing.models import Event, DancingParty, DancingPartyRegistration
 
 
@@ -38,11 +39,18 @@ class IndexView(ClaMemberModuleMixin, TemplateView):
             party for party in parties if self.request.user.infos.college in party.colleges
         ]
 
+    def get_websites(self):
+        websites = Website.objects.filter(display=True)
+        return [
+            website for website in websites if self.request.user.infos.college in website.colleges
+        ]
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({
             'events': self.get_opened_events(),
-            'parties': self.get_opened_parties()
+            'parties': self.get_opened_parties(),
+            'websites': self.get_websites(),
         })
         return context
 
