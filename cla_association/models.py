@@ -3,6 +3,7 @@ import uuid
 
 from django.contrib.auth.models import User
 from django.db import models
+from django.shortcuts import redirect, resolve_url
 from multiselectfield import MultiSelectField
 from django_resized import ResizedImageField
 
@@ -66,6 +67,9 @@ class Association(models.Model):
 
     display = models.BooleanField(default=True, verbose_name="Afficher sur le site")
     active = models.BooleanField(default=True, verbose_name="Active", help_text="Une association active peut effectuer des demandes de réservation du foyer, du synthé, du barbecue...")
+
+    def get_absolute_url(self):
+        return resolve_url("cla_association:detail", self.slug)
 
     def __str__(self):
         return self.name
