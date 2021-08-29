@@ -32,8 +32,8 @@ class Migration(migrations.Migration):
                 ('ticketing_href', models.URLField(blank=True, help_text='Laisser vide si aucune', null=True, verbose_name="Lien vers la billeterie d'encaissement")),
             ],
             options={
-                'verbose_name': 'Billeterie de soirée dansante',
-                'verbose_name_plural': 'Billeteries de soirée dansante',
+                'verbose_name': 'Billetterie de soirée dansante',
+                'verbose_name_plural': 'Billetteries de soirée dansante',
                 'abstract': False,
             },
         ),
@@ -54,8 +54,8 @@ class Migration(migrations.Migration):
                 ('allow_non_contributor_registration', models.BooleanField(default=False, verbose_name="Autoriser l'inscription des non cotisants")),
             ],
             options={
-                'verbose_name': "Billeterie d'événement",
-                'verbose_name_plural': "Billeteries d'événement",
+                'verbose_name': "Billetterie d'événement",
+                'verbose_name_plural': "Billetteries d'événement",
                 'abstract': False,
             },
         ),

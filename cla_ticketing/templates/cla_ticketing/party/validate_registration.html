@@ -1,0 +1,205 @@
+{% extends "layout/standalone.html" %}
+{% load static %}
+
+{% block css %}
+    {{ block.super }}
+    <style>
+
+        @media (min-width: 1200px) {
+            h1 {
+                font-size: 2rem
+            }
+
+            h3 {
+                font-size: 1.5rem;
+            }
+        }
+
+        h1 {
+            font-size: 1.5rem
+        }
+
+        h2 {
+            text-transform: uppercase;
+            letter-spacing: .05rem;
+            font-size: 1rem;
+            color: #3a3a3a;
+        }
+
+        h3 {
+            font-size: 1.25rem;
+        }
+
+        p {
+            font-size: .85rem;
+        }
+
+        .alert {
+            font-size: .8rem;
+            padding: .33rem;
+        }
+
+        #main {
+            height: 100%;
+            max-height: 80vh;
+            max-width: 525px;
+            width: 100%;
+        }
+
+        @media (max-width: 768px) {
+            #main {
+                max-height: calc(100% - 1rem);
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block page_title %}Entrées | {{ party.name }} | CLA{% endblock %}
+
+{% block background_image_url %}{% static "cla_ticketing/img/sd1_blur.jpg" %}{% endblock %}
+
+{% block content %}
+    <div id="main" class="card w-100">
+        <div class="card-body">
+            <div class="d-flex flex-column justify-content-between h-100 mx-auto" style="max-width: 450px">
+                <div class="text-center">
+                    <h2>Billetterie</h2>
+                    <h1>{{ party.name }}</h1>
+                </div>
+                {% include "components/messages.html" %}
+                {% if registration %}
+                    {% if loop %}
+                        <div class="alert alert-info text-center">
+                            <i class="fas fa-info-circle"></i> Vous avez fait le tour des inscriptions à valider
+                        </div>
+                    {% endif %}
+                    <div style="flex: auto; overflow: auto">
+                        <div class="text-center mt-2 mb-3">
+                            <p class="m-0">
+                                Inscrit le {{ registration.created_on|date:'d/m/Y à H:i' }}
+                            </p>
+                            <p class="m-0" style="font-size: .75rem">
+                                Il y a {{ registration.created_on|timesince }}
+                            </p>
+                        </div>
+
+                        {% if registration.is_minor and registration.type == registration.Types.HARD %}
+                            <div class="alert alert-danger mb-3 text-center">
+                                L'inscrit est mineur et a pris une place avec alcool
+                            </div>
+                        {% endif %}
+
+                        <dl class="">
+                            <dt>Etudiant</dt>
+                            <dd>
+                                {{ registration.first_name }} {{ registration.last_name }}
+                                {% if registration.user %}
+                                    <span class="text-muted">({{ registration.user.infos.college.label }})</span>
+                                {% endif %}
+                            </dd>
+                            <dt>Place</dt>
+                            <dd>
+                                {{ registration.ticket_label }}<br>
+                            </dd>
+                            <dt>Date de naissance</dt>
+                            <dd>
+                                {{ registration.birthdate|date:'d/m/Y' }}
+                                {% if registration.is_minor %}
+                                    <span class="badge badge-danger">Mineur</span>
+                                {% endif %}
+                            </dd>
+                            {% if registration.user %}
+                            {% else %}
+                                <dt>Garant</dt>
+                                <dd>
+                                    {{ registration.guarantor.first_name }} {{ registration.guarantor.last_name }} <span class="text-muted">({{ registration.guarantor.infos.college.label }})</span>
+                                </dd>
+                            {% endif %}
+                            {% for cs, cs_value in inline_custom_fields %}
+                                <dt>{{ cs.label }}</dt>
+                                <dd>{{ cs_value.value }}</dd>
+                            {% endfor %}
+                        </dl>
+
+                        {% if block_custom_fields %}
+                            <h4>Documents</h4>
+                            {% for cs, cs_value in block_custom_fields %}
+                                {% if cs.type == cs.Type.FILE %}
+                                    <label>
+                                        <b>{{ cs.label }}</b>
+                                        {% if cs_value.value and cs_value.value.url %}
+                                            <a href="{{ cs_value.value.url }}" target="popup" onclick="window.open(this.href, 'popup', 'width=600,height=600'); return false;"><i class="far fa-external-link"></i></a>
+                                        {% endif %}
+                                    </label>
+                                    {% if cs_value.value.name %}
+                                        <iframe src="{{ cs_value.value.url }}" class="mx-auto w-100" height="450" width="450"></iframe>
+                                    {% else %}
+                                        {% if registration.validated and cs.delete_file_after_validation %}
+                                            <div class="alert alert-success">
+                                                <i class="fas fa-file-check mr-1"></i> Le document a été validé
+                                            </div>
+                                        {% else %}
+                                            <div class="alert alert-danger">
+                                                <i class="fas fa-file-times mr-1"></i> L'utilisateur n'a pas encore envoyé ce document
+                                            </div>
+                                        {% endif %}
+                                    {% endif %}
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+
+                    </div>
+                    <div class="mx-auto mt-4 w-100">
+                        <form class="mt-3" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="registration_pk" value="{{ registration.pk }}">
+                            <div class="row text-center">
+                                {% for field in form.visible_fields %}
+                                    <div class="col-6">
+                                        <div class="form-group{% if field.errors %} is-invalid{% endif %}">
+
+                                            <label for="{{ field.id_for_label }}">{{ field }} {{ field.label }}{% if field.field.required %} <b class="text-red">*</b>{% endif %}</label>
+                                            {% if field.errors %}
+                                                <div class="invalid-feedback">
+                                                    {% if field.errors|length > 1 %}
+                                                        <ul>
+                                                            {% for error in field.errors %}
+                                                                <li>{{ error|escape }}</li>
+                                                            {% endfor %}
+                                                        </ul>
+                                                    {% else %}
+                                                        {{ field.errors.0|escape }}
+                                                    {% endif %}
+                                                </div>
+                                            {% endif %}
+
+                                            {% if field.help_text %}
+                                                <small class="form-text text-muted">{{ field.help_text|safe }}</small>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            <div class="mx-auto mt-3" style="max-width: 350px">
+                                <button type="submit" class="btn btn-red-dark btn-block btn-xl">Suivant</button>
+                                <a class="btn btn-dark btn-block btn-lg mt-2 mb-2" href="/admin/cla_ticketing/dancingpartyregistration/{{ registration.pk }}/change/?_to_field=id&amp;dancingparty={{ party.pk }}&amp;redirect=validation">
+                                    Modifier la place
+                                </a>
+                            </div>
+                        </form>
+
+                    </div>
+                {% else %}
+                    <div class="mx-auto" style="max-width: 350px">
+                        <div class="alert alert-success p-4" style="font-size: 1rem">
+                            <i class="far fa-check-circle mr-1"></i> Aucune autre inscription à valider !
+                        </div>
+                    </div>
+                    <div class="mx-auto mt-5 w-100" style="max-width: 350px;">
+                        <a class="btn btn-dark btn-block btn-lg mt-2 mb-2" href="/admin/cla_ticketing/dancingparty/{{ party.pk }}/change">Accéder à l'événement</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

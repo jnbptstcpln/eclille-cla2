@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterModelOptions(
             name='dancingparty',
-            options={'permissions': (('dancingparty_manager', "Accès à l'interface de gestion des soirées dansantes pour lesquelles l'utilisateur est administrateur"),), 'verbose_name': 'Billeterie de soirée dansante', 'verbose_name_plural': 'Billeteries de soirée dansante'},
+            options={'permissions': (('dancingparty_manager', "Accès à l'interface de gestion des soirées dansantes pour lesquelles l'utilisateur est administrateur"),), 'verbose_name': 'Billetterie de soirée dansante', 'verbose_name_plural': 'Billetteries de soirée dansante'},
         ),
         migrations.AlterModelOptions(
             name='dancingpartyregistration',

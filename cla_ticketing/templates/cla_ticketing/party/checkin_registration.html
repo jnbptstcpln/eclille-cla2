@@ -97,18 +97,20 @@
                                 <span class="badge badge-danger">Mineur</span>
                             {% endif %}
                         </dd>
+                        <dt>Téléphone</dt>
+                        <dd>{% if registration.phone %}{{ registration.phone }}{% else %}<span class="text-muted">Non indiqué</span>{% endif %}</dd>
                         <dt>Logement en fin de soirée</dt>
                         <dd>{{ registration.home }}</dd>
                         {% if registration.user %}
                             <dt>Cursus</dt>
-                            <dd>{{ registration.user.infos.get_cursus_display }}</dd>
+                            <dd>{{ registration.user.infos.college.label }}</dd>
                             <dt>Promotion</dt>
                             <dd>{{ registration.user.infos.promo }}</dd>
                         {% else %}
                             <dt>Garant</dt>
                             <dd>
                                 {{ registration.guarantor.first_name }} {{ registration.guarantor.last_name }}<br>
-                                <span class="small">({{ registration.guarantor.infos.get_cursus_display }})</span>
+                                <span class="small">({{ registration.guarantor.infos.college.label }})</span>
                             </dd>
                         {% endif %}
                     </dl>

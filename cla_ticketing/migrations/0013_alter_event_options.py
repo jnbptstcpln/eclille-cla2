@@ -12,6 +12,6 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterModelOptions(
             name='event',
-            options={'permissions': (('event_manager', "Accès à l'interface de gestion des événements pour lesquels l'utilisateur est administrateur"),), 'verbose_name': "Billeterie d'événement", 'verbose_name_plural': "Billeteries d'événement"},
+            options={'permissions': (('event_manager', "Accès à l'interface de gestion des événements pour lesquels l'utilisateur est administrateur"),), 'verbose_name': "Billetterie d'événement", 'verbose_name_plural': "Billetteries d'événement"},
         ),
     ]

@@ -54,37 +54,37 @@ class RegistrationSession(models.Model):
     ticketing_href_centrale_pack = models.URLField(
         null=True,
         blank=True,
-        verbose_name="Billeterie \"[Centrale Lille] Pack Alumni+CLA\"",
+        verbose_name="Billetterie \"[Centrale Lille] Pack Alumni+CLA\"",
         default=DefaultTicketingHref.ticketing_href_centrale_pack
     )
     ticketing_href_centrale_cla = models.URLField(
         null=True,
         blank=True,
-        verbose_name="Billeterie \"[Centrale Lille] Adhésion CLA\"",
+        verbose_name="Billetterie \"[Centrale Lille] Adhésion CLA\"",
         default=DefaultTicketingHref.ticketing_href_centrale_cla
     )
     ticketing_href_centrale_dd_pack = models.URLField(
         null=True,
         blank=True,
-        verbose_name="Billeterie \"[Centrale Lille][Double diplôme] Pack Alumni+CLA\"",
+        verbose_name="Billetterie \"[Centrale Lille][Double diplôme] Pack Alumni+CLA\"",
         default=DefaultTicketingHref.ticketing_href_centrale_dd_pack
     )
     ticketing_href_centrale_dd_cla = models.URLField(
         null=True,
         blank=True,
-        verbose_name="Billeterie \"[Centrale Lille][Double diplôme] Adhésion CLA\"",
+        verbose_name="Billetterie \"[Centrale Lille][Double diplôme] Adhésion CLA\"",
         default=DefaultTicketingHref.ticketing_href_centrale_dd_cla
     )
     ticketing_href_iteem_pack = models.URLField(
         null=True,
         blank=True,
-        verbose_name="Billeterie \"[ITEEM] Pack Alumni+CLA\"",
+        verbose_name="Billetterie \"[ITEEM] Pack Alumni+CLA\"",
         default=DefaultTicketingHref.ticketing_href_iteem_pack
     )
     ticketing_href_iteem_cla = models.URLField(
         null=True,
         blank=True,
-        verbose_name="Billeterie \"[ITEEM] Adhésion CLA\"",
+        verbose_name="Billetterie \"[ITEEM] Adhésion CLA\"",
         default=DefaultTicketingHref.ticketing_href_iteem_cla
     )
 

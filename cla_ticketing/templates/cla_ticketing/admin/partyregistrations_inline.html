@@ -34,6 +34,12 @@
                         })
                     </script>
                 </div>
+                {% if has_change_permission %}
+                    <a href="{% url "cla_ticketing:party_validate" original.slug %}"
+                       style="border: 1px solid var(--border-color);font-size: 13px;padding: 4px 8px;margin: 0;vertical-align: middle;background: var(--body-bg);box-shadow: 0 -15px 20px -10px rgba(0, 0, 0, 0.15) inset;cursor: pointer;color: var(--body-fg); margin-right: 3px">
+                        Valider les inscriptions...
+                    </a>
+                {% endif %}
                 <div>
                     {% if has_change_permission %}
                         <a href="/admin/cla_ticketing/dancingpartyregistration/add/?_to_field=id&amp;dancingparty={{ original.pk }}&amp;type=contributor"

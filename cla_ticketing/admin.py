@@ -61,7 +61,7 @@ class EventAdmin(admin.ModelAdmin):
 
     class EventRegistrationCustomFieldInline(admin.StackedInline):
         fields = [
-            ('type', 'label'), 'help_text', ('required', 'admin_only'), 'options'
+            ('type', 'label'), 'help_text', ('required', 'admin_only', 'editable'), 'options', 'delete_file_after_validation'
         ]
         model = EventRegistrationCustomField
         extra = 0
@@ -501,7 +501,7 @@ class DancingPartyAdmin(admin.ModelAdmin):
 
     class DancingPartyRegistrationCustomFieldInline(admin.StackedInline):
         fields = [
-            ('type', 'label'), 'help_text', ('required', 'admin_only'), 'options'
+            ('type', 'label'), 'help_text', ('required', 'admin_only', 'editable'), 'options', 'delete_file_after_validation'
         ]
         model = DancingPartyRegistrationCustomField
         extra = 0
@@ -866,7 +866,8 @@ class DancingPartyRegistrationAdmin(admin.ModelAdmin):
 
     def response_post_save_change(self, request, obj: DancingPartyRegistration):
         return {
-            "checkin": redirect("cla_ticketing:party_checkin_registration", obj.dancing_party.slug, obj.pk)
+            "checkin": redirect("cla_ticketing:party_checkin_registration", obj.dancing_party.slug, obj.pk),
+            "validation": redirect(resolve_url("cla_ticketing:party_validate", obj.dancing_party.slug)+f"?registration_pk={obj.pk}")
         }.get(request.GET.get('redirect'), redirect("admin:cla_ticketing_dancingparty_change", obj.dancing_party.pk))
 
 

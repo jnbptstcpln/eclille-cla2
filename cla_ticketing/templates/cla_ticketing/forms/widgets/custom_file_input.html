@@ -1,0 +1,4 @@
+{% if widget.is_initial %}
+    <div class="alert alert-success py-1 px-3 mb-2" style="font-size: .75rem"><i class="fas fa-file-check mr-1"></i> Vous avez déjà envoyé ce document</div>
+{% endif %}
+<input type="{{ widget.type }}" name="{{ widget.name }}"{% include "django/forms/widgets/attrs.html" %}>

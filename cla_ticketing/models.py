@@ -56,6 +56,16 @@ class AbstractEvent(models.Model):
         return self.registration_starts_on < timezone.now() <= self.registration_ends_on and self.places_remaining > 0
 
     @property
+    def has_started(self):
+        return self.event_starts_on < timezone.now()
+
+    @property
+    def has_editable_fields(self):
+        if hasattr(self, 'custom_fields'):
+            return self.custom_fields.filter(editable=True).count() > 0
+        return False
+
+    @property
     def places_remaining(self):
         return max(self.places-self.registrations.count(), 0)
 
@@ -104,12 +114,28 @@ class AbstractRegistrationCustomField(models.Model):
         CHECKBOX = "checkbox", "Case à cocher"
         FILE = "file", "Fichier"
 
+        @classmethod
+        def get_inlines_types(cls):
+            return {
+                cls.TEXT,
+                cls.SELECT,
+                cls.CHECKBOX
+            }
+
+        @classmethod
+        def get_block_types(cls):
+            return {
+                cls.FILE
+            }
+
     type = models.CharField(max_length=255, choices=Type.choices, default=Type.TEXT, verbose_name="Type")
     admin_only = models.BooleanField(default=False, verbose_name="Disponible seulement du côté administrateur", blank=True)
+    editable = models.BooleanField(default=False, verbose_name="Peut être modifié", help_text="Permet aux étudiants de modifier ce champ après avoir pris leur place, jusqu'au début de l'événement")
     required = models.BooleanField(default=False, verbose_name="Requis", blank=True)
     label = models.CharField(max_length=255, verbose_name="Nom")
     help_text = models.CharField(max_length=255, verbose_name="Description", blank=True)
     options = models.TextField(verbose_name="Options pour le select", help_text="Une valeur par ligne", blank=True, null=True)
+    delete_file_after_validation = models.BooleanField(default=False, verbose_name="Supprimer le fichier après validation", help_text="Permet de préserver la confidentialité des données une fois qu'elles ne sont plus utiles")
 
     @property
     def field_id(self):
@@ -209,8 +235,8 @@ class Event(AbstractEvent):
 
     class Meta:
         abstract = False
-        verbose_name = "Billeterie d'événement"
-        verbose_name_plural = "Billeteries d'événement"
+        verbose_name = "Billetterie d'événement"
+        verbose_name_plural = "Billetteries d'événement"
         permissions = (
             ('event_manager', "Accès à l'interface de gestion des événements pour lesquels l'utilisateur est administrateur"),
         )
@@ -271,8 +297,8 @@ class DancingParty(AbstractEvent):
 
     class Meta:
         abstract = False
-        verbose_name = "Billeterie de soirée dansante"
-        verbose_name_plural = "Billeteries de soirée dansante"
+        verbose_name = "Billetterie de soirée dansante"
+        verbose_name_plural = "Billetteries de soirée dansante"
         permissions = (
             ('dancingparty_manager', "Accès à l'interface de gestion des soirées dansantes pour lesquelles l'utilisateur est administrateur"),
         )
@@ -330,7 +356,7 @@ class DancingPartyRegistration(AbstractRegistration):
     is_staff = models.BooleanField(default=False)
     type = models.CharField(max_length=255, choices=Types.choices, default=None, verbose_name="Place", null=True)
     staff_description = models.CharField(max_length=255, null=True, blank=True, verbose_name="Staff")
-    home = models.CharField(max_length=100, verbose_name="Logement après la soirée")
+    home = models.CharField(max_length=100, verbose_name="Logement après la soirée", help_text="Résidence et numéro de chambre ou bien \"Lille\"")
     birthdate = models.DateField(verbose_name="Date de naissance")
     guarantor = models.ForeignKey(User, on_delete=models.DO_NOTHING, to_field="username", related_name="+", verbose_name="Garant", null=True)
     checkin_datetime = models.DateTimeField(null=True, verbose_name="Date et heure d'entrée")
