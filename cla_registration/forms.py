@@ -143,7 +143,7 @@ class ImageRightForm(forms.ModelForm):
         self.fields['email_school'].help_text = "Vous trouverez cette adresse dans les documents que vient de vous remettre l'administration de Centrale."
 
         for field_name, field in self.fields.items():
-            field.widget.attrs['class'] = field.widget.attrs.get('class', "") + "form-control"
+            field.widget.attrs['class'] = field.widget.attrs.get('class', "") + "form-control form-control-sm"
 
     def clean_email_school(self):
         email_school = self.cleaned_data['email_school']

@@ -41,6 +41,11 @@
                 max-height: calc(100% - 1rem);
             }
         }
+        @media (min-height: 750px) {
+            #main {
+                max-height: 650px;
+            }
+        }
     </style>
 {% endblock %}
 
@@ -49,7 +54,7 @@
 {% block content %}
     <div id="main" class="card w-100">
         <div class="card-body">
-            https://centralelilleassos.fr/droit-image
+            <form method="post" class="d-flex flex-column justify-content-between h-100">
                 <header class="d-flex align-items-center justify-content-around">
                     <div>
                         {% if associations.cla.logo %}
@@ -76,13 +81,14 @@
                     </div>
                 </header>
 
-                <div class="mt-5 mb-4 text-center">
-                    <p>
+                <div class="mt-2 mb-2 mt-md-3 mb-md-2 text-center">
+                    <p style="font-size: 0.9rem">
                         Pour commencer, veuillez remplir le formulaire ci-dessous et cliquer sur "Suivant"
                     </p>
                 </div>
 
-                <div class="border-1-grey rounded-10 mt-2 mx-auto p-4" style="max-width: 425px; overflow: auto">
+
+                <div class="border-1-grey rounded-10 mx-auto p-4" style="max-width: 425px; overflow: auto">
                     {% csrf_token %}
                     {% include "components/form-errors.html" with form=form %}
                     {% include "components/form-group.html" with field=form.first_name %}
