@@ -16,14 +16,14 @@ Cette plateforme a été initialement développée en 2020 par Jean-Baptiste Cap
 Ce projet utilise la librairie [WeasyPrint](https://doc.courtbouillon.org/weasyprint/latest/first_steps.html) pour générer des PDFs.
 L'utilisation de cette librairie nécessite l'installation des packages suivant :
 ```shell
-apt install python3-cffi python3-brotli libpango-1.0-0 libharfbuzz0b libpangoft2-1.0-0
+apt install python3-cffi python3-brotli libpango-1.0-0 libharfbuzz0b libpangoft2-1.0-0 libpangocairo-1.0-0
 ```
 
 Après avoir récupéré le code depuis le dépôt GitHub il faut installer les dépendances en utilisant pip, mais avant cela il est recommandé de mettre en place un environnement virtuel avec ``virtualenv`` :
 ```shell script
 virtualenv venv
 source venv/bin/activate
-
+pip install wheel  # Nécessaire pour l'installation de WeasyPrint
 pip install -r requirements.txt
 ```
 
