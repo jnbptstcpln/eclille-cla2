@@ -49,8 +49,7 @@
 {% block content %}
     <div id="main" class="card w-100">
         <div class="card-body">
-            <div>
-
+            https://centralelilleassos.fr/droit-image
                 <header class="d-flex align-items-center justify-content-around">
                     <div>
                         {% if associations.cla.logo %}
@@ -83,8 +82,7 @@
                     </p>
                 </div>
 
-
-                <form method="post" class="border-1-grey rounded-10 mt-2 mx-auto p-4" style="max-width: 425px">
+                <div class="border-1-grey rounded-10 mt-2 mx-auto p-4" style="max-width: 425px; overflow: auto">
                     {% csrf_token %}
                     {% include "components/form-errors.html" with form=form %}
                     {% include "components/form-group.html" with field=form.first_name %}
@@ -95,7 +93,7 @@
                     <p class="text-center mt-3 mb-0">
                         <button type="submit" class="btn btn-primary btn-lg">Suivant</button>
                     </p>
-                </form>
+                </div>
             </div>
         </div>
     </div>
