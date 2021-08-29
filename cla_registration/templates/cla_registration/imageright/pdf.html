@@ -1,0 +1,61 @@
+<html>
+<head>
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,500,600,700" rel="stylesheet" type="text/css">
+    <style>
+        body {
+            font-family: "Open Sans", sans-serif;
+        }
+        ul li:not(:last-child) {
+            margin-bottom: .2cm;
+        }
+        @page {
+            size: A4 portrait; /* can use also 'landscape' for orientation */
+            margin: 2cm 1cm 2cm 1cm;
+            @top-left {
+                content: element(header);
+            }
+            @bottom-left {
+                content: element(footer);
+            }
+        }
+    </style>
+</head>
+<body>
+<header>
+    <div style="display: flex; justify-content: space-between">
+        <div>
+            {% if associations.cla.logo %}
+                <img src="{{ associations.cla.logo.url }}" style="width: 3cm; height: 3cm; margin: auto;">
+            {% endif %}
+        </div>
+        <div>
+            {% if associations.bde.logo %}
+                <img src="{{ associations.bde.logo.url }}" style="width: 3cm; height: 3cm; margin: auto;">
+            {% endif %}
+        </div>
+    </div>
+</header>
+<div>
+    <h1 style="text-align: center; margin-top: 2cm; margin-bottom: 1cm"><b>Formulaire de droit à<br>l’image et à l’information</b></h1>
+    <div style="padding: 0 1cm">
+        <p>Je soussigné.e <b>{{ image_right_agreement.fullname }}</b> né.e le <b>{{ image_right_agreement.birthdate|date:'d/m/Y' }}</b> autorise à titre
+            gratuit l’association Centrale Lille Associations et l’ensemble de ses clubs et commissions ainsi que l’AEEC Lille à :
+        </p>
+        <ul>
+            <li>
+                Me prendre en photo/me filmer lors des divers évènements de la vie étudiante centralienne.
+            </li>
+            <li>
+                Diffuser ces photos/vidéos sur leurs sites internet, sur les réseaux sociaux et par les voies de communication usuelles et documents de Centrale Lille Associations et AEEC Lille.
+            </li>
+            <li>
+                Utiliser mon nom et mon prénom dans le cadre de documents officiels créer par Centrale Lille Associations ou AEEC Lille.
+            </li>
+        </ul>
+    </div>
+    <p style="text-align: center; margin-top: 2cm">Signé le {% now 'd/m/Y' %} à Villeneuve-d'Ascq</p>
+    <p style="text-align: center; margin-top: 1cm"><img src="{{ signature }}"></p>
+</div>
+<footer></footer>
+</body>
+</html>

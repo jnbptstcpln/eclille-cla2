@@ -1,0 +1,147 @@
+{% extends "layout/standalone.html" %}
+{% load static %}
+
+{% block css %}
+    {{ block.super }}
+    <style>
+        header .logo {
+            --size: 75px;
+            width: var(--size);
+            height: var(--size);
+        }
+        header h1 {
+            font-size: 1.33rem;
+            margin: 0;
+        }
+        @media (max-width: 500px) {
+            header h1 {
+                font-size: .90rem;
+            }
+        }
+        @media (max-width: 410px) {
+            header .logo {
+                --size: 50px;
+            }
+        }
+        @media (max-width: 350px) {
+            header .logo {
+                display: none;
+            }
+        }
+
+        #main {
+            height: 100%;
+            max-height: 85vh;
+            max-width: 700px;
+            width: 100%;
+        }
+
+        @media (max-width: 768px) {
+            #main {
+                max-height: calc(100% - 1rem);
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block page_title %}Droit à l'image{% endblock %}
+
+{% block content %}
+    <div id="main" class="card w-100">
+        <div class="card-body">
+            <form method="post" class="d-flex flex-column justify-content-between h-100">
+                {% csrf_token %}
+                <div>
+                    <header class="d-flex align-items-center justify-content-around">
+                        <div>
+                            {% if associations.cla.logo %}
+                                <div class="mx-auto logo"
+                                     style="background-image: url('{{ associations.cla.logo.url }}'); background-size: contain; background-repeat: no-repeat; background-position: center"></div>
+                            {% else %}
+                                <div class="d-flex align-items-center justify-content-center mx-auto logo" style="background-color: #aaaaaa">
+                                    <h4 class="m-0 text-uppercase text-gray-700 mx-auto" style="font-size: 1rem">{{ associations.cla.name }}</h4>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <h1 class="text-center"><b>Formulaire de droit à<br>l’image et à l’information</b></h1>
+                        </div>
+                        <div>
+                            {% if associations.bde.logo %}
+                                <div class="mx-auto logo"
+                                     style="background-image: url('{{ associations.bde.logo.url }}'); background-size: contain; background-repeat: no-repeat; background-position: center"></div>
+                            {% else %}
+                                <div class="d-flex align-items-center justify-content-center mx-auto logo" style="background-color: #aaaaaa">
+                                    <h4 class="m-0 text-uppercase text-gray-700" style="font-size: 1rem">{{ associations.bde.name }}</h4>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </header>
+                </div>
+
+                <div class="d-flex align-items-md-center px-md-5" style="flex: auto; overflow: auto">
+                    <div style="font-size: 0.90rem">
+                        <p>Je soussigné.e <b>{{ image_right_agreement.fullname }}</b> né.e le <b>{{ image_right_agreement.birthdate|date:'d/m/Y' }}</b> autorise à titre gratuit l’association Centrale Lille Associations et l’ensemble de ses
+                            clubs
+                            et
+                            commissions ainsi que l’AEEC Lille à :</p>
+                        <ul>
+                            <li>
+                                Me prendre en photo/me filmer lors des divers évènements de la vie étudiante centralienne.
+                            </li>
+                            <li>
+                                Diffuser ces photos/vidéos sur leurs sites internet, sur les réseaux sociaux et par les voies de communication usuelles et documents de Centrale Lille Associations et AEEC Lille.
+                            </li>
+                            <li>
+                                Utiliser mon nom et mon prénom dans le cadre de documents officiels créer par Centrale Lille Associations ou AEEC Lille.
+                            </li>
+
+                        </ul>
+                    </div>
+                </div>
+                <div class="text-center mt-4" style="font-size: 0.90rem">
+                    <b>Signé le {% now "d/m/Y" %}, à Villeneuve-d'Ascq</b>
+                </div>
+
+                <div>
+                    <input type="hidden" id="userSignature" name="userSignature" value="" required>
+                    <div class="mt-3">
+                        {{ form.signature }}
+                        <span class="d-block text-center mb-2"><i class="far fa-arrow-down"></i> Signez-ici <i class="far fa-arrow-down"></i></span>
+                        <div class="pos-relative mx-auto" style="max-width: 300px;">
+                            <a id="reset-canvas" href="#" class="btn btn-icon pos-absolute pos-r pos-b text-gray-500 text-hover-dark" style="font-size: .75rem"><i class="far fa-redo-alt"></i></a>
+                            <canvas class="d-block border-1-grey bg-gray-100" height="120" width="300" id="signature">Signature</canvas>
+                        </div>
+                    </div>
+                    <p class="text-center mt-3">
+                        <button type="submit" class="btn btn-primary btn-lg">Valider</button>
+                    </p>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block body_js %}
+    {{ block.super }}
+    <script src="{% static "cla_registration/js/signature_pad.min.js" %}"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function (e) {
+            var canvas = document.getElementById('signature');
+            var signaturePad = new SignaturePad(canvas);
+            $('#reset-canvas').on('click', function (e) {
+                signaturePad.clear();
+            });
+            $('form').on('submit', function (e) {
+                if (signaturePad.isEmpty()) {
+                    window.alert("Il faut signer le document dans l'encadré prévu à cet effet.")
+                    return false;
+                } else {
+                    document.getElementById('{{ form.signature.id_for_label }}').value = signaturePad.toDataURL();
+                    return true;
+                }
+            });
+        })
+
+    </script>
+{% endblock %}

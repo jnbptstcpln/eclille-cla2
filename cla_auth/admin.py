@@ -16,7 +16,7 @@ from django.utils import timezone
 
 from cla_web.utils import current_school_year
 from cla_auth.forms.admin_user_form import UserCreationForm, UserChangeForm
-from cla_registration.models import Registration
+from cla_registration.models import Registration, ImageRightAgreement
 from .models import UserInfos, UserMembership, Service, PasswordResetRequest
 
 # Remove default User management interface
@@ -35,12 +35,20 @@ class UserAdmin(UserAdmin):
             ('promo', 'cursus'),
             ('activated_on', 'valid_until'),
             'phone',
-            'original_school'
+            'original_school',
+            'image_right_agreement'
         )
-        readonly_fields = 'activated_on', 'valid_until', 'original_school'
+        readonly_fields = 'activated_on', 'valid_until', 'original_school', 'image_right_agreement'
         extra = 1
         min_num = 1
         can_delete = False
+
+        def image_right_agreement(self, obj: UserInfos):
+            image_right_agreement = ImageRightAgreement.objects.filter(email_school=obj.email_school, created_on__year=obj.user.date_joined.year).first()
+            if image_right_agreement and image_right_agreement.file.name:
+                return mark_safe(f"<a href='{image_right_agreement.file.url}' target='_blank'>Voir</a>")
+            return "Aucun document correspondant"
+        image_right_agreement.short_description = 'Formulaire de droit à l\'image'
 
     class MembershipInline(admin.StackedInline):
         model = UserMembership

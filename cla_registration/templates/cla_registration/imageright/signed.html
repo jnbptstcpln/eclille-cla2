@@ -1,0 +1,46 @@
+{% extends "layout/standalone.html" %}
+
+{% block css %}
+    {{ block.super }}
+    <style>
+        header .logo {
+            --size: 75px;
+            width: var(--size);
+            height: var(--size);
+        }
+
+        @media (max-width: 410px) {
+            header .logo {
+                --size: 50px;
+            }
+        }
+
+        @media (max-width: 350px) {
+            header .logo {
+                display: none;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block page_title %}Droit à l'image{% endblock %}
+
+{% block content %}
+    <div style="max-width: 750px" class="card w-100">
+        <div class="card-body">
+            <div>
+
+                <div class="mx-auto mt-4 mb-4" style="max-width: 500px">
+                    <div class="alert alert-success">
+                        <p class="mt-0">Votre accord a bien été enregistré.</p>
+                        <p class="mb-0">Le document que vous avez signé sera disponible sur votre compte CLA ou bien à la demande à <a href="mailto:cla@centralelille.fr">cla@centralelille.fr</a></p>
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <a class="btn btn-primary" href="{% url "cla_registration:imageright_form" %}">Accéder de nouveau au formulaire</a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

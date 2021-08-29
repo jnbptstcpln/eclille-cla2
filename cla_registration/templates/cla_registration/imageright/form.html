@@ -1,0 +1,102 @@
+{% extends "layout/standalone.html" %}
+
+
+{% block css %}
+    {{ block.super }}
+    <style>
+        header .logo {
+            --size: 75px;
+            width: var(--size);
+            height: var(--size);
+        }
+        header h1 {
+            font-size: 1.33rem;
+            margin: 0;
+        }
+        @media (max-width: 500px) {
+            header h1 {
+                font-size: .90rem;
+            }
+        }
+        @media (max-width: 410px) {
+            header .logo {
+                --size: 50px;
+            }
+        }
+        @media (max-width: 350px) {
+            header .logo {
+                display: none;
+            }
+        }
+
+        #main {
+            height: 100%;
+            max-height: 85vh;
+            max-width: 700px;
+            width: 100%;
+        }
+
+        @media (max-width: 768px) {
+            #main {
+                max-height: calc(100% - 1rem);
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block page_title %}Droit à l'image{% endblock %}
+
+{% block content %}
+    <div id="main" class="card w-100">
+        <div class="card-body">
+            <div>
+
+                <header class="d-flex align-items-center justify-content-around">
+                    <div>
+                        {% if associations.cla.logo %}
+                            <div class="mx-auto logo"
+                                 style="background-image: url('{{ associations.cla.logo.url }}'); background-size: contain; background-repeat: no-repeat; background-position: center"></div>
+                        {% else %}
+                            <div class="d-flex align-items-center justify-content-center mx-auto logo" style="background-color: #aaaaaa">
+                                <h4 class="m-0 text-uppercase text-gray-700 mx-auto" style="font-size: 1rem">{{ associations.cla.name }}</h4>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <h1 class="text-center"><b>Formulaire de droit à<br>l’image et à l’information</b></h1>
+                    </div>
+                    <div>
+                        {% if associations.bde.logo %}
+                            <div class="mx-auto logo"
+                                 style="background-image: url('{{ associations.bde.logo.url }}'); background-size: contain; background-repeat: no-repeat; background-position: center"></div>
+                        {% else %}
+                            <div class="d-flex align-items-center justify-content-center mx-auto logo" style="background-color: #aaaaaa">
+                                <h4 class="m-0 text-uppercase text-gray-700" style="font-size: 1rem">{{ associations.bde.name }}</h4>
+                            </div>
+                        {% endif %}
+                    </div>
+                </header>
+
+                <div class="mt-5 mb-4 text-center">
+                    <p>
+                        Pour commencer, veuillez remplir le formulaire ci-dessous et cliquer sur "Suivant"
+                    </p>
+                </div>
+
+
+                <form method="post" class="border-1-grey rounded-10 mt-2 mx-auto p-4" style="max-width: 425px">
+                    {% csrf_token %}
+                    {% include "components/form-errors.html" with form=form %}
+                    {% include "components/form-group.html" with field=form.first_name %}
+                    {% include "components/form-group.html" with field=form.last_name %}
+                    {% include "components/form-group.html" with field=form.birthdate %}
+                    {% include "components/form-group.html" with field=form.email_school %}
+
+                    <p class="text-center mt-3 mb-0">
+                        <button type="submit" class="btn btn-primary btn-lg">Suivant</button>
+                    </p>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

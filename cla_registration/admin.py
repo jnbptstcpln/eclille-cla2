@@ -1,5 +1,6 @@
 import csv
 from django.contrib import admin
+from django.contrib.auth.models import User
 from django.http import HttpRequest, HttpResponse
 from django_admin_inline_paginator.admin import TabularInlinePaginated
 from django.conf import settings
@@ -9,7 +10,7 @@ from django.shortcuts import resolve_url, get_object_or_404
 from django.urls import path
 from django.utils.safestring import mark_safe
 
-from .models import RegistrationSession, Registration
+from .models import RegistrationSession, Registration, ImageRightAgreement
 from .views.admin import RegistrationValidationView, RegistrationSessionExportView
 
 
@@ -176,6 +177,28 @@ class RegistrationSessionAdmin(admin.ModelAdmin):
         urls = my_urls + urls
         return urls
 
-
     def render_change_form(self, request, context, add=False, change=False, form_url='', obj=None):
         return super().render_change_form(request, context, add, change, form_url, obj)
+
+
+@admin.register(ImageRightAgreement)
+class ImageRightAgreementAdmin(admin.ModelAdmin):
+
+    fields = (
+        'created_on',
+        'account',
+        ('first_name', 'last_name'),
+        'birthdate',
+        'email_school',
+        'file'
+    )
+    readonly_fields = ('created_on', 'account', 'file')
+    list_display = ("fullname", "created_on", "account")
+
+    def account(self, obj: ImageRightAgreement):
+        user = User.objects.filter(infos__email_school=obj.email_school, date_joined__year=obj.created_on.year).first()
+        if user:
+            return mark_safe(f"<a href='{resolve_url('admin:auth_user_change', user.pk)}'>{user.first_name} {user.last_name}</a>")
+        return "Aucun compte correspondant"
+
+    account.short_description = "Compte lié"

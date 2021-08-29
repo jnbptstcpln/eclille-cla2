@@ -41,6 +41,20 @@ class AssociationManager(models.Manager):
                 display=False
             )
 
+    def get_bde(self):
+        try:
+            return self.get(slug="bde")
+        except self.model.DoesNotExist:
+            return self.create(
+                name="BDE",
+                subtitle="Bureau des élèves",
+                slug="bde",
+                type=self.model.Types.BDX,
+                category=self.model.Category.BDX,
+                description="Le BDE est le bureau des élèves de l'école Centrale de Lille",
+                display=False
+            )
+
 
 class Association(models.Model):
 

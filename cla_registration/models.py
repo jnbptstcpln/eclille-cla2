@@ -1,8 +1,25 @@
+import os
+import uuid
 from uuid import uuid4
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
 from cla_web.utils import next_back_to_school_year
+
+
+class FilePath:
+
+    @classmethod
+    def _path(cls, pathlist, current_filename, new_filename):
+        ext = current_filename.split('.')[-1]
+        if new_filename is None:
+            new_filename = uuid.uuid4()
+        pathlist.append(f"{new_filename}.{ext}")
+        return os.path.join(*pathlist)
+
+    @classmethod
+    def image_right_agreement(cls, instance, current_filename):
+        return cls._path(["cla_registration", "image_right_agreement"], current_filename, instance.pk)
 
 
 class RegistrationSessionManager(models.Manager):
@@ -178,3 +195,26 @@ class DataSharingLogs(models.Model):
     session = models.ForeignKey(RegistrationSession, related_name="+", on_delete=models.CASCADE)
     download_on = models.DateTimeField(auto_now_add=True)
     download_by = models.CharField(max_length=255, choices=Organism.choices)
+
+
+class ImageRightAgreement(models.Model):
+
+    class Meta:
+        verbose_name = "Formulaire de droit à l'image"
+        verbose_name_plural = "Formulaires de droit à l'image"
+        ordering = "-created_on",
+
+    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+    first_name = models.CharField(max_length=250, verbose_name="Prénom")
+    last_name = models.CharField(max_length=250, verbose_name="Nom")
+    birthdate = models.DateField(verbose_name="Date de naissance")
+    email_school = models.EmailField(verbose_name="Adresse mail école")
+    file = models.FileField(upload_to=FilePath.image_right_agreement, verbose_name="Formulaire de droit à l'image et à l'information", editable=False)
+    created_on = models.DateTimeField(auto_now_add=True, null=True, verbose_name="Date de l'enregistrement", editable=False)
+
+    @property
+    def fullname(self):
+        return f"{self.first_name} {self.last_name}"
+
+    def __str__(self):
+        return self.fullname

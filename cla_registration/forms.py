@@ -1,5 +1,5 @@
 from django import forms
-from .models import Registration
+from .models import Registration, ImageRightAgreement
 
 from cla_auth.forms.admin_user_form import UserCreationForm
 from cla_auth.models import UserInfos, UserMembership
@@ -113,3 +113,40 @@ class RegistrationAdminForm(forms.ModelForm):
     amount = forms.IntegerField(label="Montant de la cotisation")
     paid_on = forms.DateField(label="Date du paiement")
     paid_by = forms.ChoiceField(choices=UserMembership.MeanOfPayment.choices)
+
+
+class ImageRightForm(forms.ModelForm):
+
+    school_domain = None
+
+    class Meta:
+        model = ImageRightAgreement
+        fields = 'first_name', 'last_name', 'birthdate', 'email_school'
+
+    def __init__(self, *args, **kwargs):
+        self.school_domain = kwargs.pop("school_domain")
+        super().__init__(*args, **kwargs)
+
+        self.fields['first_name'].widget.attrs['placeholder'] = f"Prénom"
+        self.fields['last_name'].widget.attrs['placeholder'] = f"Nom"
+        self.fields['birthdate'].widget.attrs['placeholder'] = f"DD/MM/YYYY"
+        self.fields['email_school'].widget.attrs['placeholder'] = f"prenom.nom@{self.school_domain}"
+        self.fields['email_school'].help_text = "Vous trouverez cette adresse dans les documents que vient de vous remettre l'administration de Centrale."
+
+        for field_name, field in self.fields.items():
+            field.widget.attrs['class'] = field.widget.attrs.get('class', "") + "form-control"
+
+    def clean_email_school(self):
+        email_school = self.cleaned_data['email_school']
+        if not email_school.endswith(self.school_domain):
+            raise forms.ValidationError(f"Veuillez vérifier que votre adresse mail scolaire finit bien en @{self.school_domain}")
+        return email_school
+
+    def clean_first_name(self):
+        return capitalize_name(self.cleaned_data['first_name'])
+
+    def clean_last_name(self):
+        return capitalize_name(self.cleaned_data['last_name'])
+
+class ImageRightSignForm(forms.Form):
+    signature = forms.CharField(widget=forms.HiddenInput())
