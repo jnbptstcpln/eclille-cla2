@@ -157,6 +157,12 @@ class UserInfos(models.Model):
     def is_valid(self):
         return self.valid_until is not None and self.valid_until > timezone.now()
 
+    def has_active_membership(self):
+        return UserMembership.objects.filter(user=self.user, refunded_on__isnull=True).count() > 0
+
+    def get_active_membership(self):
+        return UserMembership.objects.filter(user=self.user, refunded_on__isnull=True).order_by("-paid_on").first()
+
     @property
     def activation_jwt(self):
         return jwt.encode(

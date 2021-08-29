@@ -1,4 +1,5 @@
 {% extends 'cla_member/lobby/_layout.html' %}
+{% load static %}
 
 {% block page_title %}Mon compte | CLA{% endblock %}
 
@@ -26,9 +27,11 @@
                                 {% endif %}
                             </h5>
                             <div class="mt-2">
-                                <div class="mx-auto" style="max-width: 400px">
-                                    <a class="btn btn-light btn-sm btn-block" href="{% url "cla_auth:logout" %}">Me déconnecter</a>
-                                </div>
+                                {% if request.user.infos.has_active_membership %}
+                                    <div class="mx-auto" style="max-width: 400px">
+                                        <a class="btn btn-slate btn-rounded btn-sm btn-block" href="{% url "cla_member:membership_proof" %}">Justificatif de cotisation <i class="fas fa-file-certificate ml-1"></i></a>
+                                    </div>
+                                {% endif %}
                             </div>
                         </div>
                     </div>

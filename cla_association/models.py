@@ -25,7 +25,26 @@ class FilePath:
         return cls._path(instance, ["cla_association", "association_logo"], filename)
 
 
+class AssociationManager(models.Manager):
+
+    def get_cla(self):
+        try:
+            return self.get(slug="cla")
+        except self.model.DoesNotExist:
+            return self.create(
+                name="CLA",
+                subtitle="Centrale Lille Associations",
+                slug="cla",
+                type=self.model.Types.ASSOC_1901,
+                category=self.model.Category.BDX,
+                description="Centrale Lille Associations est une association loi 1901 fondée en 2008, continuation de plus d'un siècle et demi de développement perpétuel des structures associatives de Centrale Lille par ses étudiants.",
+                display=False
+            )
+
+
 class Association(models.Model):
+
+    objects = AssociationManager()
 
     class Meta:
         verbose_name = "Association"

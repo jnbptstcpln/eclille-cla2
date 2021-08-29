@@ -4,6 +4,8 @@ from django.shortcuts import render
 
 from django.http import HttpRequest
 
+from cla_auth.models import UserMembership
+
 
 class IsContributorMixin(AccessMixin):
     is_contributor_raise_403 = False
@@ -25,5 +27,20 @@ class IsContributorMixin(AccessMixin):
                 raise PermissionDenied()
             else:
                 return render(request, self.is_contributor_validation_template, {'redirect': request.get_full_path()})
+
+        return super().dispatch(request, *args, **kwargs)
+
+
+class HasMembershipMixin(AccessMixin):
+    membership: UserMembership = None
+
+    def dispatch(self, request: HttpRequest, *args, **kwargs):
+        if not hasattr(request.user, 'infos'):
+            raise PermissionDenied()
+
+        if not request.user.infos.has_active_membership():
+            raise PermissionDenied()
+
+        self.membership = request.user.infos.get_active_membership()
 
         return super().dispatch(request, *args, **kwargs)

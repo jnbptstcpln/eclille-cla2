@@ -1,0 +1,219 @@
+{% extends 'cla_member/lobby/_layout.html' %}
+{% load static %}
+
+{% block css %}
+    {{ block.super }}
+    <style>
+
+        .wrapper-wrapper {
+            box-sizing: border-box;
+            /*border: solid 2px blue;*/
+            position: relative;
+        }
+
+        .scaled-wrapper {
+            --ratio: 210;
+            position: relative;
+            width: calc(210px / 210px * var(--ratio));
+            height: calc(297px / 210px * var(--ratio));
+            margin: auto;
+            /*outline: 1px solid red;*/
+            z-index: 1;
+            border: 1px solid #aaaaaa;
+        }
+
+        .scaled-content {
+            box-sizing: border-box;
+            display: inline-block;
+            transform-origin: 0 0;
+            /*background-color: #ffd0d0;*/
+            z-index: -1;
+        }
+
+        #membership-proof {
+            width: 21cm;
+            height: 29.7cm;
+        }
+
+        #membership-proof-container {
+
+        }
+
+        @media (min-width: 500px) {
+            .scaled-wrapper {
+                --ratio: 300;
+            }
+        }
+
+        @media (min-width: 800px) {
+            .scaled-wrapper {
+                --ratio: 600;
+            }
+        }
+
+        @media (min-width: 1200px) {
+            .scaled-wrapper {
+                --ratio: 1000;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block page_title %}Justificatif d'adhésion | CLA{% endblock %}
+
+{% block section_title %}Mon adhésion{% endblock %}
+
+{% block section_content %}
+    <div>
+
+        <div class="mx-auto" style="max-width: 200px">
+            <a class="btn btn-red-dark btn-block" href="#" onclick="return xepOnline.Formatter.Format('membership-proof-container',{render:'download'});">
+                Télécharger <i class="fas fa-download ml-1"></i>
+            </a>
+        </div>
+        <div class="mx-auto mt-3 wrapper-wrapper" style="max-width: 700px">
+            <div class="scaled-wrapper">
+                <div id="membership-proof-container" class="scaled-content">
+                    <div id="membership-proof">
+                        <div class="float-left pt-5 px-4">
+                            <img id="cla-horizontal" src="" style="max-width: 250px; position: relative; top: 25px;">
+                        </div>
+                        <div class="float-right pt-5 px-4">
+                            <div class="text-right">
+                                <p style="margin-bottom: .33rem">
+                                    <b>Association "Centrale Lille Associations"</b>
+                                </p>
+                                <p style="margin-bottom: .1rem">
+                                    Cité Scientifique - CS 20048
+                                </p>
+                                <p style="margin-bottom: .1rem">
+                                    59651 - Villeneuve d’Ascq
+                                </p>
+                                <p style="margin-bottom: .1rem">
+                                    <a href="mailto:cla@centralelille.fr">cla@centralelille.fr</a>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="text-center px-4 pt-3 mb-5" style="clear: both">
+                            <h1>Reçu de paiement</h1>
+                            <h2>Règlement de la cotisation</h2>
+                        </div>
+                        <div class="text-justify px-4">
+                            <p>
+                                Je, soussigné {{ treasurer.user.first_name }} {{ treasurer.user.last_name }}, agissant en tant que Trésorier du conseil d'administration de Centrale Lille Associations,
+                                <b>déclare avoir reçu la somme de {{ membership.amount }}€ de la part de {{ membership.user.first_name }} {{ membership.user.last_name }}</b>,
+                                né le {{ membership.user.infos.birthdate|date:'d/m/Y' }} et étudiant au sein du Centrale Lille Institut, comme frais d’acquittement de sa cotisation
+                                à Centrale Lille Associations.
+                            </p>
+                            <p>
+                                <b>L’étudiant est de ce fait membre de Centrale Lille Associations</b>, ainsi que de l’Association des Elèves ou de l’Association des Iteemiens selon sa situation,
+                                de l’Association Culturelle et de l’Association Sportive. Il peut adhérer librement à tout club et à toute commission de Centrale Lille Associations, et a accès à toutes
+                                les installations sportives mises à la disposition des étudiants de l’école ainsi qu’au foyer. Et ce tant qu’il reste membre de Centrale Lille Associations.
+                            </p>
+                            <p>
+                                Pour faire valoir ce que de droit.
+                            </p>
+                        </div>
+                        <div class="mt-5 px-4">
+                            <div class="float-right pr-6">
+                                <p style="margin-bottom: .33rem">
+                                    Fait à Villeneuve d’Ascq, le {% now 'd/m/Y' %}
+                                </p>
+                                <p style="margin-bottom: .1rem">
+                                    {{ treasurer.user.first_name }} {{ treasurer.user.last_name }}
+                                </p>
+                                <p style="margin-bottom: .1rem">
+                                    Trésorier du Conseil d’Administration
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block body_js %}
+    {{ block.super }}
+    <script src="{% static "cla_member/js/xepOnline.jqPlugin.js" %}"></script>
+    <script>
+        let scaledWrapper = document.getElementsByClassName('scaled-wrapper')[0];
+
+        let applyScaling = scaledWrapper => {
+
+            // Get the scaled content, and reset its scaling for an instant
+            let scaledContent = scaledWrapper.getElementsByClassName('scaled-content')[0];
+            scaledContent.style.transform = 'scale(1, 1)';
+
+            let {width: cw, height: ch} = scaledContent.getBoundingClientRect();
+            let {width: ww, height: wh} = scaledWrapper.getBoundingClientRect();
+
+//  let scaleAmtX = ww / cw;
+//  let scaleAmtY = wh / ch;
+            let scaleAmtX = Math.min(ww / cw, wh / ch);
+            let scaleAmtY = scaleAmtX;
+
+
+            scaledContent.style.transform = `scale(${scaleAmtX}, ${scaleAmtY})`;
+
+        };
+
+        applyScaling(scaledWrapper);
+
+        // ---- The rest of the code is just for the demonstration ui ----
+        let change = () => {
+            let w = parseInt(wInp.value);
+            let h = parseInt(hInp.value);
+            if (!isNaN(w)) scaledWrapper.style.width = `${w}px`;
+            if (!isNaN(h)) scaledWrapper.style.height = `${h}px`;
+            scaledWrapper.getElementsByClassName('scaled-content')[0].innerHTML = textInp.value;
+            applyScaling(scaledWrapper);
+        };
+
+        let wInp = document.createElement('input');
+        wInp.setAttribute('placeholder', 'input parent width in px');
+        wInp.addEventListener('input', change);
+        wInp.value = '100';
+        document.body.appendChild(wInp);
+
+        let hInp = document.createElement('input');
+        hInp.setAttribute('placeholder', 'input parent height in px');
+        hInp.addEventListener('input', change);
+        hInp.value = '100';
+        document.body.appendChild(hInp);
+
+        let textInp = document.createElement('input');
+        textInp.setAttribute('placeholder', 'input text content');
+        textInp.addEventListener('input', change);
+        textInp.value = 'abc';
+        document.body.appendChild(textInp);
+
+        function toDataURL(src, callback, outputFormat) {
+            var img = new Image();
+            img.crossOrigin = 'Anonymous';
+            img.onload = function () {
+                var canvas = document.createElement('CANVAS');
+                var ctx = canvas.getContext('2d');
+                var dataURL;
+                canvas.height = this.naturalHeight;
+                canvas.width = this.naturalWidth;
+                ctx.drawImage(this, 0, 0);
+                dataURL = canvas.toDataURL(outputFormat);
+                callback(dataURL);
+            };
+            img.src = src;
+            if (img.complete || img.complete === undefined) {
+                img.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==";
+                img.src = src;
+            }
+        }
+
+        toDataURL(
+            '{% static "app/img/logo/cla_horizontal.png" %}',
+            function (dataUrl) {
+                $('#cla-horizontal').attr('src', dataUrl);
+            }
+        )
+    </script>
+{% endblock %}

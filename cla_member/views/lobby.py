@@ -10,7 +10,9 @@ from django.shortcuts import render, redirect, reverse, get_object_or_404
 from django.http import HttpRequest, HttpResponseNotAllowed, Http404, HttpResponse
 from django.utils import timezone
 
-from cla_association.models import AssociationMember
+from cla_association.models import AssociationMember, Association
+from cla_auth.mixins import IsContributorMixin, HasMembershipMixin
+from cla_auth.models import UserMembership
 from cla_member.models import Website
 from cla_ticketing.models import Event, DancingParty, DancingPartyRegistration
 
@@ -106,6 +108,19 @@ class AccountValidationView(ClaMemberModuleMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         context.update({
             'user': self.request.user,
+        })
+        return context
+
+
+class MembershipProofView(ClaMemberModuleMixin, HasMembershipMixin, TemplateView):
+    template_name = "cla_member/lobby/membership_proof.html"
+    cla_member_active_section = 'account'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'membership': self.membership,
+            'treasurer': Association.objects.get_cla().members.filter(_role=AssociationMember.Roles.TREASURER).first()
         })
         return context
 
