@@ -1,4 +1,6 @@
 from django import forms
+from django.utils import timezone
+
 from .models import Registration, ImageRightAgreement
 
 from cla_auth.forms.admin_user_form import UserCreationForm
@@ -128,9 +130,16 @@ class ImageRightForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
         self.fields['first_name'].widget.attrs['placeholder'] = f"Prénom"
+        self.fields['first_name'].widget.attrs['autocomplete'] = f"off"
+
         self.fields['last_name'].widget.attrs['placeholder'] = f"Nom"
+        self.fields['last_name'].widget.attrs['autocomplete'] = f"off"
+
         self.fields['birthdate'].widget.attrs['placeholder'] = f"DD/MM/YYYY"
+        self.fields['birthdate'].widget.attrs['autocomplete'] = f"off"
+
         self.fields['email_school'].widget.attrs['placeholder'] = f"prenom.nom@{self.school_domain}"
+        self.fields['email_school'].widget.attrs['autocomplete'] = f"off"
         self.fields['email_school'].help_text = "Vous trouverez cette adresse dans les documents que vient de vous remettre l'administration de Centrale."
 
         for field_name, field in self.fields.items():
@@ -140,6 +149,9 @@ class ImageRightForm(forms.ModelForm):
         email_school = self.cleaned_data['email_school']
         if not email_school.endswith(self.school_domain):
             raise forms.ValidationError(f"Veuillez vérifier que votre adresse mail scolaire finit bien en @{self.school_domain}")
+
+        if ImageRightAgreement.objects.filter(email_school=email_school, created_on__year=timezone.now().year).count() > 0:
+            raise forms.ValidationError(f"Cette adresse mail a déjà remplie ce formulaire")
         return email_school
 
     def clean_first_name(self):
@@ -147,6 +159,7 @@ class ImageRightForm(forms.ModelForm):
 
     def clean_last_name(self):
         return capitalize_name(self.cleaned_data['last_name'])
+
 
 class ImageRightSignForm(forms.Form):
     signature = forms.CharField(widget=forms.HiddenInput())

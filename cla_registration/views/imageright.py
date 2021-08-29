@@ -9,11 +9,38 @@ from django_weasyprint import WeasyTemplateResponse
 from weasyprint import HTML
 
 from cla_association.models import Association
+from cla_association.views.manage import ChangeView
 from cla_registration.forms import ImageRightForm, ImageRightSignForm
 from cla_registration.models import ImageRightAgreement
 
 
 class CreateAgreementView(CreateView):
+    template_name = "cla_registration/imageright/form.html"
+    form_class = ImageRightForm
+    model = ImageRightAgreement
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'associations': {
+                'cla': Association.objects.get_cla(),
+                'bde': Association.objects.get_bde()
+            }
+        })
+        return context
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update({
+            'school_domain': 'centrale.centralelille.fr'
+        })
+        return kwargs
+
+    def get_success_url(self):
+        return resolve_url("cla_registration:imageright_sign", self.object.pk)
+
+
+class ChangeAgreementView(ChangeView):
     template_name = "cla_registration/imageright/form.html"
     form_class = ImageRightForm
     model = ImageRightAgreement
@@ -49,6 +76,19 @@ class SignAgreementView(FormView):
             self.image_right_agreement = ImageRightAgreement.objects.get(pk=kwargs.pop("pk", None))
         except ImageRightAgreement.DoesNotExist:
             return redirect("cla_registration:imageright_form")
+        
+        if self.image_right_agreement.file.name:
+            return render(
+                self.request,
+                "cla_registration/imageright/signed.html",
+                {
+                    'associations': {
+                        'cla': Association.objects.get_cla(),
+                        'bde': Association.objects.get_bde()
+                    }
+                }
+            )
+        
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
@@ -69,18 +109,8 @@ class SignAgreementView(FormView):
             base_url=self.request.build_absolute_uri()
         )
         self.image_right_agreement.file.save("generated_pdf.pdf", ContentFile(pdf_factory.write_pdf()), True)
-
-        # Implement save logic
-        return render(
-            self.request,
-            "cla_registration/imageright/signed.html",
-            {
-                'associations': {
-                    'cla': Association.objects.get_cla(),
-                    'bde': Association.objects.get_bde()
-                }
-            }
-        )
+        
+        return super(SignAgreementView, self).form_valid(form)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -92,3 +122,6 @@ class SignAgreementView(FormView):
             }
         })
         return context
+
+    def get_success_url(self):
+        return resolve_url("cla_registration:imageright_sign", self.image_right_agreement.pk)
