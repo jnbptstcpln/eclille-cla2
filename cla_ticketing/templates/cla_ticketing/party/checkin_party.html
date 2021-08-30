@@ -39,10 +39,6 @@
             padding: .33rem;
         }
 
-        #main {
-            height: 80vh;
-        }
-
         .search-item {
             display: flex;
             align-items: center;
@@ -104,23 +100,10 @@
             justify-content: center;
         }
 
-        #main, #qrcode-container {
-            height: 100%;
-            max-height: 80vh;
-            max-width: 525px;
-            width: 100%;
-        }
-
         #qrcode-container {
             display: none;
             position: relative;
             background-color: #34495e;
-        }
-
-        @media (max-width: 768px) {
-            #main, #qrcode-container {
-                max-height: calc(100% - 1rem);
-            }
         }
 
     </style>
@@ -131,8 +114,16 @@
 {% block background_image_url %}{% static "cla_ticketing/img/sd1_blur.jpg" %}{% endblock %}
 
 {% block content %}
-    <div id="main" class="card">
-        <div class="card-body">
+    <div id="main" class="card" style="max-width: 525px">
+        <div id="qrcode-container" class="card-body w-100 p-0">
+            <div class="p-1">
+                <div id="qrcode-reader"></div>
+            </div>
+            <div class="pos-absolute pos-b-2 w-100 px-3">
+                <a id="qrcode-stop" href="#" class="btn btn-light btn-block btn-lg mx-auto">Annuler</a>
+            </div>
+        </div>
+        <div id="main-container" class="card-body w-100">
             <div class="d-flex flex-column justify-content-between h-100">
                 <div class="text-center">
                     <h2>Billetterie</h2>
@@ -156,13 +147,6 @@
             </div>
         </div>
     </div>
-    <div id="qrcode-container">
-        <div id="qrcode-reader"></div>
-        <div class="pos-absolute pos-b-2 w-100 px-3">
-            <a id="qrcode-stop" href="#" class="btn btn-light btn-block btn-lg mx-auto">Annuler</a>
-        </div>
-    </div>
-
 {% endblock %}
 
 {% block body_js %}
@@ -174,7 +158,7 @@
             var loading_timeout;
             var request;
             var qrcode_scanner;
-            const $main = $('#main');
+            const $main_container = $('#main-container');
             const $qrcode_container = $('#qrcode-container');
             const $search_field = $('#search-field');
             const $search_container = $('#search-container');
@@ -201,7 +185,7 @@
                                         let r = data.payload[i];
                                         let classname = (!r.is_contributor ? 'noncontributor' : '');
                                         let icon = (r.checked_in ? "<i class='fas fa-user-check'></i>" : "<i class='fas fa-user'></i>");
-                                        $search_container.append("<a href='" + r.href + "' class='search-item " + classname + "'><div class='infos'><h4>" + r.first_name + " " + r.last_name + "</h4><h5>" + r.ticket_label + "</h5></div><div class='status'>"+icon+"</div></a>");
+                                        $search_container.append("<a href='" + r.href + "' class='search-item " + classname + "'><div class='infos'><h4>" + r.first_name + " " + r.last_name + "</h4><h5>" + r.ticket_label + "</h5></div><div class='status'>" + icon + "</div></a>");
                                     }
                                 } else {
                                     $search_container.append("<div class='search-item empty'><h4>Aucun résultat</h4></div>");
@@ -217,7 +201,7 @@
             });
             $('#qrcode-start').on('click', function (event) {
                 event.preventDefault()
-                $main.hide();
+                $main_container.hide();
                 $qrcode_container.show();
 
                 let loading = false;
@@ -228,14 +212,14 @@
                     if (!loading) {
                         loading = true;
                         $.ajax({
-                            url: '{% url "cla_ticketing:party_checkin" party.slug %}/qrcode/'+decodedText,
+                            url: '{% url "cla_ticketing:party_checkin" party.slug %}/qrcode/' + decodedText,
                             type: 'GET',
                             success: function (data) {
                                 loading = false;
                                 qrcode_scanner.stop()
                                 window.location.href = data.href;
                             },
-                            error: function (jqXHR, textStatus,errorThrown) {
+                            error: function (jqXHR, textStatus, errorThrown) {
                                 loading = false;
                                 alert('Le QRCode scanné est invalide')
                             },
@@ -249,7 +233,7 @@
             $('#qrcode-stop').on('click', function (event) {
                 event.preventDefault();
                 $qrcode_container.hide();
-                $main.show();
+                $main_container.show();
                 qrcode_scanner.stop();
                 qrcode_scanner = null;
             });

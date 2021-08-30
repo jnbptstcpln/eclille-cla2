@@ -7,6 +7,7 @@
         body {
             height: 100%;
         }
+
         html {
             height: 100%
         }
@@ -19,18 +20,45 @@
         }
 
         #wrapper2 {
+            display: flex;
+            align-items: center;
+            justify-content: center;
             height: 100%;
             z-index: 5;
-            overflow-y: auto;
-            box-sizing: content-box
+        }
+
+        #wrapper2 > div {
+            height: 100%;
+            /*overflow-y: auto;*/
+        }
+        @media (max-width: 768px) {
+            #wrapper2 > div {
+                width: 100%;
+                height: 100%;
+            }
+        }
+
+        #main {
+            margin: auto;
+            height: 100%;
+            max-height: calc(100% - 1rem);
+            width: calc(100vw - 1rem);
+            max-width: 750px;
+        }
+        @media (max-width: 768px) {
+            #main {
+                max-height: calc(100% - 1rem);
+            }
         }
     </style>
 {% endblock %}
 
 {% block body %}
     <div id="wrapper1" style="background-image: url('{% block background_image_url %}{% static "app/img/rez_blur.jpg" %}{% endblock %}'); " class="position-relative p-2 p-sm-4">
-        <div id="wrapper2" class="d-flex {% block content_align %}align-items-start{% endblock %} align-items-md-center justify-content-center">
-            {% block content %}{% endblock %}
+        <div id="wrapper2">
+            <div>
+                {% block content %}{% endblock %}
+            </div>
         </div>
     </div>
     <footer class="position-fixed p-2 w-100 text-center text-white d-none d-md-block" style="font-size: .75rem; bottom: 0; background: linear-gradient(to top, rgba(0,0,0,0.75), rgba(0,0,0,0)); z-index: 10;">

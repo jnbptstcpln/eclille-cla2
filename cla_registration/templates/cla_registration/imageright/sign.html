@@ -67,34 +67,18 @@
             }
         }
 
-        #main {
-            height: 100%;
-            max-height: 85vh;
-            max-width: 700px;
-            width: 100%;
-        }
-        @media (max-width: 768px) {
-            #main {
-                max-height: calc(100% - 1rem);
-            }
-        }
-        @media (min-height: 900px) {
-            #main {
-                max-height: 763px;
-            }
-        }
     </style>
 {% endblock %}
 
 {% block page_title %}Droit à l'image{% endblock %}
 
 {% block content %}
-    <div id="main" class="card w-100">
-        <div class="card-body">
+    <div id="main" style="max-width: 600px" class="card">
+        <div class="card-body w-100">
             <form method="post" class="d-flex flex-column justify-content-between h-100">
                 {% csrf_token %}
-                <div>
-                    <header class="align-items-center justify-content-around">
+                <header class="mb-3">
+                    <div class="d-flex align-items-center justify-content-around w-100">
                         <div>
                             {% if associations.cla.logo %}
                                 <div class="mx-auto logo"
@@ -118,52 +102,55 @@
                                 </div>
                             {% endif %}
                         </div>
-                    </header>
-                </div>
+                    </div>
+                </header>
 
-                <div id="text-content" class="align-items-md-center px-md-5" style="overflow: auto">
-                    <div style="font-size: 0.90rem" class="text-justify">
-                        <p>Je soussigné.e <b>{{ image_right_agreement.fullname }}</b> né.e le <b>{{ image_right_agreement.birthdate|date:'d/m/Y' }}</b> autorise à titre gratuit
-                            l’association <i>Centrale Lille Associations</i> et l’ensemble de ses clubs et commissions ainsi que <i>l’AEEC Lille</i> à :</p>
-                        <ul>
-                            <li>
-                                Me prendre en photo/me filmer lors des divers évènements de la vie étudiante centralienne.
-                            </li>
-                            <li>
-                                Diffuser ces photos/vidéos sur leurs sites internet, sur les réseaux sociaux et par les voies de communication usuelles et documents de <i>Centrale Lille Associations</i> et <i>AEEC Lille</i> sans limitation de durée.
-                            </li>
-                            <li>
-                                Utiliser mon nom et mon prénom dans le cadre de documents officiels créer par <i>Centrale Lille Associations</i> ou <i>AEEC Lille</i>.
-                            </li>
-                        </ul>
-                        <div class="text-center" style="font-size: 0.90rem">
-                            <b>Signé le {% now "d/m/Y" %}, à Villeneuve-d'Ascq</b>
+                <div style="flex: auto; overflow: auto">
+                    <div id="text-content" class="align-items-md-center px-md-5" style="overflow: auto">
+                        <div style="font-size: 0.90rem" class="text-justify">
+                            <p>Je soussigné.e <b>{{ image_right_agreement.fullname }}</b> né.e le <b>{{ image_right_agreement.birthdate|date:'d/m/Y' }}</b> autorise à titre gratuit
+                                l’association <i>Centrale Lille Associations</i> et l’ensemble de ses clubs et commissions ainsi que <i>l’AEEC Lille</i> à :</p>
+                            <ul>
+                                <li>
+                                    Me prendre en photo/me filmer lors des divers évènements de la vie étudiante centralienne.
+                                </li>
+                                <li>
+                                    Diffuser ces photos/vidéos sur leurs sites internet, sur les réseaux sociaux et par les voies de communication usuelles et documents de <i>Centrale Lille Associations</i> et <i>AEEC Lille</i> sans limitation de
+                                    durée.
+                                </li>
+                                <li>
+                                    Utiliser mon nom et mon prénom dans le cadre de documents officiels créer par <i>Centrale Lille Associations</i> ou <i>AEEC Lille</i>.
+                                </li>
+                            </ul>
+                            <div class="text-center" style="font-size: 0.90rem">
+                                <b>Signé le {% now "d/m/Y" %}, à Villeneuve-d'Ascq</b>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div>
-                    <input type="hidden" id="userSignature" name="userSignature" value="" required>
                     <div>
-                        {{ form.signature }}
-                        <span class="d-block text-center mb-2"><i class="far fa-arrow-down"></i> Signez-ici <i class="far fa-arrow-down"></i></span>
-                        <div id="canvas-container" class="pos-relative mx-auto ">
-                            <canvas class="d-block border-1-grey bg-gray-100" height="192" width="384" id="signature">Signature</canvas>
-                            <a id="reset-canvas" href="#" class="btn btn-icon pos-absolute pos-r pos-b text-gray-500 text-hover-dark" style="font-size: .75rem"><i class="far fa-redo-alt"></i></a>
-                            <div id="rotate-phone" class="pos-absolute pos-t pos-l overlay overlay-dark overlay-op-5 w-100 h-100">
-                                <div class="p-3 text-center d-flex align-items-center h-100">
-                                    <div>
-                                        <span class="text-white">Nous vous conseillez de signer avec votre téléphone en mode paysage.</span>
-                                        <div class="mx-auto mt-3" style="max-width: 150px">
-                                            <a href="#" class="btn btn-outline-white btn-block" onclick="$('#rotate-phone').remove(); return false;">Compris</a>
+                        <input type="hidden" id="userSignature" name="userSignature" value="" required>
+                        <div>
+                            {{ form.signature }}
+                            <span class="d-block text-center mb-2"><i class="far fa-arrow-down"></i> Signez-ici <i class="far fa-arrow-down"></i></span>
+                            <div id="canvas-container" class="pos-relative mx-auto ">
+                                <canvas class="d-block border-1-grey bg-gray-100" height="192" width="384" id="signature">Signature</canvas>
+                                <a id="reset-canvas" href="#" class="btn btn-icon pos-absolute pos-r pos-b text-gray-500 text-hover-dark" style="font-size: .75rem"><i class="far fa-redo-alt"></i></a>
+                                <div id="rotate-phone" class="pos-absolute pos-t pos-l overlay overlay-dark overlay-op-5 w-100 h-100">
+                                    <div class="p-3 text-center d-flex align-items-center h-100">
+                                        <div>
+                                            <span class="text-white">Nous vous conseillez de signer avec votre téléphone en mode paysage.</span>
+                                            <div class="mx-auto mt-3" style="max-width: 150px">
+                                                <a href="#" class="btn btn-outline-white btn-block" onclick="$('#rotate-phone').remove(); return false;">Compris</a>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <p class="text-center mt-3">
-                        <button type="submit" class="btn btn-primary btn-lg">Valider</button>
-                    </p>
+                </div>
+                <div class="mt-3">
+                    <button type="submit" class="btn btn-primary btn-block btn-lg">Valider</button>
                 </div>
             </form>
         </div>

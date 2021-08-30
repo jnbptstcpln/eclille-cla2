@@ -9,6 +9,17 @@
             height: var(--size);
         }
 
+        header h1 {
+            font-size: 1.33rem;
+            margin: 0;
+        }
+
+        @media (max-width: 500px) {
+            header h1 {
+                font-size: .90rem;
+            }
+        }
+
         @media (max-width: 410px) {
             header .logo {
                 --size: 50px;
@@ -26,19 +37,47 @@
 {% block page_title %}Droit à l'image{% endblock %}
 
 {% block content %}
-    <div style="max-width: 750px" class="card w-100">
-        <div class="card-body">
+    <div id="main" class="card" style="max-width: 600px; height: initial">
+        <div class="card-body w-100 overflow-auto">
             <div>
+                <header class="mb-3">
+                    <div class="d-flex align-items-center justify-content-around w-100">
+                        <div>
+                            {% if associations.cla.logo %}
+                                <div class="mx-auto logo"
+                                     style="background-image: url('{{ associations.cla.logo.url }}'); background-size: contain; background-repeat: no-repeat; background-position: center"></div>
+                            {% else %}
+                                <div class="d-flex align-items-center justify-content-center mx-auto logo" style="background-color: #aaaaaa">
+                                    <h4 class="m-0 text-uppercase text-gray-700 mx-auto" style="font-size: 1rem">{{ associations.cla.name }}</h4>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <h1 class="text-center"><b>Formulaire de droit à<br>l’image et à l’information</b></h1>
+                        </div>
+                        <div>
+                            {% if associations.bde.logo %}
+                                <div class="mx-auto logo"
+                                     style="background-image: url('{{ associations.bde.logo.url }}'); background-size: contain; background-repeat: no-repeat; background-position: center"></div>
+                            {% else %}
+                                <div class="d-flex align-items-center justify-content-center mx-auto logo" style="background-color: #aaaaaa">
+                                    <h4 class="m-0 text-uppercase text-gray-700" style="font-size: 1rem">{{ associations.bde.name }}</h4>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </header>
 
                 <div class="mx-auto mt-4 mb-4" style="max-width: 500px">
                     <div class="alert alert-success">
                         <p class="mt-0">Votre accord a bien été enregistré.</p>
-                        <p class="mb-0">Le document que vous avez signé sera disponible sur votre compte CLA ou bien à la demande à <a href="mailto:cla@centralelille.fr">cla@centralelille.fr</a></p>
+                        <p class="">Le document que vous avez signé sera disponible sur votre compte CLA ou bien en faisant la demande à l'adresse mail suivante :</p>
+                        <p class="mb-0 text-center"><a href="mailto:cla@centralelille.fr" class="text-success">cla@centralelille.fr</a></p>
                     </div>
                 </div>
 
                 <div class="text-center">
-                    <a class="btn btn-primary" href="{% url "cla_registration:imageright_form" %}">Accéder de nouveau au formulaire</a>
+                    <a class="btn btn-primary btn-lg" href="{% url "cla_registration:imageright_form" %}">Accéder de nouveau au formulaire</a>
                 </div>
             </div>
         </div>

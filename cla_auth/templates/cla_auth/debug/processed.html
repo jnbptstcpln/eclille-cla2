@@ -17,8 +17,8 @@
 {% endblock %}
 
 {% block content %}
-    <div style="max-width: 450px" class="card w-100">
-        <div class="card-body">
+    <div id="main" class="card" style="max-width: 650px; height: initial">
+        <div class="card-body w-100 overflow-auto">
             <form method="post" enctype="multipart/form-data" class="p-2 p-md-4">
                 {% csrf_token %}
                 <h1 class="text-center mb-4">

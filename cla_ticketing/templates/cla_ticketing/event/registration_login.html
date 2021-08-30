@@ -3,9 +3,9 @@
 {% block page_title %}{{ view.event.name }} | Billetteries | CLA{% endblock %}
 
 {% block content %}
-    <div style="max-width: 650px" class="card w-100">
-        <div class="card-body">
-            <div class="mt-4 mt-md-0">
+    <div id="main" class="card" style="max-width: 600px; height: initial">
+        <div class="card-body w-100 overflow-auto">
+            <div>
                 <div class="text-center">
                     <h1 class="text-x1 text-lg-x2">Inscription : {{ event.name }}</h1>
                     <p class="lead mt-3">

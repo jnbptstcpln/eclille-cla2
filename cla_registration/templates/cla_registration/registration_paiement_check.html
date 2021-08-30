@@ -3,41 +3,38 @@
 {% block page_title %}Demande d'adhésion enregistrée | CLA{% endblock %}
 
 {% block content %}
-    <div style="max-width: 650px" class="card w-100">
-        <div class="card-body">
-            <div class="mt-4 mt-md-0">
-                <p class="text-justify">
-                    <b>Votre adhésion ne sera effective qu'après le règlement de votre cotisation d'adhésion.</b>
-                    Pour procéder au paiement par chèque, veuillez utiliser les informations suivantes :
-                </p>
-                <div class="alert alert-blue-dark mx-auto" style="max-width: 300px">
-                    <dl class="dl-horizontal lead mb-0">
-                        <dt>Ordre</dt>
-                        <dd>Centrale Lille Associations</dd>
-                        <dt>Montant</dt>
-                        <dd>{{ registration.contribution }}€</dd>
-                    </dl>
-                </div>
-
-                <p class="text-bold">
-                    <b>N'oubliez pas d'écrire votre prénom et votre nom à l'arrière au verso !</b>
-                </p>
-                <p class="text-justify">
-                    Il ne vous reste plus qu'à déposer le chèque dans la boite aux lettres prévue à cet effet au
-                    local BDX (rez-de-chaussée du bâtiment E de <b>l'école Centrale</b>).
-                </p>
-                <p class="text-justify">
-                    Pour toute question, n'hésitez pas à contacter <a href="mailto:cla@centralelille.fr"><u>cla@centralelille.fr</u></a>
-                </p>
-                <hr>
-                <p class="text-justify">
-                    Vous avez aussi la possibilité de régler votre cotisation d'adhésion en ligne :
-                </p>
-                <p class="text-center mt-4">
-                    <a class="btn btn-primary btn-lg" target="_blank" href="{{ registration.ticketing_href }}">Accéder à la plateforme de paiement</a>
-                </p>
-
+    <div id="main" class="card" style="max-width: 500px; height: initial">
+        <div class="card-body w-100 overflow-auto">
+            <p class="text-justify">
+                <b>Votre adhésion ne sera effective qu'après le règlement de votre cotisation d'adhésion.</b>
+                Pour procéder au paiement par chèque, veuillez utiliser les informations suivantes :
+            </p>
+            <div class="alert alert-blue-dark mx-auto" style="max-width: 300px">
+                <dl class="dl-horizontal lead mb-0">
+                    <dt>Ordre</dt>
+                    <dd>Centrale Lille Associations</dd>
+                    <dt>Montant</dt>
+                    <dd>{{ registration.contribution }}€</dd>
+                </dl>
             </div>
+
+            <p class="text-bold">
+                <b>N'oubliez pas d'écrire votre prénom et votre nom à l'arrière au verso !</b>
+            </p>
+            <p class="text-justify">
+                Il ne vous reste plus qu'à déposer le chèque dans la boite aux lettres prévue à cet effet au
+                local BDX (rez-de-chaussée du bâtiment E de <b>l'école Centrale</b>).
+            </p>
+            <p class="text-justify">
+                Pour toute question, n'hésitez pas à contacter <a href="mailto:cla@centralelille.fr"><u>cla@centralelille.fr</u></a>
+            </p>
+            <hr>
+            <p class="text-justify">
+                Vous avez aussi la possibilité de régler votre cotisation d'adhésion en ligne :
+            </p>
+            <p class="text-center mt-4 mb-3">
+                <a class="btn btn-primary btn-lg" target="_blank" href="{{ registration.ticketing_href }}">Paiement en ligne</a>
+            </p>
         </div>
     </div>
 {% endblock %}

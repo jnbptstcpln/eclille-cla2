@@ -38,30 +38,17 @@
             font-size: .8rem;
             padding: .33rem;
         }
-
-        #main {
-            height: 100%;
-            max-height: 80vh;
-            max-width: 525px;
-            width: 100%;
-        }
-
-        @media (max-width: 768px) {
-            #main {
-                max-height: calc(100% - 1rem);
-            }
-        }
     </style>
 {% endblock %}
 
-{% block page_title %}Entrées | {{ party.name }} | CLA{% endblock %}
+{% block page_title %}Validation | {{ party.name }} | CLA{% endblock %}
 
 {% block background_image_url %}{% static "cla_ticketing/img/sd1_blur.jpg" %}{% endblock %}
 
 {% block content %}
-    <div id="main" class="card w-100">
-        <div class="card-body">
-            <div class="d-flex flex-column justify-content-between h-100 mx-auto" style="max-width: 450px">
+    <div id="main" class="card" style="max-width: 525px">
+        <div class="card-body w-100">
+            <div class="d-flex flex-column justify-content-between h-100 w-100 mx-auto" style="max-width: 450px">
                 <div class="text-center">
                     <h2>Billetterie</h2>
                     <h1>{{ party.name }}</h1>
@@ -132,7 +119,9 @@
                                         {% endif %}
                                     </label>
                                     {% if cs_value.value.name %}
-                                        <iframe src="{{ cs_value.value.url }}" class="mx-auto w-100" height="450" width="450"></iframe>
+                                        <div class="alert alert-info">
+                                            <i class="fas fa-file-upload mr-1"></i> Document en attente de validation
+                                        </div>
                                     {% else %}
                                         {% if registration.validated and cs.delete_file_after_validation %}
                                             <div class="alert alert-success">

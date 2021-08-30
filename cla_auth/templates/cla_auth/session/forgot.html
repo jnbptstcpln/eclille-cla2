@@ -4,11 +4,26 @@
 
 {% block content_align %}align-items-center{% endblock %}
 
+{% block css %}
+    {{ block.super }}
+    <style>
+        #wrapper2 > div {
+            height: initial;
+        }
+
+        @media (max-height: 500px) {
+            #wrapper2 > div {
+                height: 100%;
+            }
+        }
+    </style>
+{% endblock %}
+
 {% block content %}
-    <div style="max-width: 650px" class="card w-100">
-        <div class="card-body">
+    <div id="main" class="card" style="max-width: 600px; height: initial">
+        <div class="card-body w-100 overflow-auto">
             <div class="mt-4 mt-md-0">
-                <h1 class="text-x1 text-lg-x2 text-center"><span style="font-size: 140%">J'ai oublié...</span></h1>
+                <h1 class="text-center"><span style="font-size: 1.75rem">J'ai oublié...</span></h1>
                 <div class="row mt-4">
                     <div class="col-12 col-md-6">
                         <a class="btn btn-primary btn-block btn-lg" href="{% url "cla_auth:forgot_username" %}">Mon identifiant</a>

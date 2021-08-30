@@ -21,7 +21,7 @@
             color: #3a3a3a;
         }
 
-        p, ul {
+        p {
             font-size: .85rem;
         }
     </style>
@@ -32,20 +32,10 @@
 {% block background_image_url %}{% static "cla_ticketing/img/sd1_blur.jpg" %}{% endblock %}
 
 {% block content %}
-    <div id="main" class="card overflow-auto" style="max-width: 525px; height: initial">
+    <div id="main" class="card" style="max-width: 600px; height: initial">
         <div class="card-body w-100 overflow-auto">
             <div>
-                <div class="text-center">
-                    <h2>Billetterie</h2>
-                    <h1>{{ party.name }}</h1>
-                </div>
-                <div class="mt-3 mx-auto" style="max-width: 300px">
-                    <p><b>Malheureusement votre réservation n'a pas pu être effectuée :</b></p>
-                    <p class="text-center">{{ message }}</p>
-                </div>
 
-
-                <p style="font-size: .75rem" class="text-center mt-3 mb-0"><a href="{% url "cla_ticketing:party_view" party.slug %}" style="color: var(--dark)">Revenir en arrière</a></p>
             </div>
         </div>
     </div>

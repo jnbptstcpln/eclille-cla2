@@ -4,9 +4,24 @@
 
 {% block content_align %}align-items-center{% endblock %}
 
+{% block css %}
+    {{ block.super }}
+    <style>
+        #wrapper2 > div {
+            height: initial;
+        }
+
+        @media (max-height: 500px) {
+            #wrapper2 > div {
+                height: 100%;
+            }
+        }
+    </style>
+{% endblock %}
+
 {% block content %}
-    <div style="max-width: 400px" class="card w-100">
-        <div class="card-body">
+    <div id="main" class="card" style="max-width: 400px; height: initial">
+        <div class="card-body w-100 overflow-auto">
             <form method="post" action="{% url "cla_auth:login" %}" class="p-2 p-md-4">
                 <h1 class="text-center mb-4">
                         <span class="cla_logo" style="transform: scale(1.25)">

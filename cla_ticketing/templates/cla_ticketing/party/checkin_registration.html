@@ -38,13 +38,14 @@
             font-size: .8rem;
             padding: .33rem;
         }
-        
+
         #main {
             height: 100%;
             max-height: 80vh;
             max-width: 525px;
             width: 100%;
         }
+
         @media (max-width: 768px) {
             #main {
                 max-height: calc(100% - 1rem);
@@ -58,9 +59,9 @@
 {% block background_image_url %}{% static "cla_ticketing/img/sd1_blur.jpg" %}{% endblock %}
 
 {% block content %}
-    <div id="main" class="card w-100">
-        <div class="card-body">
-            <div class="d-flex flex-column justify-content-between h-100">
+    <div id="main" class="card" style="max-width: 525px">
+        <div class="card-body w-100">
+            <div class="d-flex flex-column h-100">
                 <div class="text-center">
                     <h2>Billetterie</h2>
                     <h1>{{ party.name }}</h1>
