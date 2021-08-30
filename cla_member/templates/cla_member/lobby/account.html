@@ -38,5 +38,16 @@
                 </div>
             </div>
         </div>
+
+        <div class="mt-5">
+            <div class="mx-auto" style="max-width: 400px">
+                {% with image_right_agreement=user.infos.get_image_right_agreement %}
+                    {% if image_right_agreement.file.name %}
+                        <a class="btn btn-outline-dark btn-block" target="_blank" href="{{ image_right_agreement.file.url }}">Formulaire de droit à<br class="d-md-none"> l'image et à l'information</a>
+                    {% endif %}
+                    <a class="btn btn-outline-dark btn-block" href="{% url "cla_auth:logout" %}">Déconnexion</a>
+                {% endwith %}
+            </div>
+        </div>
     </div>
 {% endblock %}

@@ -74,6 +74,15 @@
                                         <a href="{% url "cla_member:lobby" %}" class="nav-link">Espace adhérent</a>
                                     </li>
                                 {% endif %}
+                                {% if request.user.is_authenticated %}
+                                    <li class="nav-item">
+                                        <a href="{% url "cla_auth:logout" %}" class="nav-link">Déconnexion</a>
+                                    </li>
+                                {% else %}
+                                    <li class="nav-item">
+                                        <a href="{% url "cla_auth:login" %}?next={{ request.path }}" class="nav-link">Connexion</a>
+                                    </li>
+                                {% endif %}
                             </ul>
                         </div>
                         <!--/.navbar-collapse -->

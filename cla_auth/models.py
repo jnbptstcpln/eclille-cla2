@@ -3,6 +3,7 @@ import os
 import uuid
 import jwt
 
+from cla_registration.models import ImageRightAgreement
 from cla_web.utils import random_six_digits
 
 from django.conf import settings
@@ -162,6 +163,9 @@ class UserInfos(models.Model):
 
     def get_active_membership(self):
         return UserMembership.objects.filter(user=self.user, refunded_on__isnull=True).order_by("-paid_on").first()
+
+    def get_image_right_agreement(self):
+        return ImageRightAgreement.objects.filter(email_school=self.email_school, created_on__year=self.user.date_joined.year).first()
 
     @property
     def activation_jwt(self):

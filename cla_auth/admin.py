@@ -44,7 +44,7 @@ class UserAdmin(UserAdmin):
         can_delete = False
 
         def image_right_agreement(self, obj: UserInfos):
-            image_right_agreement = ImageRightAgreement.objects.filter(email_school=obj.email_school, created_on__year=obj.user.date_joined.year).first()
+            image_right_agreement = obj.get_image_right_agreement()
             if image_right_agreement and image_right_agreement.file.name:
                 return mark_safe(f"<a href='{image_right_agreement.file.url}' target='_blank'>Voir</a>")
             return "Aucun document correspondant"
