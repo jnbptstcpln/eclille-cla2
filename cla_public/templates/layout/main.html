@@ -75,11 +75,11 @@
                                     </li>
                                 {% endif %}
                                 {% if request.user.is_authenticated %}
-                                    <li class="nav-item">
+                                    <li class="nav-item d-block d-lg-none">
                                         <a href="{% url "cla_auth:logout" %}" class="nav-link">Déconnexion</a>
                                     </li>
                                 {% else %}
-                                    <li class="nav-item">
+                                    <li class="nav-item d-block d-lg-none">
                                         <a href="{% url "cla_auth:login" %}?next={{ request.path }}" class="nav-link">Connexion</a>
                                     </li>
                                 {% endif %}
