@@ -64,16 +64,9 @@
                                 <li class="nav-item">
                                     <a href="https://bds-centralelille.fr" class="nav-link">Sports</a>
                                 </li>
-                                {% if not request.user.is_authenticated %}
-                                    <li class="nav-item {% if page_active == "registration" %}active{% endif %}">
-                                        <a href="{% url "cla_registration:register_introduction" %}" class="nav-link">Adhérer</a>
-                                    </li>
-                                {% endif %}
-                                {% if request.user.infos %}
-                                    <li class="nav-item {% if page_active == "cla_member" %}active{% endif %}">
-                                        <a href="{% url "cla_member:lobby" %}" class="nav-link">Espace adhérent</a>
-                                    </li>
-                                {% endif %}
+                                <li class="nav-item {% if page_active == "cla_member" %}active{% endif %}">
+                                    <a href="{% url "cla_member:lobby" %}" class="nav-link">Espace adhérent</a>
+                                </li>
                                 {% if request.user.is_authenticated %}
                                     <li class="nav-item d-block d-lg-none">
                                         <a href="{% url "cla_auth:logout" %}" class="nav-link">Déconnexion</a>
