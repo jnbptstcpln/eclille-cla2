@@ -230,7 +230,7 @@ class UserAdmin(UserAdmin):
     def save_model(self, request, obj: User, form, change):
         super().save_model(request, obj, form, change)
 
-        if hasattr(obj, 'infos'):
+        if hasattr(obj, 'infos') and not change:
             messages.success(request, f"Un mail de bienvenue a été envoyé à {obj.infos.email_school} avec un lien d'activation")
 
     def user_reset_password(self, req, id, form_url=''):
