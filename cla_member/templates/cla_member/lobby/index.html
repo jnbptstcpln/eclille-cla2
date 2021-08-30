@@ -1,3 +1,4 @@
+
 {% extends 'cla_member/lobby/_layout.html' %}
 
 {% block page_title %}Espace adhérent | CLA{% endblock %}
@@ -16,7 +17,7 @@
             <h3 class="mt-0 mb-3" style="font-size: 1.25rem">Inscriptions aux événements</h3>
             <div class="row">
                 {% for event in events %}
-                    <div class="col-6 col-lg-4">
+                    <div class="col-12 col-md-6 col-lg-4">
                         <div class="card card-body bg-gradient bg-shadow">
                             <h5 class="text-center text-grey" style="font-size: .95rem; letter-spacing: .05rem;">{{ event.event_starts_on|date:"d/m/Y H:i" }}</h5>
                             <h4 class="card-title mb-3 text-center">
@@ -27,7 +28,7 @@
                     </div>
                 {% endfor %}
                 {% for party in parties %}
-                    <div class="col-6 col-lg-4">
+                    <div class="col-12 col-md-6 col-lg-4">
                         <div class="card card-body bg-gradient bg-shadow">
                             <h5 class="text-center text-grey-dark" style="font-size: .90rem; letter-spacing: .05rem;">{{ party.event_starts_on|date:"d/m/Y H:i" }}</h5>
                             <h4 class="card-title mb-3 text-center">
@@ -46,7 +47,7 @@
             <h3 class="mt-0 mb-3" style="font-size: 1.25rem">Sites web associatifs</h3>
             <div class="row">
                 {% for website in websites %}
-                    <div class="col-6 col-lg-4 customer type-media">
+                    <div class="col-12 col-md-6 col-lg-4 customer type-media">
                         <div class="card mb-4 bg-gradient bg-shadow">
                             <div class="pt-3 px-3">
                                 {% if website.visual %}
@@ -71,7 +72,7 @@
                                         </a>
                                         {% if website.service %}
                                             <a href="{% url "cla_auth:service_authenticate" website.service.identifier %}" class="btn btn-blue-dark btn-block mt-1">
-                                                Se connecter <span class="d-none d-sm-none d-md-none d-xl-inline">avec CLA</span> <i class="far fa-user ml-1"></i>
+                                                Se connecter <span class="d-inline d-md-none d-xl-inline">avec CLA</span> <i class="far fa-user ml-1"></i>
                                             </a>
                                         {% endif %}
                                     </div>
