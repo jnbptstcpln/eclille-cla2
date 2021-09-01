@@ -7,7 +7,7 @@ from cla_registration.forms import RegistrationForm, RegistrationPackForm
 def register_introduction(req):
     return render(
         req,
-        "cla_registration/introduction.html",
+        "cla_registration/registration/introduction.html",
         {
             'page_active': "registration"
         }
@@ -24,14 +24,14 @@ class AbstractRegistrationView(CreateView):
     contribution = None
     school_domain = None
     registration_type = None
-    template_name = "cla_registration/register.html"
+    template_name = "cla_registration/registration/register.html"
     ticketing_field = ""
     description = None
 
     def dispatch(self, request, *args, **kwargs):
         self.current_registration_session = RegistrationSession.objects.get_current_registration_session()
         if self.current_registration_session is None:
-            return render(request, "cla_registration/registration_closed.html")
+            return render(request, "cla_registration/registration/registration_closed.html")
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
@@ -117,9 +117,9 @@ class ITEEMCLARegistrationView(AbstractRegistrationView):
 
 class RegistrationPaiementView(DetailView):
     model = Registration
-    template_name = "cla_registration/registration_paiement.html"
+    template_name = "cla_registration/registration/registration_paiement.html"
 
 
 class RegistrationPaiementCheckView(DetailView):
     model = Registration
-    template_name = "cla_registration/registration_paiement_check.html"
+    template_name = "cla_registration/registration/registration_paiement_check.html"
