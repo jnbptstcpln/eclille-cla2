@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, resolve_url
 from django.views.generic import CreateView, DetailView
 from cla_registration.models import RegistrationSession, Registration
 from cla_registration.forms import RegistrationForm, RegistrationPackForm
@@ -26,6 +26,7 @@ class AbstractRegistrationView(CreateView):
     registration_type = None
     template_name = "cla_registration/registration/register.html"
     ticketing_field = ""
+    registration: Registration = None
     description = None
 
     def dispatch(self, request, *args, **kwargs):
@@ -35,20 +36,20 @@ class AbstractRegistrationView(CreateView):
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
-        registration = form.save(False)
-        if self.current_registration_session.registrations.filter(email_school=registration.email_school).count() == 0:
-            registration.session = self.current_registration_session
-            registration.type = self.registration_type
-            registration.school = self.school_domain
-            registration.contribution = self.contribution
-            registration.pack = self.pack
+        self.registration = form.save(False)
+        if self.current_registration_session.registrations.filter(email_school=self.registration.email_school).count() == 0:
+            self.registration.session = self.current_registration_session
+            self.registration.type = self.registration_type
+            self.registration.school = self.school_domain
+            self.registration.contribution = self.contribution
+            self.registration.pack = self.pack
             if self.is_from_another_school:
-                registration.original_school = form.cleaned_data.get('original_school')
-            registration.save()
+                self.registration.original_school = form.cleaned_data.get('original_school')
+            self.registration.save()
         else:
-            registration = self.current_registration_session.registrations.filter(email_school=registration.email_school).first()
+            self.registration = self.current_registration_session.registrations.filter(email_school=self.registration.email_school).first()
 
-        return redirect("cla_registration:register_paiement", registration.pk)
+        return super().form_valid(form)
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -61,9 +62,16 @@ class AbstractRegistrationView(CreateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({
-            'description': self.description
+            'description': self.description,
+            'back_href': self.get_back_url()
         })
         return context
+
+    def get_success_url(self):
+        return resolve_url("cla_registration:register_paiement", self.registration.pk)
+
+    def get_back_url(self):
+        return resolve_url("cla_registration:register_introduction")
 
 
 class AbstractPackRegistrationView(AbstractRegistrationView):

@@ -1,0 +1,81 @@
+{% extends "layout/standalone.html" %}
+
+{% block page_title %}Demande d'adhésion enregistrée | CLA{% endblock %}
+
+{% block css %}
+    {{ block.super }}
+    <style>
+        p {
+            font-size: 0.9rem;
+        }
+
+        h1 img {
+            width: 50px;
+        }
+
+        h1 {
+            font-size: 1.1rem;
+        }
+
+        @media (min-width: 1000px) {
+            h1 img {
+                width: 75px;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div id="main" class="card" style="max-width: 500px; height: initial">
+        <div class="card-body w-100 overflow-auto">
+            <div class="alert alert-success text-center p-1">
+                <p class="lead mt-3">
+                    Ta demande d'adhésion <br>a bien été enregistrée !
+                </p>
+            </div>
+            <p class="text-justify">
+                Il ne te reste plus qu'à procéder au règlement de ta cotisation
+                d'adhésion dont le montant s'élève à {{ object.contribution }}€
+            </p>
+            <h3 style="font-size: 1rem" class="mt-4">
+                Plusieurs mode de paiement sont possible. Quelques soit celui que tu choisis, rapproche-toi
+                de notre stand une fois ton paiement effectué.
+            </h3>
+
+            <div class="border-1-grey rounded-15 mt-3 p-4">
+                <h4 class="text-center">Payer par chèque</h4>
+                <p>Tu peux le préparer avec les informations suivantes :</p>
+                <dl>
+                    <dt>Ordre</dt>
+                    <dd>Centrale Lille Associations</dd>
+                    <dt>Montant</dt>
+                    <dd>{{ object.contribution }}€</dd>
+                </dl>
+                <p class="mb-0">
+                    N'oublie pas d'écrire ton nom et prénom au dos et
+                    rapproche toi de notre stand une fois ton chèque prêt
+                </p>
+            </div>
+
+            <div class="border-1-grey rounded-15 mt-3 p-4">
+                <h4 class="text-center">Payer en espèce</h4>
+                <p class="mb-0">
+                    Rapproches toi de notre stand pour procéder au paiement
+                </p>
+            </div>
+
+            <div class="border-1-grey rounded-15 mt-3 p-4">
+                <h4 class="text-center">Payer par carte bancaire ou Pumpkin</h4>
+                <p class="mb-3">
+                    Accède à la plateforme de paiement à l'aide du lien suivant et
+                    rapproche toi de notre stand une fois le paiement effecté.
+                </p>
+                <a href="{{ object.ticketing_href }}" target="_blank" class="btn btn-primary btn-block mt-2">Paiement en ligne</a>
+            </div>
+        </div>
+    </div>
+{% endblock %}

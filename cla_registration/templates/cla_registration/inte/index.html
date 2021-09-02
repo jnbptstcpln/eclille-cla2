@@ -1,0 +1,181 @@
+{% extends "layout/standalone.html" %}
+{% load static %}
+
+{% block page_title %}Adhérer | CLA{% endblock %}
+
+{% block css %}
+    {{ block.super }}
+    <style>
+        p {
+            font-size: 0.9rem;
+        }
+
+        h1 img {
+            width: 50px;
+        }
+
+        h1 {
+            font-size: 1.1rem;
+        }
+
+        @media (min-width: 1000px) {
+            h1 img {
+                width: 75px;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div id="main" style="max-width: 650px" class="card">
+        <div class="card-body w-100">
+            <form method="post" class="d-flex flex-column justify-content-center h-100">
+                <div style="flex: auto; overflow: auto">
+
+                    <h1 class="d-flex align-items-center justify-content-center mb-4">
+                        <div class="mr-2">
+                            <img src="{% static "app/img/logo/cla.png" %}" style="max-width: 100%">
+                        </div>
+                        <div>
+                            Bienvenue sur le formulaire<br>
+                            de pré-adhésion à CLA
+                        </div>
+                    </h1>
+                    <p class="text-justify">
+                        <b>
+                            <i>Centrale Lille Associations</i>, ou CLA, est la principale association étudiante du
+                            Centrale Lille Institut regroupant les différents bureaux (BDE, BDA, BDS) ainsi que de nombreux
+                            clubs et commission tel que le foyer.
+                        </b>
+                    </p>
+                    <p class="text-justify">
+                        Pour simplifier ton intégration au sein de notre univers associatif, c'est-à-dire pratiquer
+                        ton ou tes sports favoris, te rendre au foyer et participer aux soirées ou encore rejoindre
+                        l'un des nombreux clubs de l'école, <b>une unique cotisation d'adhésion te sera demandée pour toute
+                        ta scolarité.</b>
+                    </p>
+                    <p class="text-justify">
+                        En parallèle de cette simple adhésion, CLA s'est associée avec <i>Centrale Lille Alumni</i>, l'association des diplômés
+                        de Centrale Lille, pour <b>te donner l'opportunité d'intégrer dès le début de ta scolarité le vaste réseau professionnel
+                        des ingénieurs centraliens en bénéficiant d'une réduction à travers le pack CLA+Alumni.</b>
+                    </p>
+                    <p class="text-justify">
+                        En fonction de ton profil, découvre ci-dessous les différentes options que nous te proposons pour rejoindre
+                        notre univers associatif :
+                    </p>
+
+                    <h3 style="font-size: 1rem" class="mt-4">
+                        Tu viens d'intégrer Centrale Lille par concours ou admission
+                        sur titre pour le cursus d'ingénieur en 3 ans
+                    </h3>
+                    <div class="p-4 border-1-grey rounded-10">
+                        <h4 class="text-center">
+                            <div style="text-transform: uppercase;letter-spacing: .05rem;font-size: .8rem;color: #3a3a3a;">Option 1</div>
+                            <div class="mt-1 mb-1">Adhérer à CLA</div>
+                            <div style="font-size: 0.75rem">270€ pour toute ta scolarité</div>
+                        </h4>
+                        <ul style="font-size: .75rem">
+                            <li>Participation à la vie associative de l'école</li>
+                            <li>Possibilité de pratiquer les sports proposés par le BDS</li>
+                            <li>Tarifs préférentiels sur de nombreux événements</li>
+                        </ul>
+                        <div class="mt-2">
+                            <a href="{% url "cla_registration:inte_cla_centrale" %}" class="btn btn-secondary btn-block">Continuer</a>
+                        </div>
+                    </div>
+                    <div class="p-4 border-1-grey rounded-10 mt-3">
+                        <h4 class="text-center">
+                            <div style="text-transform: uppercase;letter-spacing: .05rem;font-size: .8rem;color: #3a3a3a;">Option 2</div>
+                            <div class="mt-1 mb-1">Pack CLA+Alumni</div>
+                            <div style="font-size: 0.75rem">355€ pour toute ta scolarité</div>
+                        </h4>
+                        <ul style="font-size: .80rem">
+                            <li>
+                                Adhésion à <i>Centrale Lille Associations</i> :
+                                <ul>
+                                    <li>Participation à la vie associative de l'école</li>
+                                    <li>Possibilité de pratiquer les sports proposés par le BDS</li>
+                                    <li>Tarifs préférentiels sur de nombreux événements</li>
+                                </ul>
+                            </li>
+                            <li>
+                                Adhésion à <i>Centrale Lille Alumni</i> :
+                                <ul>
+                                    <li>Accès à l’ensemble des services carrière des alumni (stage, job)</li>
+                                    <li>Mentorat</li>
+                                    <li>Contacts centraliens à travers toute la France et le monde entier</li>
+                                    <li>Evénements, conférences professionnelles, etc.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <div class="mt-2">
+                            <a href="{% url "cla_registration:inte_pack_centrale" %}" class="btn btn-primary btn-block">Continuer</a>
+                        </div>
+                    </div>
+
+                    <h3 style="font-size: 1rem" class="mt-4">
+                        Tu viens d'intégrer Centrale Lille en double diplôme
+                        depuis l'EDHEC ou une université partenaire
+                    </h3>
+                    <div class="p-4 border-1-grey rounded-10">
+                        <h4 class="text-center">
+                            <div style="text-transform: uppercase;letter-spacing: .05rem;font-size: .8rem;color: #3a3a3a;">Option 1</div>
+                            <div class="mt-1 mb-1">Adhérer à CLA</div>
+                            <div style="font-size: 0.75rem">180€ pour toute ta scolarité</div>
+                        </h4>
+                        <ul style="font-size: .75rem">
+                            <li>Participation à la vie associative de l'école</li>
+                            <li>Possibilité de pratiquer les sports proposés par le BDS</li>
+                            <li>Tarifs préférentiels sur de nombreux événements</li>
+                        </ul>
+                        <div class="mt-2">
+                            <a href="{% url "cla_registration:inte_cla_centrale_dd" %}" class="btn btn-secondary btn-block">Continuer</a>
+                        </div>
+                    </div>
+                    <div class="p-4 border-1-grey rounded-10 mt-3">
+                        <h4 class="text-center">
+                            <div style="text-transform: uppercase;letter-spacing: .05rem;font-size: .8rem;color: #3a3a3a;">Option 2</div>
+                            <div class="mt-1 mb-1">Pack CLA+Alumni</div>
+                            <div style="font-size: 0.75rem">265€ pour toute ta scolarité</div>
+                        </h4>
+                        <ul style="font-size: .80rem">
+                            <li>
+                                Adhésion à <i>Centrale Lille Associations</i> :
+                                <ul>
+                                    <li>Participation à la vie associative de l'école</li>
+                                    <li>Possibilité de pratiquer les sports proposés par le BDS</li>
+                                    <li>Tarifs préférentiels sur de nombreux événements</li>
+                                </ul>
+                            </li>
+                            <li>
+                                Adhésion à <i>Centrale Lille Alumni</i> :
+                                <ul>
+                                    <li>Accès à l’ensemble des services carrière des alumni (stage, job)</li>
+                                    <li>Mentorat</li>
+                                    <li>Contacts centraliens à travers toute la France et le monde entier</li>
+                                    <li>Evénements, conférences professionnelles, etc.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <div class="mt-2">
+                            <a href="{% url "cla_registration:inte_pack_centrale_dd" %}" class="btn btn-primary btn-block">Continuer</a>
+                        </div>
+                    </div>
+
+                    <div class="p-3 mt-4">
+                        <div>
+                            <h3 style="font-size: 1.25rem" class="mb-1">Une question ?</h3>
+                            <p class="m-0">
+                                N'hésite pas à nous solliciter à notre stand
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
