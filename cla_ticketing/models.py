@@ -83,6 +83,11 @@ class AbstractRegistration(models.Model):
         CONTRIBUTOR = 'contributor', 'Cotisant'
         NON_CONTRIBUTOR = 'non_contributor', 'Non cotisant'
 
+    class MeansOfPaiement(models.TextChoices):
+        PUMPKIN = "pumpkin", "Pumpkin"
+        MONEY_CHECK = "money_check", "Chèque"
+        CASH = "cash", "Liquide"
+
     user = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="+", verbose_name="Utilisateur", help_text="Laisser vide si l'inscrit n'est pas un cotisant", null=True, blank=True)
     student_status = models.CharField(max_length=20, choices=StudentStatus.choices, verbose_name="Statut de l'étudiant", editable=False)
     first_name = models.CharField(max_length=150, verbose_name="Prénom")
@@ -92,6 +97,7 @@ class AbstractRegistration(models.Model):
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="+", verbose_name="Créateur de cette inscription", editable=False, null=True)
     created_on = models.DateTimeField(auto_now_add=True, editable=False, verbose_name="Inscrit le")
     paid = models.BooleanField(default=False, verbose_name="A payé")
+    mean_of_paiement = models.CharField(max_length=100, verbose_name="Moyen de paiement", choices=MeansOfPaiement.choices, null=True, blank=True)
 
     def __str__(self):
         return f"{self.last_name.upper()} {self.first_name}"

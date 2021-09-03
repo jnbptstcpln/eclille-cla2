@@ -763,9 +763,9 @@ class DancingPartyRegistrationAdmin(admin.ModelAdmin):
         registration_type = self.get_registration_type(request, obj)
         fields = []
         if registration_type == "contributor":
-            fields += ['ticket_label', 'user', 'type', 'home', ('paid', 'validated')]
+            fields += ['ticket_label', 'user', 'type', 'home', 'mean_of_paiement', ('paid', 'validated')]
         elif registration_type == "non_contributor":
-            fields += ['ticket_label', ('first_name', 'last_name'), ('email', 'phone'), 'birthdate', 'home', 'type', 'guarantor', ('paid', 'validated')]
+            fields += ['ticket_label', ('first_name', 'last_name'), ('email', 'phone'), 'birthdate', 'type', 'guarantor', 'home', 'mean_of_paiement', ('paid', 'validated')]
         elif registration_type == "staff":
             fields += ['ticket_label', 'user', 'staff_description', 'paid']
 
@@ -791,7 +791,7 @@ class DancingPartyRegistrationAdmin(admin.ModelAdmin):
 
         # Set field requirements
         form = context.get('adminform').form
-        non_required_set = {'paid', 'validated'}.union(set([cf.field_id for cf in party.custom_fields.all()]))
+        non_required_set = {'paid', 'validated', 'mean_of_paiement'}.union(set([cf.field_id for cf in party.custom_fields.all()]))
         for name, field in form.fields.items():
             field.required = True if name not in non_required_set else False
 
@@ -869,7 +869,6 @@ class DancingPartyRegistrationAdmin(admin.ModelAdmin):
             "checkin": redirect("cla_ticketing:party_checkin_registration", obj.dancing_party.slug, obj.pk),
             "validation": redirect(resolve_url("cla_ticketing:party_validate", obj.dancing_party.slug)+f"?registration_pk={obj.pk}")
         }.get(request.GET.get('redirect'), redirect("admin:cla_ticketing_dancingparty_change", obj.dancing_party.pk))
-
 
     def response_delete(self, request, obj_display, obj_id):
         party = self.get_party(request)
