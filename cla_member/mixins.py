@@ -33,6 +33,13 @@ class ClaMemberModuleMixin(LoginRequiredMixin):
                 'href': resolve_url("cla_member:associations")
             })
 
+        if self.request.user.has_perm("cla_auth.upload_user_picture"):
+            sections.append({
+                'id': "photos",
+                'label': "Photos de profil",
+                'href': resolve_url("cla_member:upload_pictures")
+            })
+
         if self.request.user.is_staff:
             sections.append({
                 'id': "admin",

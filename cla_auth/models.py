@@ -23,13 +23,17 @@ class FilePath:
     @classmethod
     def _path(cls, instance, pathlist, filename):
         ext = filename.split('.')[-1]
-        filename = "%s-%s.%s" % (slugify(instance.name), uuid.uuid4(), ext)
+        filename = "%s-%s.%s" % (instance.email_school, uuid.uuid4(), ext)
         pathlist.append(filename)
         return os.path.join(*pathlist)
 
     @classmethod
     def picture(cls, instance, filename):
         return cls._path(instance, ["cla_auth", "user", "picture"], filename)
+
+    @classmethod
+    def picture_compressed(cls, instance, filename):
+        return cls._path(instance, ["cla_auth", "user", "picture_compressed"], filename)
 
 
 class UserInfos(models.Model):
@@ -44,6 +48,7 @@ class UserInfos(models.Model):
             ('manage_user_validation', "Accès au processus de validation des comptes"),
             ('manage_user_password', "Accès au processus de réinitialisation des mots de passes"),
             ('autocomplete_user', "Accès à la fonctionnalité d'autocomplétion sur les champs utilisateur"),
+            ('upload_user_picture', "Accès à la fonctionnalité de mise en ligne des photos utilisateurs"),
         )
 
     class AccountType(models.TextChoices):
@@ -135,9 +140,15 @@ class UserInfos(models.Model):
     activated_on = models.DateTimeField(verbose_name="Date d'activation du compte", null=True)
     valid_until = models.DateTimeField(verbose_name="Compte valide jusqu'au", null=True)
     original_school = models.CharField(max_length=255, null=True, verbose_name="École/université d'origine")
-    picture = ResizedImageField(
+    picture = models.ImageField(
         verbose_name="Photo de profil",
         upload_to=FilePath.picture,
+        null=True,
+        blank=True
+    )
+    picture_compressed = ResizedImageField(
+        verbose_name="Photo de profil compressée",
+        upload_to=FilePath.picture_compressed,
         size=[500, 500],
         quality=90,
         force_format="JPEG",
@@ -402,7 +413,6 @@ class PasswordResetRequestManager(models.Manager):
 
 
 class PasswordResetRequest(models.Model):
-
     class Meta:
         ordering = "created_on",
 
@@ -448,7 +458,6 @@ class ValidationRequest(models.Model):
 
 
 class UserMembership(models.Model):
-
     class Meta:
         verbose_name = "Cotisation"
 
@@ -472,7 +481,6 @@ class UserMembership(models.Model):
 
 
 class Service(models.Model):
-
     class Meta:
         verbose_name = "Service"
         ordering = "name",
