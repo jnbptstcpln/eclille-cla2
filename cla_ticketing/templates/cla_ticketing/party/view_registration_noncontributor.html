@@ -1,4 +1,4 @@
-{% extends "layout/standalone.html" %}
+{% extends "layout/standalone_legacy.html" %}
 {% load static qr_code %}
 
 {% block css %}
@@ -57,7 +57,7 @@
 {% block background_image_url %}{% static "cla_ticketing/img/sd1_blur.jpg" %}{% endblock %}
 
 {% block content %}
-    <div id="main" style="max-width: 525px; height: initial" class="card">
+    <div id="main" style="max-width: 650px; height: initial" class="card">
         <div class="card-body w-100 overflow-auto">
             <div>
                 <div class="text-center">
