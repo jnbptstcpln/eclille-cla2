@@ -29,6 +29,13 @@ ALLOWED_HOSTS = config("ALLOWED_HOSTS").split(",")
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
+
+# Admins
+
+ADMINS = [(x, x) for x in config("ADMINS", "").split(',')]
+SERVER_EMAIL = config("EMAIL_FROM")
+
+
 # Application definition
 
 INSTALLED_APPS = [
