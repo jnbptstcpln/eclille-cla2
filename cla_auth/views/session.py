@@ -7,12 +7,14 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.template.loader import render_to_string
 from django.utils import timezone
+from django.views.decorators.csrf import csrf_protect
 
 from cla_web.middlewares import StayLoggedInMiddleware
 from cla_auth.models import PasswordResetRequest
 from cla_auth.forms.session import LoginForm, ForgotForm
 
 
+@csrf_protect
 def login(req):
 
     if req.user.is_authenticated:
@@ -80,6 +82,7 @@ def forgot_username(req):
     if req.user.is_authenticated:
         return redirect('cla_member:lobby')
 
+    username = None
     if req.method == "POST":
         form = ForgotForm(req.POST)
         if form.is_valid():
@@ -90,7 +93,6 @@ def forgot_username(req):
                 pass
     else:
         form = ForgotForm()
-        username = None
 
     return render(
         req,
