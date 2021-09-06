@@ -1,5 +1,6 @@
 import csv
 from django.contrib import admin
+from django.contrib.admin import SimpleListFilter
 from django.contrib.auth.models import User
 from django.http import HttpRequest, HttpResponse
 from django_admin_inline_paginator.admin import TabularInlinePaginated
@@ -10,6 +11,7 @@ from django.shortcuts import resolve_url, get_object_or_404
 from django.urls import path
 from django.utils.safestring import mark_safe
 
+from cla_web.utils import current_school_year
 from .models import RegistrationSession, Registration, ImageRightAgreement
 from .views.admin import RegistrationValidationView, RegistrationSessionExportView
 
@@ -183,6 +185,22 @@ class RegistrationSessionAdmin(admin.ModelAdmin):
 
 @admin.register(ImageRightAgreement)
 class ImageRightAgreementAdmin(admin.ModelAdmin):
+
+    class YearFilter(SimpleListFilter):
+        title = 'année'
+        parameter_name = 'promo'
+
+        def lookups(self, request, model_admin):
+            y = current_school_year()
+            return [(y-i, y-i) for i in range(4)]
+
+        def queryset(self, request, queryset):
+            if self.value() is not None:
+                return queryset.filter(created_on__year=self.value())
+            else:
+                return queryset
+
+    list_filter = (YearFilter,)
 
     fields = (
         'created_on',
