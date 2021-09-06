@@ -135,9 +135,10 @@ class AbstractRegistrationDetailView(IsContributorMixin, DancingPartyRegistratio
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.registration = self.get_registration()
-        if self.registration is None:
-            raise Http404()
+        if request.user.is_authenticated:
+            self.registration = self.get_registration()
+            if self.registration is None:
+                raise Http404()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
