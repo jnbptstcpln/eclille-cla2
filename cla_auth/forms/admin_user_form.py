@@ -4,6 +4,7 @@ from django.utils.text import slugify
 from django.contrib.auth.forms import UserChangeForm as Auth_UserChangeForm
 
 from cla_auth.models import PasswordResetRequest
+from cla_auth.utils import create_username
 
 
 class UserCreationForm(forms.ModelForm):
@@ -23,7 +24,7 @@ class UserCreationForm(forms.ModelForm):
         user = super().save(commit=False)
         _first_name = self.cleaned_data['first_name'].replace(' ', '').replace('-', '')
         _last_name = self.cleaned_data['last_name'].replace(' ', '').replace('-', '')
-        user.username = f"{slugify(_first_name)}.{slugify(_last_name)}"
+        user.username = create_username(_first_name, _last_name)
         if commit:
             user.save()
         return user

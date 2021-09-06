@@ -8,7 +8,7 @@ from django.shortcuts import render, redirect, reverse, get_object_or_404
 from django.http import HttpRequest, HttpResponseNotAllowed, Http404, HttpResponse
 from django.utils import timezone
 
-
+from cla_auth.utils import create_username
 from cla_registration.models import Registration, RegistrationSession
 from cla_registration.forms import RegistrationAdminForm
 from cla_auth.models import UserInfos, UserMembership
@@ -33,7 +33,7 @@ class RegistrationValidationView(UserPassesTestMixin, generic.FormView):
     def form_valid(self, form):
         # Creating user object
         user = User(
-            username=f"{slugify(form.cleaned_data['first_name'])}.{slugify(form.cleaned_data['last_name'])}",
+            username=create_username(form.cleaned_data['first_name'], form.cleaned_data['last_name']),
             first_name=form.cleaned_data['first_name'],
             last_name=form.cleaned_data['last_name'],
             email=form.cleaned_data['email']
