@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, re_path
 
 from cla_ticketing.views import event
 from cla_ticketing.views import party
@@ -7,9 +7,11 @@ app_name = "cla_ticketing"
 urlpatterns = [
 
     path("evenements/<str:event_slug>", event.EventRegistrationView.as_view(), name="event_ticketing"),
+    path("evenements/<str:event_slug>/", event.EventRegistrationView.as_view(), name="event_ticketing"),
     path("evenements/<str:event_slug>/nonmember", event.EventRegistrationNonMemberView.as_view(), name="event_ticketing_non_member"),
 
     path("<str:party_slug>", party.DancingPartyView.as_view(), name="party_view"),
+    path("<str:party_slug>/", party.DancingPartyView.as_view(), name="party_view"),
 
     path("<str:party_slug>/inscription/cotisant", party.ContributorRegistrationCreateView.as_view(), name="party_register_contributor"),
     path("<str:party_slug>/inscription/non-cotisant", party.NonContributorRegistrationCreateView.as_view(), name="party_register_noncontributor"),
