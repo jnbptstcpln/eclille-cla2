@@ -1,3 +1,4 @@
+from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect, resolve_url
 from django.views.generic import CreateView, DetailView
 from cla_registration.models import RegistrationSession, Registration
@@ -49,7 +50,8 @@ class AbstractRegistrationView(CreateView):
         else:
             self.registration = self.current_registration_session.registrations.filter(email_school=self.registration.email_school).first()
 
-        return super().form_valid(form)
+        self.registration.save()
+        return HttpResponseRedirect(self.get_success_url())
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
