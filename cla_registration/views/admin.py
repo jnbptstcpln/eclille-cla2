@@ -57,7 +57,9 @@ class RegistrationValidationView(UserPassesTestMixin, generic.FormView):
             user=user,
             amount=form.cleaned_data['amount'],
             paid_on=form.cleaned_data['paid_on'],
-            paid_by=form.cleaned_data['paid_by']
+            paid_by=form.cleaned_data['paid_by'],
+            paid_validated=form.cleaned_data['paid_validated'],
+            paiement_method=form.cleaned_data['paiement_method']
         )
         membership.save()
 

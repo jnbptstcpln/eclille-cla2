@@ -98,7 +98,9 @@ class RegistrationAdminForm(forms.ModelForm):
             'promo',
             'amount',
             'paid_on',
-            'paid_by'
+            'paid_by',
+            'paiement_method',
+            'paid_validated'
         ]
 
     def __init__(self, *args, **kwargs):
@@ -114,7 +116,9 @@ class RegistrationAdminForm(forms.ModelForm):
     promo = forms.IntegerField(label="Promotion")
     amount = forms.IntegerField(label="Montant de la cotisation")
     paid_on = forms.DateField(label="Date du paiement")
-    paid_by = forms.ChoiceField(choices=UserMembership.MeanOfPayment.choices)
+    paid_by = forms.ChoiceField(label="Moyen de paiement", choices=UserMembership.MeanOfPayment.choices)
+    paiement_method = forms.ChoiceField(label="Méthode de paiement", choices=UserMembership.PaymentMethod.choices)
+    paid_validated = forms.BooleanField(label="Paiement effectué", required=False, help_text="Ne pas cocher si le paiement sera effectué plus tard, pour les virements par exemple")
 
 
 class ImageRightForm(forms.ModelForm):
