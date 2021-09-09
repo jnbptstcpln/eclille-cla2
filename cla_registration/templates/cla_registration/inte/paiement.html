@@ -42,8 +42,9 @@
                 d'adhésion dont le montant s'élève à {{ object.contribution }}€
             </p>
             <h3 style="font-size: 1rem" class="mt-4">
-                Plusieurs mode de paiement sont possible. Quelques soit celui que tu choisis, rapproche-toi
-                de notre stand une fois ton paiement effectué.
+                Plusieurs mode de paiement sont possible. Quelques soit celui que tu choisis,
+                <b>rapproche-toi de notre stand avant de continuer le parcours pour que l'on
+                    puisse valider ton adhésion.</b>
             </h3>
 
             <div class="border-1-grey rounded-15 mt-3 p-4">
@@ -55,27 +56,56 @@
                     <dt>Montant</dt>
                     <dd>{{ object.contribution }}€</dd>
                 </dl>
+                <p>
+                    N'oublie pas d'écrire ton nom et prénom au dos.
+                </p>
                 <p class="mb-0">
-                    N'oublie pas d'écrire ton nom et prénom au dos et
-                    rapproche toi de notre stand une fois ton chèque prêt
+                    <b>Rapproches toi de notre stand pour procéder à la validation de ton adhésion.</b>
                 </p>
             </div>
 
             <div class="border-1-grey rounded-15 mt-3 p-4">
                 <h4 class="text-center">Payer en espèce</h4>
                 <p class="mb-0">
-                    Rapproches toi de notre stand pour procéder au paiement
+                    <b>Rapproches toi de notre stand pour procéder à la validation de ton adhésion.</b>
                 </p>
             </div>
 
             <div class="border-1-grey rounded-15 mt-3 p-4">
-                <h4 class="text-center">Payer par carte bancaire ou Pumpkin</h4>
-                <p class="mb-3">
-                    Accède à la plateforme de paiement à l'aide du lien suivant et
-                    rapproche toi de notre stand une fois le paiement effecté.
+                <h4 class="text-center">Payer par virement</h4>
+                <p>Utilise les informations suivante pour effectuer ton virement :</p>
+                <dl>
+                    <dt>IBAN</dt>
+                    <dd>FR76 1670 6050 8753 9202 7749 390</dd>
+                    <dt>Montant</dt>
+                    <dd>{{ object.contribution }}€</dd>
+                </dl>
+                <p class="mt-1 mb-1">
+                    Une fois le virement effectué, envoie un mail à <a href="mailto:cla@centralelille.fr">cla@centralelille.fr</a> avec comme
+                    objet <code>Adhésion NOM Prénom - Preuve virement</code> et une capture d'écran du virement effectué.
                 </p>
-                <a href="{{ object.ticketing_href }}" target="_blank" class="btn btn-primary btn-block mt-2">Paiement en ligne</a>
+                <p class="mt-1 mb-1">
+                    Si tu ne peux pas effectuer le virement tout de suite, nous te donnons un délai de 7 jours.
+                </p>
+                <p class="mb-0">
+                    <b>Rapproches toi de notre stand pour procéder à la validation de ton adhésion.</b>
+                </p>
             </div>
+
+            {% if object.ticketing_href %}
+                <div class="border-1-grey rounded-15 mt-3 p-4">
+                    <h4 class="text-center">Payer par carte bancaire ou Pumpkin</h4>
+                    <p class="mb-3">
+                        Accède à la plateforme de paiement à l'aide du lien suivant et
+                        rapproche toi de notre stand une fois le paiement effecté.
+                    </p>
+                    <a href="{{ object.ticketing_href }}" target="_blank" class="btn btn-primary btn-block mt-2">Paiement en ligne</a>
+                    <p class="mb-0">
+                        <b>Rapproches toi de notre stand pour procéder à la validation de ton adhésion.</b>
+                    </p>
+                </div>
+            {% endif %}
+
         </div>
     </div>
 {% endblock %}
