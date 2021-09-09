@@ -1,0 +1,31 @@
+<html>
+<head>
+    <title>[Nouvelle Adhésion] {{ registration.get_school_display }} {{ registration.last_name|upper }} {{ registration.first_name }}</title>
+    <meta charset="utf-8">
+    <style>
+
+    </style>
+</head>
+<body>
+<p>
+    Une demande d'adhésion vient d'être réalisée sur le site.
+</p>
+<p>
+    <b>Nom :</b> {{ registration.last_name }}<br>
+    <b>Prénom :</b> {{ registration.first_name }}<br>
+    <b>Ecole :</b> {{ registration.get_school_display }}<br>
+    <b>Type :</b> {{ registration.get_type_display }}<br>
+    <b>Pack :</b> {{ registration.pack|yesno }}<br>
+    <b>Montant :</b> {{ registration.contribution }}<br>
+</p>
+<p>
+    Accéder à l'aide du lien suivant à la campagne pour en savoir plus et valider l'adhésion :
+</p>
+<p>
+    <a href="{{ campaign_href }}">{{ campaign_href }}</a>
+</p>
+<p>
+
+</p>
+</body>
+</html>

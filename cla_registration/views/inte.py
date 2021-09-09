@@ -12,19 +12,19 @@ class IndexView(CurrentRegistrationSessionMixin, TemplateView):
 
 
 class PackRegistrationView(InteRegistrationMixin, CentralePackRegistrationView):
-    pass
+    send_email_notification = False
 
 
 class PackDDRegistrationView(InteRegistrationMixin, CentralePackDDRegistrationView):
-    pass
+    send_email_notification = False
 
 
 class CLARegistrationView(InteRegistrationMixin, CentraleCLARegistrationView):
-    pass
+    send_email_notification = False
 
 
 class CLADDRegistrationView(InteRegistrationMixin, CentraleCLADDRegistrationView):
-    pass
+    send_email_notification = False
 
 
 class RegistrationPaiementView(DetailView):
