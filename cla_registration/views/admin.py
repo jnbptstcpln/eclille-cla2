@@ -130,6 +130,21 @@ class RegistrationSessionExportView(UserPassesTestMixin, generic.View):
             headers={'Content-Disposition': 'attachment; filename="Campagne d\'adhésion ' + str(session.school_year) + '.csv"'},
         )
 
+        def get_mean_of_paiement(x: Registration):
+            if x.account is not None:
+                if hasattr(x.account, "membership"):
+                    output = x.account.membership.get_paid_by_display()
+                    output += f" - {x.account.membership.get_paiement_method_display()}" if x.account.membership.paiement_method is not None else ""
+                return "Aucune cotisation enregistrée"
+            return "N'a pas encore payé"
+
+        def get_paiement_validation(x: Registration):
+            if x.account is not None:
+                if hasattr(x.account, "membership"):
+                    return "Oui" if x.account.membership.paid_validated else "Non"
+                return "---"
+            return "---"
+
         fields = {
             "Nom": lambda x: x.last_name,
             "Prénom": lambda x: x.first_name,
@@ -144,6 +159,8 @@ class RegistrationSessionExportView(UserPassesTestMixin, generic.View):
             "Montant de la cotisation": lambda x: f"{x.contribution}€",
             "A choisi le pack": lambda x: "Oui" if x.pack else "Non",
             "A réglé sa cotisation": lambda x: "Oui" if x.account is not None else "Non",
+            "Moyen de paiement": get_mean_of_paiement,
+            "Paiement validé": get_paiement_validation,
             "Référence adhésion": lambda x: x.pk
         }
 

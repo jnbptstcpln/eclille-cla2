@@ -53,7 +53,8 @@ class UserAdmin(UserAdmin):
     class MembershipInline(admin.StackedInline):
         model = UserMembership
         fields = (
-            ('amount', 'paid_on', 'paid_by'),
+            ('amount', 'paid_validated'),
+            ('paid_by', 'paiement_method', 'paid_on'),
             ('refunded', 'refunded_amount', 'refunded_on')
         )
         extra = 0

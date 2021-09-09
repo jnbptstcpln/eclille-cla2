@@ -468,10 +468,20 @@ class UserMembership(models.Model):
         TRANSFER = 'transfer', 'Virement'
         CARD = 'card', 'Carte bancaire'
 
+    class PaymentMethod(models.TextChoices):
+        CASH = 'cash', 'En une fois'
+        MONTH_2 = 'month-2', 'En 2 fois (étalé sur 2 mois)'
+        MONTH_3 = 'month-3', 'En 3 fois (étalé sur 3 mois)'
+        MONTH_4 = 'month-4', 'En 4 fois (étalé sur 4 mois)'
+        MONTH_5 = 'month-5', 'En 5 fois (étalé sur 5 mois)'
+        MONTH_6 = 'month-6', 'En 6 fois (étalé sur 6 mois)'
+
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="membership", to_field="username")
     amount = models.PositiveIntegerField(verbose_name="Montant de la cotisation", blank=True)
     paid_on = models.DateField(verbose_name="Date de paiement", null=True, blank=True)
     paid_by = models.CharField(max_length=100, choices=MeanOfPayment.choices, verbose_name="Moyen de paiement", blank=True)
+    paid_validated = models.BooleanField(default=False, verbose_name="Paiement validé")
+    paiement_method = models.CharField(max_length=100, choices=PaymentMethod.choices, verbose_name="Méthode de paiement", blank=True, null=True)
     refunded = models.BooleanField(default=False, blank=True, verbose_name="La cotisation a été remboursée")
     refunded_amount = models.PositiveIntegerField(null=True, blank=True, verbose_name="Montant remboursé")
     refunded_on = models.DateField(null=True, blank=True, verbose_name="Date du remboursement")
