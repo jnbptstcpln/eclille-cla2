@@ -137,6 +137,7 @@ class RegistrationSessionExportView(UserPassesTestMixin, generic.View):
                 if hasattr(x.account, "membership"):
                     output = x.account.membership.get_paid_by_display()
                     output += f" - {x.account.membership.get_paiement_method_display()}" if x.account.membership.paiement_method is not None else ""
+                    return output
                 return "Aucune cotisation enregistrée"
             return "N'a pas encore payé"
 
