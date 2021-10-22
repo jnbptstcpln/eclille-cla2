@@ -138,6 +138,7 @@ class DancingPartyExportView(UserPassesTestMixin, generic.View):
             "Adresse mail": lambda x: x.email,
             "Numéro de téléphone": lambda x: x.phone,
             "Date de naissance": lambda x: x.birthdate.strftime("%Y-%m-%d"),
+            "Cursus": lambda x: x.user.infos.cursus if x.user is not None and hasattr(x.user, 'infos') else "Non précisé",
             "Logement en fin de soirée": lambda x: x.home,
             "Date inscription": lambda x: x.created_on.strftime("%Y-%m-%d %H:%M:%S"),
             "Type de place": lambda x: f"{x.get_student_status_display()} {x.get_type_display().lower()}" if not x.is_staff else f"Staff : {x.staff_description}",
