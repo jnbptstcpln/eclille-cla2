@@ -132,13 +132,21 @@ class DancingPartyExportView(UserPassesTestMixin, generic.View):
             headers={'Content-Disposition': 'attachment; filename="' + str(self.party.name) + '.csv"'},
         )
 
+        def get_cursus(x: DancingPartyRegistration):
+            if x.user and hasattr(x.user, 'infos'):
+                return x.user.infos.cursus
+            elif x.guarantor and hasattr(x.guarantor, 'infos'):
+                return x.guarantor.infos.cursus
+            else:
+                return "Non précisé"
+
         fields = {
             "Nom": lambda x: x.last_name,
             "Prénom": lambda x: x.first_name,
             "Adresse mail": lambda x: x.email,
             "Numéro de téléphone": lambda x: x.phone,
             "Date de naissance": lambda x: x.birthdate.strftime("%Y-%m-%d"),
-            "Cursus": lambda x: x.user.infos.cursus if x.user is not None and hasattr(x.user, 'infos') else "Non précisé",
+            "Cursus": get_cursus,
             "Logement en fin de soirée": lambda x: x.home,
             "Date inscription": lambda x: x.created_on.strftime("%Y-%m-%d %H:%M:%S"),
             "Type de place": lambda x: f"{x.get_student_status_display()} {x.get_type_display().lower()}" if not x.is_staff else f"Staff : {x.staff_description}",
