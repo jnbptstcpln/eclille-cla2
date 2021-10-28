@@ -14,6 +14,7 @@ from django.utils.html import mark_safe, escape
 from django.conf import settings
 from django.utils import timezone
 
+from cla_registration.views.admin import MembershipProofView
 from cla_web.utils import current_school_year
 from cla_auth.forms.admin_user_form import UserCreationForm, UserChangeForm
 from cla_registration.models import Registration, ImageRightAgreement
@@ -48,17 +49,27 @@ class UserAdmin(UserAdmin):
             if image_right_agreement and image_right_agreement.file.name:
                 return mark_safe(f"<a href='{image_right_agreement.file.url}' target='_blank'>Voir</a>")
             return "Aucun document correspondant"
+
         image_right_agreement.short_description = 'Formulaire de droit à l\'image'
 
     class MembershipInline(admin.StackedInline):
         model = UserMembership
         fields = (
-            ('amount', 'paid_validated'),
+            ('amount', 'paid_validated', 'proof'),
             ('paid_by', 'paiement_method', 'paid_on'),
             ('refunded', 'refunded_amount', 'refunded_on')
         )
+        readonly_fields = ("proof",)
         extra = 0
         min_num = 0
+
+        def proof(self, obj: UserMembership):
+            return mark_safe(
+                (
+                    "<a href='{}' target='_blank'>Accéder</a>"
+                ).format(resolve_url('admin:auth_user_membership', obj.user.pk))
+            )
+        proof.short_description = 'Attestation de cotisation'
 
     fieldsets = (
         (
@@ -116,7 +127,7 @@ class UserAdmin(UserAdmin):
 
         def lookups(self, request, model_admin):
             y = current_school_year()
-            return [(y+i, y+i) for i in range(6)]
+            return [(y + i, y + i) for i in range(6)]
 
         def queryset(self, request, queryset):
             if self.value() is not None:
@@ -144,23 +155,28 @@ class UserAdmin(UserAdmin):
 
     def email_school(self, obj: User):
         return obj.infos.email_school
+
     email_school.short_description = 'Email école'
 
     def cursus(self, obj: User):
         return obj.infos.cursus
+
     cursus.short_description = 'Cursus'
 
     def promo(self, obj: User):
         return obj.infos.promo
+
     promo.short_description = 'Promotion'
 
     def is_activated(self, obj: User):
         return obj.infos.activated_on is not None
+
     is_activated.short_description = 'Compté activé'
     is_activated.boolean = True
 
     def is_validated(self, obj: User):
         return obj.infos.valid_until is not None and obj.infos.valid_until > timezone.now()
+
     is_validated.short_description = 'Compte validé'
     is_validated.boolean = True
 
@@ -182,6 +198,7 @@ class UserAdmin(UserAdmin):
                 )
         else:
             return "Ce compte n'est qu'un compte de gestion"
+
     account_status.short_description = 'Statut du compte'
 
     def link_reset(self, obj: User):
@@ -192,6 +209,7 @@ class UserAdmin(UserAdmin):
                 "<a class='button' onclick='document.getElementById(\"id_reset_jwt\").select();document.execCommand(\"copy\");return false;','>Copier</a>"
             ).format(reset_jwt=f"https://{settings.ALLOWED_HOSTS[0]}{resolve_url('cla_auth:reset', obj.infos.reset_request.get_reset_jwt(exp=False))}")
         )
+
     link_reset.short_description = ""
 
     def link_activation(self, obj: User):
@@ -202,9 +220,10 @@ class UserAdmin(UserAdmin):
                 "<a class='button' onclick='document.getElementById(\"id_activation_jwt\").select();document.execCommand(\"copy\");return false;','>Copier</a>"
             ).format(activation_jwt=f"https://{settings.ALLOWED_HOSTS[0]}{resolve_url('cla_auth:activate', obj.infos.activation_jwt)}")
         )
+
     link_activation.short_description = 'Activation du compte'
 
-    def get_fieldsets(self, request, obj: User=None):
+    def get_fieldsets(self, request, obj: User = None):
         fieldsets = copy.deepcopy(super().get_fieldsets(request, obj))
         if obj is not None:
             # Il est nécessaire d'avoir la permission `manage_user_activation` pour accéder au lien d'activation du compte
@@ -221,12 +240,17 @@ class UserAdmin(UserAdmin):
 
     def get_urls(self):
         return [
-               path(
-                   '<id>/password-reset',
-                   self.admin_site.admin_view(self.user_reset_password),
-                   name='auth_user_password_reset',
-               ),
-           ] + super().get_urls()
+                   path(
+                       '<id>/password-reset',
+                       self.admin_site.admin_view(self.user_reset_password),
+                       name='auth_user_password_reset',
+                   ),
+                   path(
+                       '<pk>/preuve-cotisation',
+                       self.admin_site.admin_view(MembershipProofView.as_view()),
+                       name='auth_user_membership',
+                   ),
+               ] + super().get_urls()
 
     def save_model(self, request, obj: User, form, change):
         super().save_model(request, obj, form, change)
@@ -248,7 +272,7 @@ class UserAdmin(UserAdmin):
         messages.success(req, "Lien de réinitialisation de mot de passe créé, il est disponible en haut de cette page")
         return redirect(f"{self.admin_site.name}:{user._meta.app_label}_{user._meta.model_name}_change", user.pk)
 
-    def has_view_permission(self, request: HttpRequest, obj: User=None):
+    def has_view_permission(self, request: HttpRequest, obj: User = None):
         perm = super().has_view_permission(request, obj)
         if request.user.has_perm("cla_auth.autocomplete_user"):  # Allow user with `cla_auth:autocomplete_user` to access user list
             perm = True
@@ -294,6 +318,7 @@ class ServiceAdmin(admin.ModelAdmin):
                 for ticket in obj.tickets.all().order_by("-created_on")[:20]
             ]
         )))
+
     last_tickets.short_description = ''
 
     def get_fieldsets(self, request, obj=None):

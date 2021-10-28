@@ -1,0 +1,84 @@
+<html>
+<head>
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,500,600,700" rel="stylesheet" type="text/css">
+    <style>
+        body {
+            font-family: "Open Sans", sans-serif;
+        }
+
+        ul li:not(:last-child) {
+            margin-bottom: .2cm;
+        }
+
+        @page {
+            size: A4 portrait; /* can use also 'landscape' for orientation */
+            margin: 2cm 1cm 2cm 1cm;
+            @top-left {
+                content: element(header);
+            }
+            @bottom-left {
+                content: element(footer);
+            }
+        }
+    </style>
+</head>
+<body>
+<header>
+    <div style="display: flex; justify-content: space-between">
+        <div>
+            {% if associations.cla.logo %}
+                <img src="{{ associations.cla.logo.url }}" style="width: 3cm; height: 3cm; margin: auto;">
+            {% endif %}
+        </div>
+        <div style="text-align: right">
+            <p style="margin-bottom: .33rem">
+                <b>Association "Centrale Lille Associations"</b>
+            </p>
+            <p style="margin-bottom: .1rem">
+                Cité Scientifique - CS 20048
+            </p>
+            <p style="margin-bottom: .1rem">
+                59651 - Villeneuve d’Ascq
+            </p>
+            <p style="margin-bottom: .1rem">
+                <a href="mailto:cla@centralelille.fr">cla@centralelille.fr</a>
+            </p>
+        </div>
+    </div>
+</header>
+<div>
+    <div style="text-align: center; margin-top: 2cm; margin-bottom: 1cm">
+        <h1>Reçu de paiement</h1>
+        <h2>Règlement de la cotisation</h2>
+    </div>
+    <div style="padding: 0 1cm; text-align: justify;">
+        <p>
+            Je, soussigné {{ treasurer.user.first_name }} {{ treasurer.user.last_name }}, agissant en tant que Trésorier du conseil d'administration de Centrale Lille Associations,
+            <b>déclare avoir reçu la somme de {{ membership.amount }}€ de la part de {{ membership.user.first_name }} {{ membership.user.last_name }}</b>,
+            né le {{ membership.user.infos.birthdate|date:'d/m/Y' }} et étudiant au sein du Centrale Lille Institut, comme frais d’acquittement de sa cotisation
+            à Centrale Lille Associations.
+        </p>
+        <p>
+            <b>L’étudiant est de ce fait membre de Centrale Lille Associations</b>, ainsi que de l’Association des Elèves ou de l’Association des Iteemiens selon sa situation,
+            de l’Association Culturelle et de l’Association Sportive. Il peut adhérer librement à tout club et à toute commission de Centrale Lille Associations, et a accès à toutes
+            les installations sportives mises à la disposition des étudiants de l’école ainsi qu’au foyer. Et ce tant qu’il reste membre de Centrale Lille Associations.
+        </p>
+        <p>
+            Pour faire valoir ce que de droit.
+        </p>
+    </div>
+    <div style="padding: 0 1cm; text-align: right;">
+        <p style="margin-bottom: .33rem">
+            Fait à Villeneuve d’Ascq, le {% now 'd/m/Y' %}
+        </p>
+        <p style="margin-bottom: .1rem">
+            {{ treasurer.user.first_name }} {{ treasurer.user.last_name }}
+        </p>
+        <p style="margin-bottom: .1rem">
+            Trésorier du Conseil d’Administration
+        </p>
+    </div>
+</div>
+<footer></footer>
+</body>
+</html>

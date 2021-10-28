@@ -1,4 +1,6 @@
 import csv
+
+from django.template.loader import render_to_string
 from django.views import generic
 from django.contrib import admin, messages
 from django.contrib.auth.mixins import UserPassesTestMixin
@@ -7,7 +9,10 @@ from django.contrib.auth.models import User
 from django.shortcuts import render, redirect, reverse, get_object_or_404
 from django.http import HttpRequest, HttpResponseNotAllowed, Http404, HttpResponse
 from django.utils import timezone
+from django_weasyprint import WeasyTemplateResponseMixin
+from weasyprint import HTML
 
+from cla_association.models import Association, AssociationMember
 from cla_auth.utils import create_username
 from cla_registration.models import Registration, RegistrationSession
 from cla_registration.forms import RegistrationAdminForm
@@ -173,3 +178,30 @@ class RegistrationSessionExportView(UserPassesTestMixin, generic.View):
             writer.writerow([field_processing(registration) for field_processing in fields.values()])
 
         return response
+
+
+class MembershipProofView(WeasyTemplateResponseMixin, UserPassesTestMixin, generic.DetailView):
+    model = User
+    membership: UserMembership = None
+    template_name = "cla_registration/admin/membership_pdf.html"
+
+    def test_func(self):
+        return self.request.user.has_perm("cla_registration.view_registration")
+
+    def get_context_data(self, **kwargs):
+
+        if not hasattr(self.object, 'infos'):
+            raise Http404()
+
+        if not self.object.infos.has_active_membership():
+            raise Http404()
+
+        self.membership = self.object.infos.get_active_membership()
+
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'user': self.object,
+            'membership': self.membership,
+            'treasurer': Association.objects.get_cla().members.filter(_role=AssociationMember.Roles.TREASURER).first()
+        })
+        return context
