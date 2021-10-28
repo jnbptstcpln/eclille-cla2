@@ -202,6 +202,9 @@ class MembershipProofView(WeasyTemplateResponseMixin, UserPassesTestMixin, gener
         context.update({
             'user': self.object,
             'membership': self.membership,
-            'treasurer': Association.objects.get_cla().members.filter(_role=AssociationMember.Roles.TREASURER).first()
+            'treasurer': Association.objects.get_cla().members.filter(_role=AssociationMember.Roles.TREASURER).first(),
+            'associations': {
+                'cla': Association.objects.get_cla()
+            }
         })
         return context
