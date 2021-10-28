@@ -66,6 +66,7 @@ class UserInfos(models.Model):
         IE4 = 'ie4', 'IE4'
         IE5 = 'ie5', 'IE5'
         ALUMNI_ITEEM = 'alumni-iteem', 'Diplomé de l\'ITEEM'
+        PHD = 'phd', 'Doctorant'
 
     class CursusChoices(models.TextChoices):
 
@@ -126,6 +127,12 @@ class UserInfos(models.Model):
         IE5_DIPLOME = "IE5-DIPLOME", 'Diplomé de l\ITEEM'
 
         # # # # # # # # #
+        #  DOCTORANTS   #
+        # # # # # # # # #
+
+        CENTRALE_PHD = "CENTRALE-PHD", 'Doctorant'
+
+        # # # # # # # # #
         # CURSUS  AUTRE #
         # # # # # # # # #
         AUTRE = "Autre", "Autre cursus"
@@ -162,6 +169,9 @@ class UserInfos(models.Model):
 
     def is_from_iteem(self):
         return re.match(r'^IE\d.*', self.cursus)
+
+    def is_phd(self):
+        return self.cursus == self.CursusChoices.CENTRALE_PHD
 
     def is_activated(self):
         return self.activated_on is not None
@@ -230,6 +240,8 @@ class UserInfos(models.Model):
             return self.Colleges.IE1_IE2
         elif self.promo == current_school_year() + 5:
             return self.Colleges.IE1_IE2
+        elif self.cursus == self.CursusChoices.CENTRALE_PHD:
+            return self.Colleges.PHD
 
     @property
     def next_cursus_choices(self):
@@ -377,6 +389,12 @@ class UserInfos(models.Model):
             class NextCursusChoices(models.TextChoices):
                 IE5 = self.CursusChoices.IE5.value, self.CursusChoices.IE5.label
                 IE5_DIPLOME = self.CursusChoices.IE5_DIPLOME.value, self.CursusChoices.IE5_DIPLOME.label
+
+            return NextCursusChoices
+
+        elif self.cursus in {self.CursusChoices.CENTRALE_PHD}:
+            class NextCursusChoices(models.TextChoices):
+                CENTRALE_PHD = self.CursusChoices.CENTRALE_PHD.value, self.CursusChoices.CENTRALE_PHD.label
 
             return NextCursusChoices
 
