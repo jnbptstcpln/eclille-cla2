@@ -97,8 +97,8 @@ class UserInfos(models.Model):
         G3_GEC = "G3-GEC", "G3 en mobilité intercentrale"
         G3_DD_EDHEC = "G3-DD-EDHEC", "Double diplôme avec l'EDHEC"
         G3_DD_SCIENCESPO = "G3-DD-SCIENCESPO", "Double diplôme avec Sciences Po"
-        G3_DD_INTERNATIONAL = "DD-INTERNATIONAL", "Double diplôme internationnal"
-        G3_DD_FRANCE = "DD-FRANCE", "Double diplôme en France"
+        G3_DD_INTERNATIONAL = "G3-DD-INTERNATIONAL", "Double diplôme internationnal"
+        G3_DD_FRANCE = "G3-DD-FRANCE", "Double diplôme en France"
 
         G3_DIPLOME_DD_EDHEC = "G3-DIPLOME-DD-EDHEC", "Diplomé DD EDHEC"
         G3_DIPLOME_DD_INTERNATIONAL = "G3-DIPLOME-DD-INTERNATIONAL", "Diplomé DD Internationnal"
