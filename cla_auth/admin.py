@@ -114,13 +114,14 @@ class UserAdmin(UserAdmin):
             return [(1, "Compte validé"), (2, "Compte activé")]
 
         def queryset(self, request, queryset):
-            val = int(self.value())
-            if val == 1:
-                return queryset.filter(infos__valid_until__gt=timezone.now())
-            elif val == 2:
-                return queryset.filter(infos__activated_on__isnull=False)
-            else:
-                return queryset
+            raw_val = self.value()
+            if raw_val is not None:
+                val = int(raw_val)
+                if val == 1:
+                    return queryset.filter(infos__valid_until__gt=timezone.now())
+                elif val == 2:
+                    return queryset.filter(infos__activated_on__isnull=False)
+            return queryset
 
     class PromotionFilter(SimpleListFilter):
         title = 'promotion'
