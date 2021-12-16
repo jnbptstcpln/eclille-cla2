@@ -85,7 +85,7 @@ def authenticate(req, identifier):
         return authorize(req, identifier)
 
     # Check if the account lost its validation since last login if needed
-    if service.validation_required and req.user.last_login <= req.user.infos.valid_until <= timezone.now():
+    if service.validation_required and not req.user.infos.is_valid():
         return render(
             req,
             "cla_auth/service/validate_alert_standalone.html",
