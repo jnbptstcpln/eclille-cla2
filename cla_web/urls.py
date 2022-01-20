@@ -37,6 +37,8 @@ urlpatterns = [
     path('espace-adherent/', include("cla_member.urls")),
     path('billetteries/', include("cla_ticketing.urls")),
     path('associations/', include("cla_association.urls")),
+    path('evenements/', include("cla_event.urls")),
+    path('reservations/', include("cla_reservation.urls")),
 
     # Flat pages
     path('privacy/', views.flatpage, {'url': '/privacy/'}, name='privacy'),

@@ -1,0 +1,40 @@
+{% extends "cla_association/manage/_layout.html" %}
+
+{% block page_title %}Événements | {{ association.name }} | Mes associations | CLA{% endblock %}
+
+{% block section_title %}Événements{% endblock %}
+
+{% block section_content %}
+    <p class="text-justify">
+        Cette page regroupe tous les événements de votre association auxquelles sont associées les différentes réservations
+        du foyer, du synthé ou du barbecue.
+    </p>
+    <p class="text-justify">
+        Vous pouvez dès à présent créer votre événement ici pour l'afficher dans le planning générale et procéder à la réservation
+        des infrastructures nécessaires.
+    </p>
+
+    <div class="row mt-5">
+        {% for folder in association.handover_folders.all %}
+            <div class="col-12 col-lg-4">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h5 class="text-uppercase text-gray-500" style="font-size: 1rem; letter-spacing: .05rem">{{ member.role }}</h5>
+                        <h4>{{ member.user.first_name }} {{ member.user.last_name }}</h4>
+                        <p class="mb-0" style="font-size: .75rem">
+                            <a href="mailto:{{ member.user.infos.email_school }}">{{ member.user.infos.email_school }}</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12 col-lg-6 offset-lg-3">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h4 class="mb-0" style="font-size: 1rem">Aucun dossier disponible</h4>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

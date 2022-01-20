@@ -3,12 +3,11 @@ import uuid
 
 from django.contrib.auth.models import User
 from django.db import models
-from django.shortcuts import redirect, resolve_url
-from multiselectfield import MultiSelectField
+from django.shortcuts import resolve_url
 from django_resized import ResizedImageField
+from django_summernote.fields import SummernoteTextField
 
 from cla_auth.models import UserInfos, Service
-from django_summernote.fields import SummernoteTextField
 
 
 class FilePath:

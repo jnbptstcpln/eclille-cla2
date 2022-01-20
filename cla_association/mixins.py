@@ -31,9 +31,9 @@ class AssociationManageMixin:
                 'href': resolve_url("cla_association:manage:change", self.association.slug)
             },
             {
-                'id': "booking",
-                'label': "Réservations",
-                'href': resolve_url("cla_member:ticketing")
+                'id': "events",
+                'label': "Événements",
+                'href': resolve_url("cla_event:association:list", self.association.slug)
             },
             {
                 'id': "managers",

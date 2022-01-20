@@ -60,9 +60,11 @@
                 </ul>
             </div>
             <div class="col col-md-9">
-                <h2 style="font-size: 1.5rem">{% block section_title %}__SECTION_TITLE__{% endblock %}</h2>
+                <div class="px-md-4">
+                    <h2 style="font-size: 1.5rem">{% block section_title %}__SECTION_TITLE__{% endblock %}</h2>
 
-                {% block section_content %}__SECTION_CONTENT__{% endblock %}
+                    {% block section_content %}__SECTION_CONTENT__{% endblock %}
+                </div>
             </div>
         </div>
     </div>

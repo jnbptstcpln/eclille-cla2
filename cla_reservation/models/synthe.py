@@ -1,0 +1,85 @@
+from datetime import datetime, timedelta
+
+from django.contrib.auth.models import User
+from django.db import models
+from django_summernote.fields import SummernoteTextField
+
+from cla_event.models import Event
+
+
+class SportActivity(models.Model):
+
+    class Meta:
+        verbose_name = "[SYNTHE] Sport ou activité"
+        verbose_name_plural = "[SYNTHE] Sports ou activités"
+        ordering = "name",
+
+    name = models.CharField(max_length=50, verbose_name="Nom")
+    description = models.CharField(max_length=255, blank=True, verbose_name="Description rapide")
+    available = models.BooleanField(default=True, verbose_name="Disponible à la sélection dans les réservations")
+
+
+class ReservationSyntheManager(models.Manager):
+
+    def to_validate(self):
+        return self.filter(validated=False, sent=True).order_by('sent_on')
+
+    def is_range_free(self, start, end):
+        return self.filter(starts_on__lte=end, ends_on__gte=start, validated=True).count() == 0
+
+
+class ReservationSynthe(models.Model):
+
+    objects = ReservationSyntheManager()
+
+    class Meta:
+        ordering = "-starts_on",
+        verbose_name = "[SYNTHE] Réservation"
+        verbose_name_plural = "[SYNTHE] Réservations"
+
+    event = models.OneToOneField(Event, on_delete=models.CASCADE, related_name="reservation_synthe", null=True, blank=True, verbose_name="Réserver dans le cadre de cet événement", editable=False)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="+", null=True, blank=True, verbose_name="Réserver à titre personnel par ce cotisant", editable=False)
+
+    description_event = SummernoteTextField(verbose_name="Description de l'événement", null=True, blank=True, help_text="Précisez ici comment va être organisé votre événement, quelles activités seront proposées et quels seront vos besoins (électrique, équipements particulier, ...)")
+    sport_activity = models.ForeignKey(SportActivity, on_delete=models.PROTECT, null=True, blank=True, verbose_name="Sport ou activité")
+
+    start_date = models.DateField(verbose_name="Date de début", help_text="Indiquez ici la date à partir de laquelle vous souhaitez occuper le lieu")
+    start_time = models.TimeField(verbose_name="Heure de début", help_text="Au format HH:MM (par exemple 18:30)")
+    end_time = models.TimeField(verbose_name="Heure de fin", help_text="Au format HH:MM (par exemple 01:00), elle correspond au moment où vous devez avoir rangé et nettoyé le lieu")
+    multiple_days = models.BooleanField(default=False, verbose_name="L'événement se déroule sur plusieurs jours", help_text="Lors de la validation la durée totale d'occupation (installation et rangement) sera bien indiqué sur plusieurs jours")
+    manually_set_datetime = models.BooleanField(default=False, verbose_name="Définir manuellement les dates et horaires de début et de fin")
+
+    starts_on = models.DateTimeField(verbose_name="Date et heure du début d'occupation", help_text="Calculée automatiquement sauf si la case précédente est cochée")
+    ends_on = models.DateTimeField(verbose_name="Date et heure de fin d'occupation", help_text="Calculée automatiquement sauf si la case précédente est cochée")
+
+    sent = models.BooleanField(default=False, verbose_name="Envoyé")
+    sent_on = models.DateTimeField(editable=False, null=True, default=None, verbose_name="Envoyé le")
+
+    created_on = models.DateTimeField(auto_now_add=True, editable=False, verbose_name="Créé le")
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, editable=False, related_name="+")
+
+    validated = models.BooleanField(default=False, verbose_name="L'événement est validé et apparait sur le planning étudiant")
+    validated_on = models.DateTimeField(null=True, blank=True, verbose_name="Validé le", editable=False, )
+    validated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Validé par", editable=False, related_name="+")
+
+    admin_display = models.BooleanField(default=False, verbose_name="L'événement apparait sur le planning de l'administration")
+    member_display = models.BooleanField(default=True, verbose_name="L'événement apparait sur le planning des cotisants")
+
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        # Auto setup dates
+        if not self.manually_set_datetime:
+            self.starts_on = datetime.combine(self.start_date, self.start_time)
+            if self.start_time >= self.end_time:
+                self.ends_on = datetime.combine(self.start_date + timedelta(days=1), self.end_time)
+            else:
+                self.ends_on = datetime.combine(self.start_date, self.end_time)
+
+        super().save(force_insert, force_update, using, update_fields)
+
+    def __str__(self):
+        if self.event:
+            return str(self.event)
+        elif self.user:
+            return str(self.user)
+        else:
+            return self.starts_on

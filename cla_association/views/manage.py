@@ -19,7 +19,6 @@ class IndexView(LoginRequiredMixin, AssociationManageMixin, TemplateView):
     template_name = "cla_association/manage/index.html"
 
 
-
 class ChangeView(LoginRequiredMixin, AssociationManageMixin, UpdateView):
     association_manage_active_section = "edit"
     template_name = "cla_association/manage/edit.html"

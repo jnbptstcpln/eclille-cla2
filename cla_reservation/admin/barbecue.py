@@ -1,0 +1,20 @@
+
+from django.contrib import admin
+
+from cla_event.models import EventType, EventPlace, Event
+from cla_reservation.models import BarbecueRules, ReservationBarbecue
+
+
+@admin.register(BarbecueRules)
+class BarbecueRuleAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(ReservationBarbecue)
+class ReservationBarbecueAdmin(admin.ModelAdmin):
+    list_display = [
+        'start_date',
+        'start_time',
+        'event',
+        'user'
+    ]

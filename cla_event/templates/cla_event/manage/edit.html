@@ -1,0 +1,47 @@
+{% extends "cla_association/manage/_layout.html" %}
+
+{% block page_title %}Modifier | {{ association.name }} | Mes associations | CLA{% endblock %}
+
+{% block section_title %}Modifier{% if form.logo %} le logo{% endif %}{% endblock %}
+
+{% block section_content %}
+    <form method="post" enctype="multipart/form-data" class="mt-3">
+        {% csrf_token %}
+        {% include "components/messages.html" %}
+        {% include "components/form-errors.html" with form=form %}
+        {% if not form.logo %}
+            <div class="mb-4 alert alert-slate">
+                <h4>Logo</h4>
+                {% if association.logo %}
+                    <div class="mx-auto" style="height: 200px; width: 200px; background-image: url('{{ association.logo.url }}'); background-size: contain; background-repeat: no-repeat; background-position: center"></div>
+                {% else %}
+                    <div class="d-flex align-items-center justify-content-center mx-auto" style="height: 200px; width: 200px; background-color: #aaaaaa">
+                        <h4 class="m-0 text-uppercase text-gray-700" style="font-size: 1.5rem">{{ association.name }}</h4>
+                    </div>
+                {% endif %}
+                <div class="mx-auto mt-2" style="max-width: 175px">
+                    <a href="{% url "cla_association:manage:change_logo" association.slug %}" class="btn btn-dark btn-block">Modifier</a>
+                </div>
+            </div>
+        {% endif %}
+
+        {% for field in form %}
+            {% include "components/form-group.html" with field=field %}
+        {% endfor %}
+
+        {% if form.logo %}
+            <div class="row mt-4 mx-auto" style="max-width: 600px">
+                <div class="col-sm-6">
+                    <a class="btn btn-grey-dark btn-block btn-lg mb-1" href="{% url "cla_association:manage:change" association.slug %}">Annuler</a>
+                </div>
+                <div class="col-sm-6">
+                    <input class="btn btn-blue-dark btn-block btn-lg" type="submit" value="Sauvegarder">
+                </div>
+            </div>
+        {% else %}
+            <div class="row mt-4 mx-auto" style="max-width: 400px">
+                <input class="btn btn-blue-dark btn-block btn-lg" type="submit" value="Sauvegarder les changements">
+            </div>
+        {% endif %}
+    </form>
+{% endblock %}

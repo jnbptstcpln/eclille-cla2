@@ -1,22 +1,42 @@
 <div class="form-group{% if field.errors %} is-invalid{% endif %}">
 
-    <label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} <b class="text-red">*</b>{% endif %}</label>
+    {% if field.field.widget.input_type == "checkbox" and field.field.widget.attrs.display != "normal"  %}
+        {% if field.errors %}
+            <div class="invalid-feedback">
+                {% if field.errors|length > 1 %}
+                    <ul>
+                        {% for error in field.errors %}
+                            <li>{{ error|escape }}</li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    {{ field.errors.0|escape }}
+                {% endif %}
+            </div>
+        {% endif %}
 
-    {% if field.errors %}
-        <div class="invalid-feedback">
-            {% if field.errors|length > 1 %}
-                <ul>
-                    {% for error in field.errors %}
-                        <li>{{ error|escape }}</li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                {{ field.errors.0|escape }}
-            {% endif %}
-        </div>
+        <label for="{{ field.id_for_label }}">{{ field }} {{ field.label }}{% if field.field.required %} <b class="text-red">*</b>{% endif %}</label>
+    {% else %}
+        <label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} <b class="text-red">*</b>{% endif %}</label>
+
+        {% if field.errors %}
+            <div class="invalid-feedback">
+                {% if field.errors|length > 1 %}
+                    <ul>
+                        {% for error in field.errors %}
+                            <li>{{ error|escape }}</li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    {{ field.errors.0|escape }}
+                {% endif %}
+            </div>
+        {% endif %}
+
+        {{ field }}
     {% endif %}
 
-    {{ field }}
+
 
     {% if field.help_text %}
         <small class="form-text text-muted">{{ field.help_text|safe }}</small>
