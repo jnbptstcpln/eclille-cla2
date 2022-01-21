@@ -1,11 +1,11 @@
 
 from django.contrib import admin
 
-from cla_association.models import Association, AssociationMember, AssociationLink
+from cla_association.models import Association, AssociationMember, AssociationLink, HandoverFolder
 
 
 @admin.register(Association)
-class WebsiteAdmin(admin.ModelAdmin):
+class AssociationAdmin(admin.ModelAdmin):
 
     class MemberInline(admin.TabularInline):
         model = AssociationMember
@@ -17,3 +17,12 @@ class WebsiteAdmin(admin.ModelAdmin):
         extra = 0
 
     inlines = [MemberInline, LinkInline]
+
+
+@admin.register(HandoverFolder)
+class HandoverFolderAdmin(admin.ModelAdmin):
+    list_display = [
+        '__str__',
+        'validated'
+    ]
+    search_fields = ['association']

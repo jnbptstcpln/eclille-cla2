@@ -19,6 +19,7 @@ urlpatterns = [
                 path("<str:slug>/gestion/modifier/logo", manage.ChangeLogoView.as_view(), name="change_logo"),
                 path("<str:slug>/gestion/responsables", manage.ManagersView.as_view(), name="managers"),
                 path("<str:slug>/gestion/passations", manage.HandoverView.as_view(), name="handover"),
+                path("<str:slug>/gestion/passations/envoyer/", manage.HandoverUploadView.as_view(), name="handover_upload"),
             ], 'manage'
         )
     ))

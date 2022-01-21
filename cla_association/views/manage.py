@@ -9,9 +9,9 @@ from django.shortcuts import render, redirect, reverse, get_object_or_404, resol
 from django.http import HttpRequest, HttpResponseNotAllowed, Http404, HttpResponse
 from django.utils import timezone
 
-from cla_association.forms import AssociationForm, AssociationLogoForm
+from cla_association.forms import AssociationForm, AssociationLogoForm, HandoverFolderForm
 from cla_association.mixins import AssociationManageMixin
-from cla_association.models import Association
+from cla_association.models import Association, HandoverFolder
 
 
 class IndexView(LoginRequiredMixin, AssociationManageMixin, TemplateView):
@@ -63,3 +63,24 @@ class ManagersView(LoginRequiredMixin, AssociationManageMixin, TemplateView):
 class HandoverView(LoginRequiredMixin, AssociationManageMixin, TemplateView):
     association_manage_active_section = "handover"
     template_name = "cla_association/manage/handover.html"
+
+
+class HandoverUploadView(LoginRequiredMixin, AssociationManageMixin, UpdateView):
+    association_manage_active_section = "handover"
+    template_name = "cla_association/manage/handover_upload.html"
+    model = HandoverFolder
+    form_class = HandoverFolderForm
+
+    def get_object(self, queryset=None):
+        folder = self.association.handover_folder_to_depose
+        if folder:
+            return folder
+        raise Http404()
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        messages.success(self.request, "Le dossier de passation a bien été déposé")
+        return response
+
+    def get_success_url(self):
+        return resolve_url("cla_association:manage:handover", self.association.slug)

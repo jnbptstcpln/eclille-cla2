@@ -1,6 +1,6 @@
 from django import forms
 
-from cla_association.models import Association
+from cla_association.models import Association, HandoverFolder
 
 
 class AssociationForm(forms.ModelForm):
@@ -36,3 +36,25 @@ class AssociationLogoForm(forms.ModelForm):
         # Customising all fields
         for field_name, field in self.fields.items():
             field.widget.attrs['class'] = field.widget.attrs.get('class', "") + "form-control"
+
+
+class HandoverFolderForm(forms.ModelForm):
+
+    class Meta:
+        model = HandoverFolder
+        fields = [
+            'quitus',
+            'archive'
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Customising all fields
+        for field_name, field in self.fields.items():
+            field.widget.attrs['class'] = field.widget.attrs.get('class', "") + "form-control"
+
+    def save(self, commit=True):
+        self.instance.opened = False
+        return super().save(commit)
+

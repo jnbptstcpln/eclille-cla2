@@ -5,6 +5,7 @@
 {% block section_title %}Passations{% endblock %}
 
 {% block section_content %}
+    {% include "components/messages.html" %}
     <p class="text-justify">
         Cette page regroupe tous les dossiers de passations de votre association.
     </p>
@@ -12,20 +13,45 @@
         À chaque fin de mandat, les bureaux des clubs et commissions de <i>Centrale Lille Associations</i> sont invités à remplir un dossier
         proposant un bilan de leur action dans l'association, permettant ainsi de conserver un historique des activités de l'association.
     </p>
-    <p class="text-justify">
-        En temps voulu vous serez à votre tour aussi invité à déposer votre dossier lors de la prochaine campagne de passation.
-    </p>
+    {% with folder=association.handover_folder_to_depose %}
+        {% if folder %}
+            <div class="mx-auto border-1-grey rounded-10 p-4">
+                <p class="text-center lead mx-auto" style="max-width: 500px">
+                    Vos passations sont passées et vous êtes maintenant invités à déposer votre dossier de passation :
+                </p>
+                <p class="text-center mb-0">
+                    <a href="{% url "cla_association:manage:handover_upload" association.slug %}" class="btn btn-outline-primary btn-lg"><i class="far fa-cloud-upload mr-1"></i> Déposer mon dossier</a>
+                </p>
+            </div>
+        {% else %}
+            <p class="text-justify">
+                En temps voulu vous serez à votre tour aussi invité à déposer votre dossier lors de la prochaine campagne de passation.
+            </p>
+        {% endif %}
+    {% endwith %}
 
     <div class="row mt-5">
-        {% for folder in association.handover_folders.all %}
-            <div class="col-12 col-lg-4">
+        {% for folder in association.validated_handover_folders %}
+            <div class="col-12 col-md-6 col-xl-4">
                 <div class="card">
-                    <div class="card-body text-center">
-                        <h5 class="text-uppercase text-gray-500" style="font-size: 1rem; letter-spacing: .05rem">{{ member.role }}</h5>
-                        <h4>{{ member.user.first_name }} {{ member.user.last_name }}</h4>
-                        <p class="mb-0" style="font-size: .75rem">
-                            <a href="mailto:{{ member.user.infos.email_school }}">{{ member.user.infos.email_school }}</a>
-                        </p>
+                    <div class="card-body">
+                        <div class="text-center mb-3">
+                            <h5 class="text-uppercase text-gray-500 mb-0" style="font-size: 1rem; letter-spacing: .05rem">Mandat</h5>
+                            <h4 style="font-size: 1.5rem">{{ folder.mandat }}</h4>
+                        </div>
+
+                        <div class="mx-auto" style="max-width: 200px">
+                            {% if folder.quitus %}
+                                <a class="btn btn-outline-primary btn-block my-2" target="_blank" href="{{ folder.quitus.url }}">
+                                    <i class="far fa-file-pdf mr-1"></i> Quitus
+                                </a>
+                            {% endif %}
+                            {% if folder.archive %}
+                                <a class="btn btn-outline-secondary btn-block my-2" download="{{ association.slug }}-{{ folder.deposed_on.year }}.zip" href="{{ folder.archive.url }}">
+                                    <i class="far fa-archive mr-1"></i> Archive
+                                </a>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
             </div>

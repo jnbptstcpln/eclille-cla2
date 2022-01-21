@@ -1,5 +1,6 @@
 import os
 import uuid
+from datetime import date
 
 from django.contrib.auth.models import User
 from django.db import models
@@ -22,6 +23,14 @@ class FilePath:
     @classmethod
     def association_logo(cls, instance, filename):
         return cls._path(instance, ["cla_association", "association_logo"], filename)
+
+    @classmethod
+    def association_quitus(cls, instance, filename):
+        return cls._path(instance, ["cla_association", "association_quitus"], filename)
+
+    @classmethod
+    def association_archive(cls, instance, filename):
+        return cls._path(instance, ["cla_association", "association_archive"], filename)
 
 
 class AssociationManager(models.Manager):
@@ -110,6 +119,14 @@ class Association(models.Model):
             self.Types.COMMISSION
         }
 
+    @property
+    def handover_folder_to_depose(self):
+        return HandoverFolder.objects.to_depose(self)
+
+    @property
+    def validated_handover_folders(self):
+        return self.handover_folders.filter(validated=True)
+
     def __str__(self):
         return self.name
 
@@ -181,3 +198,40 @@ class AssociationLink(models.Model):
 
     def __str__(self):
         return self.type
+
+
+class HandoverFolderManager(models.Manager):
+
+    def to_depose(self, association):
+        return self.filter(association=association, opened=True).order_by("-deposed_on").first()
+
+
+class HandoverFolder(models.Model):
+
+    objects = HandoverFolderManager()
+
+    class Meta:
+        verbose_name = "Dossier de passation"
+        verbose_name_plural = "Dossiers de passation"
+        ordering = "-deposed_on", "association__name"
+
+    association = models.ForeignKey(Association, on_delete=models.CASCADE, related_name="handover_folders")
+    deposed_on = models.DateField(default=date.today, verbose_name="Date de dépot", help_text="Doit correspondre à l'année de fin du mandat")
+    president = models.CharField(max_length=75, blank=True, verbose_name="Président")
+    treasurer = models.CharField(max_length=75, blank=True, verbose_name="Trésorier")
+    quitus = models.FileField(null=True, blank=True, upload_to=FilePath.association_quitus, verbose_name="Quitus", help_text="De préférence au format PDF")
+    archive = models.FileField(null=True, blank=True, upload_to=FilePath.association_archive, verbose_name="Archive", help_text="De préférence au format ZIP et contenant toutes les ressources intéressantes de l'association (logo, trésorerie, photos, ...)")
+
+    opened = models.BooleanField(default=False, verbose_name="Les responsables de l'association peuvent déposer le quitus et l'archive")
+    validated = models.BooleanField(default=False, verbose_name="Le dossier est validé")
+
+    @property
+    def slug(self):
+        return self.association.slug
+
+    @property
+    def mandat(self):
+        return f"{self.deposed_on.year-1}/{self.deposed_on.year}"
+
+    def __str__(self):
+        return f"{self.deposed_on.year} {self.association}"

@@ -1,0 +1,35 @@
+{% extends "cla_association/manage/_layout.html" %}
+
+{% block page_title %}Déposer mon dossier | {{ association.name }} | Mes associations | CLA{% endblock %}
+
+{% block section_title %}Déposer mon dossier de passation{% endblock %}
+
+{% block section_content %}
+    <p class="text-justify">
+        Le dossier de passations deux éléments importants :
+    </p>
+    <ul class="text-justify">
+        <li>
+            <b>Le quitus</b> qui regroupe un maximum d'information essentielles sur le fonctionnement,
+            les événements et faits marquant de votre mandat ainsi que des conseils pour les générations à venir
+        </li>
+        <li>
+            <b>Une archive</b> qui regroupe toutes les ressources que vous considérez utiles de léguer aux mandats
+            à venir. Cela peut être le logo actuel de l'association, des journaux de trésorerie, un retour d'expérience
+            sur un événement particulier, quelques photos marquantes de votre mandats, etc...
+        </li>
+    </ul>
+    <p class="text-justify">
+        L'objectif de ces deux documents est de vous permettre de transmettre aux futurs mandats un instanné le plus fidèle
+        possible de l'association qu'ils seront amenés à gérer, comme vous l'avez fait ces douze derniers mois.
+    </p>
+    <form method="post" enctype="multipart/form-data" class="mt-3 mx-auto border-1-grey rounded-10 p-4" style="max-width: 500px">
+        {% csrf_token %}
+        {% for field in form %}
+            {% include "components/form-group.html" with field=field %}
+        {% endfor %}
+        <button type="submit" class="btn btn-outline-primary btn-lg btn-block">
+            Envoyer
+        </button>
+    </form>
+{% endblock %}
