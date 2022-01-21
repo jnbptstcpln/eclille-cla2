@@ -4,7 +4,9 @@ from datetime import datetime, timedelta
 
 from django.contrib.auth.models import User
 from django.db import models
-from django.shortcuts import resolve_url
+from django.template.defaultfilters import date
+from django.utils import timezone
+from django.utils.safestring import mark_safe
 from django_resized import ResizedImageField
 from django_summernote.fields import SummernoteTextField
 
@@ -53,7 +55,9 @@ class EventPlace(models.Model):
 
 
 class EventManager(models.Manager):
-    pass
+
+    def is_range_free(self, start, end):
+        return self.filter(starts_on__lte=end, ends_on__gte=start, validated=True, public=True).count() == 0
 
 
 class Event(models.Model):
@@ -79,6 +83,8 @@ class Event(models.Model):
     ends_on = models.DateTimeField(verbose_name="Date et heure de fin", help_text="Calculée automatiquement sauf si la case précédente est cochée")
     poster = ResizedImageField(size=[827, 1170], force_format="PNG", upload_to=FilePath.event_poster, null=True, blank=True, verbose_name="Affiche de l'événement", help_text="Au format A4 (827px*1170px)")
 
+    public = models.BooleanField(default=True, verbose_name="Événement public à faire apparaitre sur le planning", help_text="Décocher cette case si cet événement correspond aux activités internes de votre association (par exemple une réunion pour laquelle vous souhaitez réserver un local)")
+
     sent = models.BooleanField(default=False, verbose_name="Envoyé")
     sent_on = models.DateTimeField(editable=False, null=True, default=None, verbose_name="Envoyé le")
 
@@ -90,6 +96,30 @@ class Event(models.Model):
     validated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Validé par", editable=False, related_name="+")
 
     admin_display = models.BooleanField(default=False, verbose_name="L'événement apparait sur le planning envoyé à l'administration")
+
+    rejected_for = SummernoteTextField(verbose_name="Raison du refus", null=True, blank=True)
+
+    def get_datetime_display(self):
+        _starts_on = self.starts_on.astimezone(timezone.get_current_timezone())
+        _ends_on = self.ends_on.astimezone(timezone.get_current_timezone())
+
+        start_time = _starts_on.strftime('%Hh%M' if _starts_on.minute != 0 else '%Hh')
+        end_time = _ends_on.astimezone(timezone.get_current_timezone()).strftime('%Hh%M' if _ends_on.minute != 0 else '%Hh')
+
+        if _starts_on.date() == _ends_on.date() or _ends_on - _starts_on <= timedelta(hours=10):
+            return f"{_starts_on.strftime('%d/%m/%Y')} - {start_time}/{end_time}"
+        else:
+            return f"{_starts_on.strftime('%d/%m/%Y')} - {start_time} / {_ends_on.strftime('%d/%m/%Y')} - {end_time}"
+
+    def get_status_display(self):
+        if self.validated:
+            return mark_safe("<span class='badge badge-success'>Validée</span>")
+        elif self.sent:
+            return mark_safe("<span class='badge badge-info'>Envoyée</span>")
+        elif self.rejected_for:
+            return mark_safe("<span class='badge badge-warning'>Rejetée</span>")
+        else:
+            return mark_safe("<span class='badge badge-secondary'>A envoyer</span>")
 
     def get_reservation_barbecue(self):
         if (hasattr(self, 'reservation_barbecue')):
@@ -106,7 +136,31 @@ class Event(models.Model):
             return self.reservation_synthe
         return None
 
+    @property
+    def reservations(self):
+        return {
+            'barbecue': self.get_reservation_barbecue(),
+            'foyer': self.get_reservation_foyer(),
+            'synthe': self.get_reservation_foyer()
+        }
 
+    def reject(self, rejected_for):
+        self.sent = False
+        self.rejected_for = rejected_for
+        self.save()
+        for name, reservation in self.reservations.items():
+            if reservation:
+                reservation.sent = False
+                reservation.validated = False
+                reservation.save()
+
+    def check_validation(self, user):
+        if not self.public:
+            if all([r.validated for _, r in self.reservations.items() if r is not None]):
+                self.validated = True
+                self.validated_by = user
+                self.validated_on = timezone.now()
+                self.save()
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         # Auto setup dates

@@ -2,11 +2,47 @@
 
 {% block page_title %}Réserver le Synthé | {{ event.name }} | CLA{% endblock %}
 
-{% block section_title %}<a class="text-black" href="{% url "cla_event:association:update" association.slug event.pk %}"><i class="far fa-chevron-left mr-2"></i> {{ event.name }}</a>{% endblock %}
+{% block section_title %}<a class="text-black" href="{% url "cla_event:association:update" association.slug event.pk %}"><i class="far fa-angle-left mr-2"></i> {{ event.name }}</a>{% endblock %}
 
 {% block section_content %}
-    <h3 style="font-size: 1.25rem">Réserver le Synthé</h3>
+    <h3 style="font-size: 1.25rem" class="mt-3">Réserver le Synthé</h3>
+
+    {% if not reservation.sent and reservation.rejected_for %}
+        <div class="alert alert-warning align-items-center d-flex mt-4 mb-5">
+            <div class="mr-4">
+                <i class="far fa-times-circle" style="font-size: 1.75rem"></i>
+            </div>
+            <div class="flex-fill">
+                <p class="mb-1"><b>Cette réservation a été rejetée pour les raisons suivantes :</b></p>
+                <div>
+                    {{ reservation.rejected_for|safe }}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
     <div>
+
+        {% if reservation.validated %}
+            <div class="alert alert-success align-items-center d-flex mb-3 mt-3">
+                <div class="mr-4">
+                    <i class="far fa-check-circle" style="font-size: 1.25rem"></i>
+                </div>
+                <div class="flex-fill">
+                    Cette réservation a été validée.
+                </div>
+            </div>
+        {% elif reservation.sent %}
+            <div class="alert alert-info align-items-center d-flex mb-3 mt-3">
+                <div class="mr-4">
+                    <i class="far fa-info-circle" style="font-size: 1.25rem"></i>
+                </div>
+                <div class="flex-fill">
+                    Cette réservation a été envoyée pour validation le {{ reservation.sent_on|date:'d/m/Y à H:i' }}.
+                </div>
+            </div>
+        {% endif %}
+
 
         {% if event.sent or event.validated %}
             <div class="mt-2 p-4">
@@ -62,6 +98,17 @@
                     </div>
                 </div>
             </div>
+
+            {% if reservation.pk %}
+                <form method="post" action="{% url "cla_reservation:association:synthe-delete" association.slug event.pk %}" class="mt-4">
+                    <hr>
+                    {% csrf_token %}
+                    <div class="row mt-4 mx-auto" style="max-width: 600px">
+                        <input class="btn btn-outline-danger btn-block btn-lg" type="submit" value="Supprimer cette réservation">
+                    </div>
+                </form>
+            {% endif %}
+
         {% endif %}
     </div>
 {% endblock %}

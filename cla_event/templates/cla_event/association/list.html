@@ -31,23 +31,13 @@
             {% for event in object_list %}
                 <tr>
                     <td>
-                        {% if event.manually_set_datetime %}
-                            {{ event.starts_on|date:'d/m/Y H\h' }} - {{ event.ends_on|date:'d/m/Y H\h' }}
-                        {% else %}
-                            {{ event.starts_on|date:'d/m/Y - H\h' }}/{{ event.ends_on|date:'H\h' }}
-                        {% endif %}
+                        {{ event.get_datetime_display }}
                     </td>
                     <td>
                         {{ event.name }}
                     </td>
                     <td>
-                        {% if event.validated %}
-                            <span class="badge badge-success">Validé</span>
-                        {% elif event.sent %}
-                            <span class="badge badge-info">Envoyé</span>
-                        {% else %}
-                            <span class="badge badge-secondary">A envoyer</span>
-                        {% endif %}
+                        {{ event.get_status_display }}
                     </td>
                     <td class="text-right">
                         <a href="{% url "cla_event:association:update" event.association.slug event.pk %}">Détails</a>
@@ -55,9 +45,9 @@
                 </tr>
             {% empty %}
                 <tr>
-                <td colspan="4" class="text-center">
-                    Aucun événement n'a encore été créé
-                </td>
+                    <td colspan="4" class="text-center">
+                        Aucun événement n'a encore été créé
+                    </td>
                 </tr>
             {% endfor %}
             </tbody>

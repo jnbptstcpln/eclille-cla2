@@ -1,6 +1,8 @@
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import resolve_url
-from django.views.generic import FormView
+from django.shortcuts import resolve_url, redirect
+from django.views import View
+from django.views.generic import FormView, DeleteView
 
 from cla_reservation.forms.barbecue import ReservationBarbecueAssociationForm
 from cla_reservation.forms.foyer import ReservationFoyerAssociationForm
@@ -32,6 +34,28 @@ class ReservationBarbecueView(LoginRequiredMixin, ReservationAssociationMixin, F
         return context
 
 
+class ReservationBarbecueDeleteView(LoginRequiredMixin, ReservationAssociationMixin, View):
+    model = ReservationBarbecue
+    creating = False
+    reservation: model = None
+
+    def get_reservation(self):
+        return self.event.get_reservation_barbecue()
+
+    def get(self, request, *args, **kwargs):
+        return redirect("cla_reservation:association:barbecue", self.association.slug, self.event.pk)
+
+    def post(self, request, *args, **kwargs):
+
+        if self.reservation.sent or self.reservation.validated:
+            return redirect("cla_reservation:association:barbecue", self.association.slug, self.event.pk)
+
+        self.reservation.delete()
+        messages.info(self.request, "Votre réservation du barbecue a bien été supprimée")
+
+        return redirect("cla_event:association:update", self.association.slug, self.event.pk)
+
+
 class ReservationFoyerView(LoginRequiredMixin, ReservationAssociationMixin, FormView):
     template_name = "cla_reservation/association/foyer.html"
     model = ReservationFoyer
@@ -54,6 +78,28 @@ class ReservationFoyerView(LoginRequiredMixin, ReservationAssociationMixin, Form
         return context
 
 
+class ReservationFoyerDeleteView(LoginRequiredMixin, ReservationAssociationMixin, View):
+    model = ReservationFoyer
+    creating = False
+    reservation: model = None
+
+    def get_reservation(self):
+        return self.event.get_reservation_foyer()
+
+    def get(self, request, *args, **kwargs):
+        return redirect("cla_reservation:association:foyer", self.association.slug, self.event.pk)
+
+    def post(self, request, *args, **kwargs):
+
+        if self.reservation.sent or self.reservation.validated:
+            return redirect("cla_reservation:association:foyer", self.association.slug, self.event.pk)
+
+        self.reservation.delete()
+        messages.info(self.request, "Votre réservation du foyer a bien été supprimée")
+
+        return redirect("cla_event:association:update", self.association.slug, self.event.pk)
+
+
 class ReservationSyntheView(LoginRequiredMixin, ReservationAssociationMixin, FormView):
     template_name = "cla_reservation/association/synthe.html"
     model = ReservationSynthe
@@ -68,3 +114,23 @@ class ReservationSyntheView(LoginRequiredMixin, ReservationAssociationMixin, For
         return resolve_url("cla_reservation:association:synthe", self.association.slug, self.event.pk)
 
 
+class ReservationSyntheDeleteView(LoginRequiredMixin, ReservationAssociationMixin, View):
+    model = ReservationSynthe
+    creating = False
+    reservation: model = None
+
+    def get_reservation(self):
+        return self.event.get_reservation_synthe()
+
+    def get(self, request, *args, **kwargs):
+        return redirect("cla_reservation:association:synthe", self.association.slug, self.event.pk)
+
+    def post(self, request, *args, **kwargs):
+
+        if self.reservation.sent or self.reservation.validated:
+            return redirect("cla_reservation:association:synthe", self.association.slug, self.event.pk)
+
+        self.reservation.delete()
+        messages.info(self.request, "Votre réservation du synthé a bien été supprimée")
+
+        return redirect("cla_event:association:update", self.association.slug, self.event.pk)

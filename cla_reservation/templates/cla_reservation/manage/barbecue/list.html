@@ -1,0 +1,92 @@
+{% extends "cla_reservation/manage/_layout.html" %}
+
+{% block page_title %}Réservations du barbecue | CLA{% endblock %}
+
+{% block section_title %}Gestion des réservations du barbecue{% endblock %}
+
+{% block section_content %}
+
+    {% include "components/messages.html" %}
+
+    {% if to_review.count > 0 %}
+        <div class="border-1-grey rounded-10 p-4 mt-4">
+            <h3 style="font-size: 1.25rem">Réservations en attente</h3>
+            <p class="text-muted text-sm">Classées par ordre d'arrivée</p>
+            <table class="table mt-3">
+                <thead>
+                <tr>
+                    <th>Nom</th>
+                    <th>Date et horaire</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for reservation in to_review %}
+                    <tr>
+                        <td>{{ reservation }}</td>
+                        <td>{% if reservation.user %}{{ reservation.get_datetime_display }}{% else %}{{ reservation.event.get_datetime_display }}{% endif %}</td>
+                        <td><a href="{% url "cla_reservation:manage:barbecue-detail" reservation.pk %}">Détails...</a></td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+
+    <div class="mt-6">
+        <h3 style="font-size: 1.25rem">Réservations validées</h3>
+        <table class="table w-100">
+            <thead>
+            <tr>
+                <th>Date</th>
+                <th>Nom</th>
+                <th>Installation/rangement</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for reservation in object_list %}
+                <tr>
+                    <td>
+                        <td>{% if reservation.user %}{{ reservation.get_datetime_display }}{% else %}{{ reservation.event.get_datetime_display }}{% endif %}</td>
+                    </td>
+                    <td>
+                        {{ reservation }}
+                    </td>
+                    <td>
+                        {{ reservation.get_datetime_display }}
+                    </td>
+                    <td><a href="{% url "cla_reservation:manage:barbecue-detail" reservation.pk %}">Détails...</a></td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center">
+                        Aucun réservation n'a encore été validée
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        {% if page_obj.paginator.num_pages > 1 %}
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous"> <span aria-hidden="true">«</span> <span class="sr-only">Previous</span> </a>
+                    </li>
+                {% endif %}
+
+                {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Next"> <span aria-hidden="true">»</span> <span class="sr-only">Next</span> </a>
+                    </li>
+                {% endif %}
+
+                <li class="page-item active">
+                    <a class="page-link" href="#">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</a>
+                </li>
+            </ul>
+        {% endif %}
+    </div>
+
+{% endblock %}

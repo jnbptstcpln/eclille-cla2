@@ -5,6 +5,8 @@ from datetime import datetime, timedelta
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import Q
+from django.utils import timezone
+from django.utils.safestring import mark_safe
 from django_summernote.fields import SummernoteTextField
 
 from cla_event.models import Event
@@ -92,6 +94,26 @@ class ReservationBarbecue(models.Model):
 
     admin_display = models.BooleanField(default=False, verbose_name="L'événement apparait sur le planning de l'administration")
     member_display = models.BooleanField(default=True, verbose_name="L'événement apparait sur le planning des cotisants")
+
+    rejected_for = SummernoteTextField(verbose_name="Raison du refus", null=True, blank=True)
+
+    def get_datetime_display(self):
+        start_time = self.starts_on.astimezone(timezone.get_current_timezone()).strftime('%Hh%M' if self.starts_on.minute != 0 else '%Hh')
+        end_time = self.ends_on.astimezone(timezone.get_current_timezone()).strftime('%Hh%M' if self.ends_on.minute != 0 else '%Hh')
+        if self.starts_on.date() == self.ends_on.date() or self.ends_on - self.starts_on <= timedelta(hours=10):
+            return f"{self.starts_on.strftime('%d/%m/%Y')} - {start_time}/{end_time}"
+        else:
+            return f"{self.starts_on.strftime('%d/%m/%Y')} - {start_time} / {self.ends_on.strftime('%d/%m/%Y')} - {end_time}"
+
+    def get_status_display(self):
+        if self.validated:
+            return mark_safe("<span class='badge badge-success'>Validée</span>")
+        elif self.sent:
+            return mark_safe("<span class='badge badge-info'>Envoyée</span>")
+        elif self.rejected_for:
+            return mark_safe("<span class='badge badge-warning'>Rejetée</span>")
+        else:
+            return mark_safe("<span class='badge badge-secondary'>A envoyer</span>")
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         # Auto setup dates

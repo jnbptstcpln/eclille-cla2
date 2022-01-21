@@ -4,6 +4,9 @@ from datetime import datetime, timedelta
 
 from django.contrib.auth.models import User
 from django.db import models
+from django.template.defaultfilters import date
+from django.utils import timezone
+from django.utils.safestring import mark_safe
 from django_summernote.fields import SummernoteTextField
 
 from cla_event.models import Event
@@ -139,6 +142,30 @@ class ReservationFoyer(models.Model):
 
     admin_display = models.BooleanField(default=False, verbose_name="L'événement apparait sur le planning de l'administration")
     member_display = models.BooleanField(default=True, verbose_name="L'événement apparait sur le planning des cotisants")
+
+    rejected_for = SummernoteTextField(verbose_name="Raison du refus", null=True, blank=True)
+
+    def get_datetime_display(self):
+        _starts_on = self.starts_on.astimezone(timezone.get_current_timezone())
+        _ends_on = self.ends_on.astimezone(timezone.get_current_timezone())
+
+        start_time = _starts_on.strftime('%Hh%M' if _starts_on.minute != 0 else '%Hh')
+        end_time = _ends_on.astimezone(timezone.get_current_timezone()).strftime('%Hh%M' if _ends_on.minute != 0 else '%Hh')
+
+        if _starts_on.date() == _ends_on.date() or _ends_on - _starts_on <= timedelta(hours=10):
+            return f"{_starts_on.strftime('%d/%m/%Y')} - {start_time}/{end_time}"
+        else:
+            return f"{_starts_on.strftime('%d/%m/%Y')} - {start_time} / {_ends_on.strftime('%d/%m/%Y')} - {end_time}"
+
+    def get_status_display(self):
+        if self.validated:
+            return mark_safe("<span class='badge badge-success'>Validée</span>")
+        elif self.sent:
+            return mark_safe("<span class='badge badge-info'>Envoyée</span>")
+        elif self.rejected_for:
+            return mark_safe("<span class='badge badge-warning'>Rejetée</span>")
+        else:
+            return mark_safe("<span class='badge badge-secondary'>A envoyer</span>")
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         # Auto setup dates

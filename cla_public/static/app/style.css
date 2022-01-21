@@ -286,3 +286,7 @@ body .header {
     color: #ffffff;
     transition: opacity 150ms;
 }
+
+p:last-child {
+    margin-bottom: 0;
+}

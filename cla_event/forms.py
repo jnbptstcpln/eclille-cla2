@@ -9,6 +9,7 @@ class EventAssociationDefaultForm(forms.ModelForm):
     class Meta:
         model = Event
         fields = [
+            'public',
             'name',
             'name_school',
             'type',

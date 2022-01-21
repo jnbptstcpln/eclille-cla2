@@ -52,9 +52,12 @@
                 </div>
 
                 <ul class="nav nav-section-menu mb-4 py-3 d-none d-md-block" style="position: relative; left: 1px;">
+                    <li>
+                        <a href="{% url "cla_member:associations" %}" class="nav-link first bg-grey bg-hover-grey text-grey-dark"><i class="fa fa-angle-left"></i> Mes associations</a>
+                    </li>
                     {% for section in sections_navigation %}
                         <li>
-                            <a href="{{ section.href }}" class="nav-link{% if forloop.first %} first{% endif %}{% if section_active == section.id %} active{% endif %}"> {{ section.label }} <i class="fa fa-angle-right"></i> </a>
+                            <a href="{{ section.href }}" class="nav-link {% if section_active == section.id %} active{% endif %}"> {{ section.label }} <i class="fa fa-angle-right"></i> </a>
                         </li>
                     {% endfor %}
                 </ul>

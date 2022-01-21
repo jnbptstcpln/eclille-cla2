@@ -14,6 +14,6 @@
         <li>Transmission et accès aux documents de passation pour les clubs et commissions de CLA</li>
     </ul>
     <p class="text-justify">
-        Toutes les personnes recensées dans la section <a href="#">"Responsables"</a> ont accès à cet espace.
+        Toutes les personnes recensées dans la section <a href="{% url "cla_association:manage:managers" association.slug %}">Responsables</a> ont accès à cet espace.
     </p>
 {% endblock %}

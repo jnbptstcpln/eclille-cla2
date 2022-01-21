@@ -1,11 +1,20 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import resolve_url, redirect
+from django.shortcuts import resolve_url
 
-from cla_association.models import Association, AssociationMember
+from cla_association.models import AssociationMember
 
 
 class ClaMemberModuleMixin(LoginRequiredMixin):
     cla_member_active_section = None
+
+    RESERVATIONS_PERMISSIONS = [
+        "cla_reservation.change_reservationfoyer",
+        "cla_reservation.change_reservationbarbecue",
+        "cla_reservation.change_reservationsynthe"
+    ]
+
+    def has_any_reservation_permission(self):
+        return any([self.request.user.has_perm(p) for p in self.RESERVATIONS_PERMISSIONS])
 
     def get_sections_navigation(self):
         sections = [
@@ -31,6 +40,13 @@ class ClaMemberModuleMixin(LoginRequiredMixin):
                 'id': "association",
                 'label': "Mes associations",
                 'href': resolve_url("cla_member:associations")
+            })
+
+        if self.has_any_reservation_permission():
+            sections.append({
+                'id': "reservations",
+                'label': "Infrastructures",
+                'href': resolve_url("cla_reservation:manage:index")
             })
 
         if self.request.user.has_perm("cla_auth.upload_user_picture"):

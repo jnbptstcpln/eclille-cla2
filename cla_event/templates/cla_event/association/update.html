@@ -6,6 +6,38 @@
 
 {% block section_content %}
     <div>
+        {% if object.validated %}
+            <div class="alert alert-success align-items-center d-flex mb-3 mt-3">
+                <div class="mr-4">
+                    <i class="far fa-check-circle" style="font-size: 1.25rem"></i>
+                </div>
+                <div class="flex-fill">
+                    Cet événement a été validée.
+                </div>
+            </div>
+        {% elif object.sent %}
+            <div class="alert alert-info align-items-center d-flex mb-3 mt-3">
+                <div class="mr-4">
+                    <i class="far fa-info-circle" style="font-size: 1.25rem"></i>
+                </div>
+                <div class="flex-fill">
+                    Cet événement a été envoyé pour validation le {{ object.sent_on|date:'d/m/Y à H:i' }}.
+                </div>
+            </div>
+        {% elif object.rejected_for %}
+            <div class="alert alert-warning align-items-center d-flex mt-4 mb-5">
+                <div class="mr-4">
+                    <i class="far fa-times-circle" style="font-size: 1.75rem"></i>
+                </div>
+                <div class="flex-fill">
+                    <p class="mb-1"><b>Votre événement a été rejetée pour les raisons suivantes :</b></p>
+                    <div>
+                        {{ object.rejected_for|safe }}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
         <p class="text-justify">
             Votre événement est maintenant créé et vous avez maintenant la possibilité d'y associer des réservations
             pour le foyer, le synthé ou le barbecue.
@@ -19,7 +51,9 @@
             <ul class="nav nav-tabs flex-column flex-lg-row" role="tablist">
                 <li class="nav-item"><a class="nav-link active" data-toggle="tab" href="#event" role="tab" aria-selected="true">Informations</a></li>
                 <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#reservation" role="tab" aria-selected="false">Réservations</a></li>
-                <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#send" role="tab" aria-selected="false">Envoyer...</a></li>
+                {% if not object.sent %}
+                    <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#send" role="tab" aria-selected="false">Envoyer...</a></li>
+                {% endif %}
             </ul>
             <div class="tab-content py-3">
                 <div class="tab-pane show active" id="event" role="tabpanel">
@@ -81,13 +115,7 @@
                             <div>
                                 <h4 class="mb-2">Réservation du foyer</h4>
                                 {% if reservation %}
-                                    {% if reservation.validated %}
-                                        <span class="badge badge-success">Validée</span>
-                                    {% elif reservation.sent %}
-                                        <span class="badge badge-info">Envoyée</span>
-                                    {% else %}
-                                        <span class="badge badge-secondary">A envoyer</span>
-                                    {% endif %}
+                                    {{ reservation.get_status_display }}
                                 {% else %}
                                     <p class="text-muted mb-0">Pas de réservation associé à votre événement</p>
                                 {% endif %}
@@ -107,13 +135,7 @@
                             <div>
                                 <h4 class="mb-2">Réservation du synthé</h4>
                                 {% if reservation %}
-                                    {% if reservation.validated %}
-                                        <span class="badge badge-success">Validée</span>
-                                    {% elif reservation.sent %}
-                                        <span class="badge badge-info">Envoyée</span>
-                                    {% else %}
-                                        <span class="badge badge-secondary">A envoyer</span>
-                                    {% endif %}
+                                    {{ reservation.get_status_display }}
                                 {% else %}
                                     <p class="text-muted mb-0">Pas de réservation associé à votre événement</p>
                                 {% endif %}
@@ -133,13 +155,7 @@
                             <div>
                                 <h4 class="mb-2">Réservation du barbecue</h4>
                                 {% if reservation %}
-                                    {% if reservation.validated %}
-                                        <span class="badge badge-success">Validée</span>
-                                    {% elif reservation.sent %}
-                                        <span class="badge badge-info">Envoyée</span>
-                                    {% else %}
-                                        <span class="badge badge-secondary">A envoyer</span>
-                                    {% endif %}
+                                    {{ reservation.get_status_display }}
                                 {% else %}
                                     <p class="text-muted mb-0">Pas de réservation associé à votre événement</p>
                                 {% endif %}
@@ -155,39 +171,41 @@
                     {% endwith %}
 
                 </div>
-                <div class="tab-pane show" id="send" role="tabpanel">
-                    <div class="d-flex align-items-center alert alert-warning">
-                        <div class="mr-3">
-                            <i class="far fa-exclamation-triangle text-x2"></i>
+                {% if not object.sent %}
+                    <div class="tab-pane show" id="send" role="tabpanel">
+                        <div class="d-flex align-items-center alert alert-warning">
+                            <div class="mr-3">
+                                <i class="far fa-exclamation-triangle text-x2"></i>
+                            </div>
+                            <div class="flex-fill">
+                                <b>Attention !</b> Une fois envoyé vous ne pourrez plus modifier les
+                                dates de l'événement ainsi que les réservations associées, vérifier donc bien que tout est correct !
+                            </div>
                         </div>
-                        <div class="flex-fill">
-                            <b>Attention !</b> Une fois envoyé vous ne pourrez plus modifier les
-                            dates de l'événement ainsi que les réservations associées, vérifier donc bien que tout est correct !
-                        </div>
+
+                        <form class="border-grey rounded-10 p-5 mt-3" method="post" action="{% url "cla_event:association:send" association.slug event.pk %}">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label for="checked">
+                                    <input type="checkbox" id="checked" required> J'ai bien vérifié que tous les éléments que j'ai indiqués, autant dans la section "Informations" que dans
+                                    chaque réservation, sont bien corrects <b class="text-red">*</b>
+                                </label>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="agreements">
+                                    <input type="checkbox" id="agreements" required> J'ai lu et j'accepte expressément de respecter toutes les indications des différentes
+                                    chartes d'utilisation des infrastructures et équipements associés à cette réservation et je m'engage personnellement à les faire
+                                    respecter par les membres de mon association <b class="text-red">*</b>
+                                </label>
+                            </div>
+
+                            <div class="d-flex justify-content-center">
+                                <button type="submit" class="btn btn-outline-primary btn-lg">Envoyer mon événement</button>
+                            </div>
+                        </form>
                     </div>
-
-                    <form class="border-grey rounded-10 p-5 mt-3" method="post" action="{% url "cla_event:association:send" association.slug event.pk %}">
-                        {% csrf_token %}
-                        <div class="form-group">
-                            <label for="checked">
-                                <input type="checkbox" id="checked" required> J'ai bien vérifié que tous les éléments que j'ai indiqués, autant dans la section "Informations" que dans
-                                chaque réservation, sont bien corrects <b class="text-red">*</b>
-                            </label>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="agreements">
-                                <input type="checkbox" id="agreements" required> J'ai lu et j'accepte expressément de respecter toutes les indications des différentes
-                                chartes d'utilisation des infrastructures et équipements associés à cette réservation et je m'engage personnellement à les faire
-                                respecter par les membres de mon association <b class="text-red">*</b>
-                            </label>
-                        </div>
-
-                        <div class="d-flex justify-content-center">
-                            <button type="submit" class="btn btn-outline-primary btn-lg">Envoyer mon événement</button>
-                        </div>
-                    </form>
-                </div>
+                {% endif %}
             </div>
         </div>
     </div>

@@ -1,0 +1,110 @@
+{% extends "cla_member/lobby/_layout.html" %}
+
+{% block section_title %}Gestion des réservations{% endblock %}
+
+{% block section_content %}
+    <div class="row mt-4">
+
+        {% if perms.cla_reservation.change_reservationbarbecue %}
+            <div class="col-6 col-md-4 customer type-media">
+                <div class="card mb-4 bg-gradient bg-shadow">
+                    <div class="pt-3 px-3">
+                        <div class="d-flex align-items-center justify-content-center" style="height: 50px; background-color: white">
+                            <h4 class="m-0 text-uppercase text-gray-700" style="font-size: 1.5rem">
+                                <i class="fas fa-fire mr-2 text-red"></i>
+                                Barbecue
+                            </h4>
+                        </div>
+                        <div class="text-center">
+                            {% with to_review=to_review_barbecue.count %}
+                                {% if to_review > 0 %}
+                                    <p class="font-weight-bold mb-0 text-sm">{{ to_review }} réservation{{ to_review|pluralize }} en attente</p>
+                                {% else %}
+                                    <p class="text-muted mb-0 text-sm">Aucune réservation en attente</p>
+                                {% endif %}
+                            {% endwith %}
+                            </p>
+                        </div>
+                        <div class="card-body px-1 pt-0 pb-3 mt-2">
+                            <div class="d-flex align-items-center">
+                                <div class="w-100">
+                                    <a href="{% url "cla_reservation:manage:barbecue" %}" class="btn btn-red-dark btn-block">
+                                        Gérer les réservations <i class="far fa-list ml-1"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+        {% if perms.cla_reservation.change_reservationfoyer %}
+            <div class="col-6 col-md-4 customer type-media">
+                <div class="card mb-4 bg-gradient bg-shadow">
+                    <div class="pt-3 px-3">
+                        <div class="d-flex align-items-center justify-content-center" style="height: 50px; background-color: white">
+                            <h4 class="m-0 text-uppercase text-gray-700" style="font-size: 1.5rem">
+                                <i class="fas fa-beer mr-2 text-warning"></i>
+                                Foyer
+                            </h4>
+                        </div>
+                        <div class="text-center">
+                            {% with to_review=to_review_foyer.count %}
+                                {% if to_review > 0 %}
+                                    <p class="font-weight-bold mb-0 text-sm">{{ to_review }} réservation{{ to_review|pluralize }} en attente</p>
+                                {% else %}
+                                    <p class="text-muted mb-0 text-sm">Aucune réservation en attente</p>
+                                {% endif %}
+                            {% endwith %}
+                            </p>
+                        </div>
+                        <div class="card-body px-1 pt-0 pb-3 mt-2">
+                            <div class="d-flex align-items-center">
+                                <div class="w-100">
+                                    <a href="{% url "cla_reservation:manage:foyer" %}" class="btn btn-red-dark btn-block">
+                                        Gérer les réservations <i class="far fa-list ml-1"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+        {% if perms.cla_reservation.change_reservationsynthe %}
+            <div class="col-6 col-md-4 customer type-media">
+                <div class="card mb-4 bg-gradient bg-shadow">
+                    <div class="pt-3 px-3">
+                        <div class="d-flex align-items-center justify-content-center" style="height: 50px; background-color: white">
+                            <h4 class="m-0 text-uppercase text-gray-700" style="font-size: 1.5rem">
+                                <i class="fas fa-volleyball-ball mr-2 text-green"></i>
+                                Synthé
+                            </h4>
+                        </div>
+                        <div class="text-center">
+                            {% with to_review=to_review_synthe.count %}
+                                {% if to_review > 0 %}
+                                    <p class="font-weight-bold mb-0 text-sm">{{ to_review }} réservation{{ to_review|pluralize }} en attente</p>
+                                {% else %}
+                                    <p class="text-muted mb-0 text-sm">Aucune réservation en attente</p>
+                                {% endif %}
+                            {% endwith %}
+                            </p>
+                        </div>
+                        <div class="card-body px-1 pt-0 pb-3 mt-2">
+                            <div class="d-flex align-items-center">
+                                <div class="w-100">
+                                    <a href="{% url "cla_reservation:manage:synthe" %}" class="btn btn-red-dark btn-block">
+                                        Gérer les réservations <i class="far fa-list ml-1"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
