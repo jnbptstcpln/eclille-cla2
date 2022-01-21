@@ -203,7 +203,7 @@ class AssociationLink(models.Model):
 class HandoverFolderManager(models.Manager):
 
     def to_depose(self, association):
-        return self.filter(association=association, opened=True).order_by("-deposed_on").first()
+        return self.filter(association=association, opened=True, validated=False).order_by("-deposed_on").first()
 
 
 class HandoverFolder(models.Model):
@@ -216,9 +216,9 @@ class HandoverFolder(models.Model):
         ordering = "-deposed_on", "association__name"
 
     association = models.ForeignKey(Association, on_delete=models.CASCADE, related_name="handover_folders")
-    deposed_on = models.DateField(default=date.today, verbose_name="Date de dépot", help_text="Doit correspondre à l'année de fin du mandat")
-    president = models.CharField(max_length=75, blank=True, verbose_name="Président")
-    treasurer = models.CharField(max_length=75, blank=True, verbose_name="Trésorier")
+    deposed_on = models.DateField(default=date.today, verbose_name="Date de la passation", help_text="Doit correspondre à l'année de fin du mandat")
+    president = models.CharField(max_length=75, blank=True, verbose_name="Président sortant")
+    treasurer = models.CharField(max_length=75, blank=True, verbose_name="Trésorier sortant")
     quitus = models.FileField(null=True, blank=True, upload_to=FilePath.association_quitus, verbose_name="Quitus", help_text="De préférence au format PDF")
     archive = models.FileField(null=True, blank=True, upload_to=FilePath.association_archive, verbose_name="Archive", help_text="De préférence au format ZIP et contenant toutes les ressources intéressantes de l'association (logo, trésorerie, photos, ...)")
 
@@ -232,6 +232,10 @@ class HandoverFolder(models.Model):
     @property
     def mandat(self):
         return f"{self.deposed_on.year-1}/{self.deposed_on.year}"
+
+    @property
+    def empty(self):
+        return self.quitus is None and self.archive is None
 
     def __str__(self):
         return f"{self.deposed_on.year} {self.association}"

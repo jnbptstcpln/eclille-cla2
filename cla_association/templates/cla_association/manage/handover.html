@@ -16,12 +16,22 @@
     {% with folder=association.handover_folder_to_depose %}
         {% if folder %}
             <div class="mx-auto border-1-grey rounded-10 p-4">
-                <p class="text-center lead mx-auto" style="max-width: 500px">
-                    Vos passations sont passées et vous êtes maintenant invités à déposer votre dossier de passation :
-                </p>
-                <p class="text-center mb-0">
-                    <a href="{% url "cla_association:manage:handover_upload" association.slug %}" class="btn btn-outline-primary btn-lg"><i class="far fa-cloud-upload mr-1"></i> Déposer mon dossier</a>
-                </p>
+                {% if association.handover_folder_to_depose.empty %}
+                    <p class="text-center lead mx-auto" style="max-width: 500px">
+                        Vos passations sont passées et vous êtes maintenant invités à déposer votre dossier de passation :
+                    </p>
+                    <p class="text-center mb-0">
+                        <a href="{% url "cla_association:manage:handover_upload" association.slug %}" class="btn btn-outline-primary btn-lg"><i class="far fa-cloud-upload mr-1"></i> Déposer mon dossier</a>
+                    </p>
+                {% else %}
+                    <p class="text-center lead mx-auto" style="max-width: 525px">
+                        Vous avez déjà déposer votre dossier de passation, néanmoins vous avez encore la possiblité de le modifier :
+                    </p>
+                    <p class="text-center mb-0">
+                        <a href="{% url "cla_association:manage:handover_upload" association.slug %}" class="btn btn-outline-primary btn-lg"><i class="far fa-cloud-upload mr-1"></i> Déposer un nouveau dossier</a>
+                    </p>
+                {% endif %}
+
             </div>
         {% else %}
             <p class="text-justify">

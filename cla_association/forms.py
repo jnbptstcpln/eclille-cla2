@@ -53,8 +53,4 @@ class HandoverFolderForm(forms.ModelForm):
         # Customising all fields
         for field_name, field in self.fields.items():
             field.widget.attrs['class'] = field.widget.attrs.get('class', "") + "form-control"
-
-    def save(self, commit=True):
-        self.instance.opened = False
-        return super().save(commit)
-
+            field.required = True

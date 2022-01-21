@@ -6,12 +6,13 @@
 
 {% block section_content %}
     <p class="text-justify">
-        Le dossier de passations deux éléments importants :
+        Le dossier de passations deux éléments importants pour lesquels le responsable passation de CLA a dû vous
+        transmettre des modèles à remplir :
     </p>
     <ul class="text-justify">
         <li>
             <b>Le quitus</b> qui regroupe un maximum d'information essentielles sur le fonctionnement,
-            les événements et faits marquant de votre mandat ainsi que des conseils pour les générations à venir
+            les événements et faits marquant de votre mandat ainsi que des conseils pour les générations à venir.
         </li>
         <li>
             <b>Une archive</b> qui regroupe toutes les ressources que vous considérez utiles de léguer aux mandats
@@ -24,6 +25,11 @@
         possible de l'association qu'ils seront amenés à gérer, comme vous l'avez fait ces douze derniers mois.
     </p>
     <form method="post" enctype="multipart/form-data" class="mt-3 mx-auto border-1-grey rounded-10 p-4" style="max-width: 500px">
+        {% if not association.handover_folder_to_depose.empty %}
+            <div class="alert alert-info mb-3">
+                Vous avez déjà déposé une première version de votre dossier, vous pouvez néanmoins la mettre à jour avec le formulaire ci-dessous.
+            </div>
+        {% endif %}
         {% csrf_token %}
         {% for field in form %}
             {% include "components/form-group.html" with field=field %}

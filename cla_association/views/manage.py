@@ -74,6 +74,9 @@ class HandoverUploadView(LoginRequiredMixin, AssociationManageMixin, UpdateView)
     def get_object(self, queryset=None):
         folder = self.association.handover_folder_to_depose
         if folder:
+            # Set to None to not display them in the form
+            folder.quitus = None
+            folder.archive = None
             return folder
         raise Http404()
 
