@@ -290,3 +290,17 @@ body .header {
 p:last-child {
     margin-bottom: 0;
 }
+
+.cursor-pointer {
+    cursor: pointer;
+}
+.border-dash {
+    border-style: dashed;
+}
+.fc-button, .fc-button:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+.min-width-100 {
+    min-width: 100px;
+}

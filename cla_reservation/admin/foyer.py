@@ -2,6 +2,7 @@
 from django.contrib import admin
 
 from cla_reservation.models import FoyerRules, ReservationFoyer, BeerMenu, FoyerItem
+from cla_reservation.models.foyer import BlockedSlotFoyer
 
 
 @admin.register(BeerMenu)
@@ -26,4 +27,15 @@ class ReservationFoyerAdmin(admin.ModelAdmin):
         'start_time',
         'event',
         'user'
+    ]
+
+
+@admin.register(BlockedSlotFoyer)
+class BlockedSlotFoyerAdmin(admin.ModelAdmin):
+    list_display = [
+        'name',
+        'start_date',
+        'start_time',
+        'end_time',
+        'recurring'
     ]

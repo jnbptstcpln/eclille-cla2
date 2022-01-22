@@ -1,7 +1,10 @@
+import bleach
 from django import forms
+from django.conf import settings
 from django.utils import timezone
 
-from cla_reservation.models.foyer import ReservationFoyer, FoyerItem
+from cla_reservation.forms._blockedslot import BlockedSlotForm
+from cla_reservation.models.foyer import ReservationFoyer, FoyerItem, BlockedSlotFoyer
 
 
 class ReservationFoyerAssociationForm(forms.ModelForm):
@@ -35,6 +38,12 @@ class ReservationFoyerAssociationForm(forms.ModelForm):
             if not hasattr(field.widget, 'input_type') or field.widget.input_type not in {'checkbox'}:
                 field.widget.attrs['class'] = field.widget.attrs.get('class', "") + "form-control"
 
+    def clean_description(self):
+        return bleach.clean(
+            self.cleaned_data['description'],
+            tags=settings.BLEACH_ALLOWED_TAGS,
+            attributes=settings.BLEACH_ALLOWED_ATTRIBUTES
+        )
 
 class ReservationFoyerAdminForm(forms.ModelForm):
     class Meta:
@@ -69,6 +78,13 @@ class ReservationFoyerAdminForm(forms.ModelForm):
         for field_name, field in self.fields.items():
             if not hasattr(field.widget, 'input_type') or field.widget.input_type not in {'checkbox'}:
                 field.widget.attrs['class'] = field.widget.attrs.get('class', "") + "form-control"
+
+    def clean_description(self):
+        return bleach.clean(
+            self.cleaned_data['description'],
+            tags=settings.BLEACH_ALLOWED_TAGS,
+            attributes=settings.BLEACH_ALLOWED_ATTRIBUTES
+        )
 
 
 class ReservationFoyerValidateForm(forms.ModelForm):
@@ -118,3 +134,8 @@ class ReservationFoyerRejectForm(forms.ModelForm):
     def save(self, commit=True):
         self.instance.sent = False
         return super().save(commit)
+
+
+class BlockedSlotFoyerForm(BlockedSlotForm):
+    class Meta(BlockedSlotForm.Meta):
+        model = BlockedSlotFoyer

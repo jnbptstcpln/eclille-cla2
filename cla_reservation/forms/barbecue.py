@@ -1,7 +1,10 @@
+import bleach
 from django import forms
+from django.conf import settings
 from django.utils import timezone
 
-from cla_reservation.models.barbecue import ReservationBarbecue
+from cla_reservation.forms._blockedslot import BlockedSlotForm
+from cla_reservation.models.barbecue import ReservationBarbecue, BlockedSlotBarbecue
 
 
 class ReservationBarbecueAssociationForm(forms.ModelForm):
@@ -26,6 +29,12 @@ class ReservationBarbecueAssociationForm(forms.ModelForm):
             if hasattr(field.widget, 'input_type') and field.widget.input_type not in {'checkbox'}:
                 field.widget.attrs['class'] = field.widget.attrs.get('class', "") + "form-control"
 
+    def clean_description_event(self):
+        return bleach.clean(
+            self.cleaned_data['description_event'],
+            tags=settings.BLEACH_ALLOWED_TAGS,
+            attributes=settings.BLEACH_ALLOWED_ATTRIBUTES
+        )
 
 class ReservationBarbecueMemberForm(forms.ModelForm):
     class Meta:
@@ -48,6 +57,12 @@ class ReservationBarbecueMemberForm(forms.ModelForm):
             if hasattr(field.widget, 'input_type') and field.widget.input_type not in {'checkbox'}:
                 field.widget.attrs['class'] = field.widget.attrs.get('class', "") + "form-control"
 
+    def clean_description_user(self):
+        return bleach.clean(
+            self.cleaned_data['description_user'],
+            tags=settings.BLEACH_ALLOWED_TAGS,
+            attributes=settings.BLEACH_ALLOWED_ATTRIBUTES
+        )
 
 class ReservationBarbecueAssociationAdminForm(forms.ModelForm):
     class Meta:
@@ -73,6 +88,13 @@ class ReservationBarbecueAssociationAdminForm(forms.ModelForm):
         for field_name, field in self.fields.items():
             if not hasattr(field.widget, 'input_type') or field.widget.input_type not in {'checkbox'}:
                 field.widget.attrs['class'] = field.widget.attrs.get('class', "") + "form-control"
+
+    def clean_description_event(self):
+        return bleach.clean(
+            self.cleaned_data['description_event'],
+            tags=settings.BLEACH_ALLOWED_TAGS,
+            attributes=settings.BLEACH_ALLOWED_ATTRIBUTES
+        )
 
 
 class ReservationBarbecueMemberAdminForm(forms.ModelForm):
@@ -100,6 +122,12 @@ class ReservationBarbecueMemberAdminForm(forms.ModelForm):
             if not hasattr(field.widget, 'input_type') or field.widget.input_type not in {'checkbox'}:
                 field.widget.attrs['class'] = field.widget.attrs.get('class', "") + "form-control"
 
+    def clean_description_user(self):
+        return bleach.clean(
+            self.cleaned_data['description_user'],
+            tags=settings.BLEACH_ALLOWED_TAGS,
+            attributes=settings.BLEACH_ALLOWED_ATTRIBUTES
+        )
 
 class ReservationBarbecueValidateForm(forms.ModelForm):
     class Meta:
@@ -148,3 +176,8 @@ class ReservationBarbecueRejectForm(forms.ModelForm):
     def save(self, commit=True):
         self.instance.sent = False
         return super().save(commit)
+
+
+class BlockedSlotBarbecueForm(BlockedSlotForm):
+    class Meta(BlockedSlotForm.Meta):
+        model = BlockedSlotBarbecue

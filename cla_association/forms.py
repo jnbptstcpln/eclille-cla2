@@ -1,6 +1,8 @@
+import bleach as bleach
 from django import forms
 
 from cla_association.models import Association, HandoverFolder
+from django.conf import settings
 
 
 class AssociationForm(forms.ModelForm):
@@ -18,6 +20,13 @@ class AssociationForm(forms.ModelForm):
         # Customising all fields
         for field_name, field in self.fields.items():
             field.widget.attrs['class'] = field.widget.attrs.get('class', "") + "form-control"
+
+    def clean_presentation_html(self):
+        return bleach.clean(
+            self.cleaned_data['presentation_html'],
+            tags=settings.BLEACH_ALLOWED_TAGS,
+            attributes=settings.BLEACH_ALLOWED_ATTRIBUTES
+        )
 
 
 class AssociationLogoForm(forms.ModelForm):

@@ -1,0 +1,74 @@
+{% extends "cla_event/manage/_layout.html" %}
+
+{% block page_title %}Gestion des événements | CLA{% endblock %}
+
+{% block section_title %}Gestion des événements{% endblock %}
+
+{% block section_buttons %}
+    <a href="#" class="btn btn-outline-primary btn-lg">Ajouter...</a>
+{% endblock %}
+
+{% block section_content %}
+    <div class="mt-4">
+        <div id='calendar'></div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                var calendarEl = document.getElementById('calendar');
+                var calendar = new FullCalendar.Calendar(calendarEl, {
+                    timeZone: 'Europe/Paris',
+                    locale: 'fr',
+                    headerToolbar: {
+                        left: 'prev,next',
+                        center: 'title',
+                        right: 'dayGridMonth,timeGridWeek,listMonth'
+                    },
+                    initialView: 'timeGridWeek',
+                    slotDuration: '01:00:00',
+                    nextDayThreshold: '08:00:00',
+                    allDaySlot: false,
+                    height: 700,
+                    events: {
+                        url: window.location.href,
+                        method: 'GET',
+                        extraParams: {
+                            format: 'json'
+                        }
+                    },
+                    eventDidMount: function (e) {
+                        if (e.event.extendedProps.popover) {
+                            $(e.el).popover({
+                                trigger: 'hover',
+                                html: true,
+                                content: e.event._def.extendedProps.popover_content
+                            })
+                        }
+                    },
+                    eventClick: function (info) {
+                        info.jsEvent.preventDefault(); // don't let the browser navigate
+                        if (info.event.url) {
+                            window.open(info.event.url);
+                        }
+                        //info.el.style.borderColor = 'red';
+                    }
+                });
+
+                calendar.render()
+
+                var refetchEventsInternal = null
+                var refetchEventsTimeout = null
+                function setupInternal() {
+                    clearTimeout(refetchEventsTimeout);
+                    clearInterval(refetchEventsInternal);
+                    refetchEventsInternal = setInterval(function () {
+                        calendar.refetchEvents()
+                    }, 3000);
+                    refetchEventsTimeout = setTimeout(function () {
+                        clearInterval(refetchEventsInternal)
+                    }, 5 * 60 * 1000) // Stop the auto-reloading after 5 minutes
+                }
+                document.addEventListener('click', setupInternal)
+
+            });
+        </script>
+    </div>
+{% endblock %}

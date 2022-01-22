@@ -16,8 +16,7 @@
             </div>
 
             <div class="col-md-9">
-                <h2 style="font-size: 1.5rem">{% block section_title %}__SECTION_TITLE__{% endblock %}</h2>
-            
+
                 <div class="dropdown d-block d-md-none mt-3 mb-4">
                     <a class="btn btn-primary btn-block btn-lg dropdown-toggle" href="{% url "cla_member:lobby" %}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> Accéder à </a>
                     <div class="dropdown-menu dropdown-menu-lg" style="width: 100%">
@@ -25,6 +24,11 @@
                             <a class="dropdown-item {% if section_active == section.id %} active{% endif %}" href="{{ section.href }}">{{ section.label }}</a>
                         {% endfor %}
                     </div>
+                </div>
+
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h2 class="mb-0" style="font-size: 1.5rem">{% block section_title %}__SECTION_TITLE__{% endblock %}</h2>
+                    <div>{% block section_buttons %}{% endblock %}</div>
                 </div>
 
                 {% block section_content %}__SECTION_CONTENT__{% endblock %}

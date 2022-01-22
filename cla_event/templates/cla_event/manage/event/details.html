@@ -1,11 +1,11 @@
-{% extends "cla_reservation/manage/_layout.html" %}
+{% extends "cla_event/manage/_layout.html" %}
 
-{% block page_title %}{{ object.event.name }} | Réservations du foyer | CLA{% endblock %}
+{% block page_title %}{{ object.name }} | Événements | CLA{% endblock %}
 
-{% block section_title %}{{ object.event.name }} | {{ object.event.get_datetime_display }}{% endblock %}
+{% block section_title %}{{ object.name }} | {{ object.get_datetime_display }}{% endblock %}
 
 {% block section_buttons %}
-    <a href="{% url "cla_reservation:manage:foyer-update" object.pk %}" class="btn btn-outline-primary btn-lg">Modifier</a>
+    <a href="{% url "cla_event:manage:event-update" object.pk %}" class="btn btn-outline-primary btn-lg">Modifier</a>
 {% endblock %}
 
 {% block section_content %}
@@ -26,11 +26,11 @@
             <div class="row">
                 <dl class="col-12 col-md-6">
                     <dt>Nom</dt>
-                    <dd>{{ object.event.association.name }}</dd>
+                    <dd>{{ object.association.name }}</dd>
                 </dl>
                 <dl class="col-12 col-md-6">
                     <dt>Type</dt>
-                    <dd>{{ object.event.association.get_type_display }}</dd>
+                    <dd>{{ object.association.get_type_display }}</dd>
                 </dl>
             </div>
         </div>
@@ -38,7 +38,7 @@
             <h4 style="font-size: 1rem">Responsables</h4>
             <table class="table table-condensed">
                 <tbody>
-                {% for member in object.event.association.members.all %}
+                {% for member in object.association.members.all %}
                     <tr>
                         <td>{{ member.role }}</td>
                         <td>{{ member.user.first_name }} {{ member.user.last_name }}</td>
@@ -50,54 +50,57 @@
                 </tbody>
             </table>
         </div>
-    </div>
-    <div class="mt-4">
+
         <h3 style="font-size: 1.25rem">Informations sur l'événement</h3>
         <div class="mt-2 p-4">
             <div class="row">
                 <dl class="col-12 col-md-6">
                     <dt>Nom</dt>
-                    <dd>{{ object.event.name }}</dd>
+                    <dd>{{ object.name }}</dd>
                 </dl>
                 <dl class="col-12 col-md-6">
                     <dt>Nom "admin compatible"</dt>
-                    <dd>{{ object.event.name_school }}</dd>
+                    <dd>{{ object.name_school }}</dd>
                 </dl>
                 <dl class="col-12 col-md-6">
                     <dt>Type d'événement</dt>
-                    <dd>{{ object.event.type }}</dd>
+                    <dd>{{ object.type }}</dd>
                 </dl>
                 <dl class="col-12 col-md-6">
                     <dt>Lieu</dt>
-                    <dd>{{ object.event.place }}</dd>
-                </dl>
-                <dl class="col-12 col-md-6">
-                    <dt>Début de l'événement</dt>
-                    <dd>{{ object.event.starts_on|date:'d/m/Y H\hi' }}</dd>
-                </dl>
-                <dl class="col-12 col-md-6">
-                    <dt>Fin de l'événement</dt>
-                    <dd>{{ object.event.ends_on|date:'d/m/Y H\hi' }}</dd>
+                    <dd>{{ object.place }}</dd>
                 </dl>
             </div>
             <div style="max-width: 700px">
                 {% if not object.validated %}
+                    {% if object.multiple_days %}
+                        <div class="d-flex align-items-center alert alert-warning mb-3">
+                            <div class="mr-3">
+                                <i class="far fa-exclamation-triangle text-x2"></i>
+                            </div>
+                            <div class="flex-fill">
+                                <b>Attention !</b> L'organisateur a indiqué que l'événement se déroule sur plusieurs
+                                jours, rapprochez vous de lui pour en savoir plus et modifier les dates
+                                en conséquence.
+                            </div>
+                        </div>
+                    {% endif %}
                     {% if is_range_free %}
                         <div class="alert alert-success align-items-center d-flex">
                             <div class="mr-4">
                                 <i class="far fa-check-circle" style="font-size: 1.25rem"></i>
                             </div>
                             <div class="flex-fill">
-                                Le foyer n'est pas occupé sur le créneau demandé ({{ object.get_datetime_display }})
+                                Aucun événement sur ce créneau ({{ object.get_datetime_display }})
                             </div>
                         </div>
                     {% else %}
-                        <div class="alert alert-danger align-items-center d-flex">
+                        <div class="alert alert-warning align-items-center d-flex">
                             <div class="mr-4">
-                                <i class="far fa-times-circle" style="font-size: 1.25rem"></i>
+                                <i class="far fa-exclamation-triangle" style="font-size: 1.25rem"></i>
                             </div>
                             <div class="flex-fill">
-                                Le foyer est occupé sur le créneau demandé ({{ object.get_datetime_display }})
+                                Un événement a déjà été validé sur ce créneau ({{ object.get_datetime_display }})
                             </div>
                         </div>
                     {% endif %}
@@ -105,11 +108,11 @@
             </div>
             <div class="row">
                 <dl class="col-12 col-md-6">
-                    <dt>Ouverture du foyer pour débuter l'installation</dt>
+                    <dt>Début de l'événement</dt>
                     <dd>{{ object.starts_on|date:'d/m/Y - H\hi' }}</dd>
                 </dl>
                 <dl class="col-12 col-md-6">
-                    <dt>Fin du rangement</dt>
+                    <dt>Fin de l'événement</dt>
                     <dd>{{ object.ends_on|date:'d/m/Y - H\hi' }}</dd>
                 </dl>
             </div>
@@ -139,12 +142,12 @@
                                     format: 'json'
                                 }
                             },
-                            eventDidMount: function (e) {
+                            eventDidMount: function(e) {
                                 console.log(e)
                                 if (e.event.extendedProps.popover) {
                                     $(e.el).popover({
-                                        trigger: 'hover',
-                                        html: true,
+                                        trigger:'hover',
+                                        html:true,
                                         content: e.event._def.extendedProps.popover_content
                                     })
                                 }
@@ -155,34 +158,12 @@
                     });
                 </script>
             </div>
-            <div class="mt-4">
-                <h4>Descripion de l'événement</h4>
-                <div class="rounded border-1-grey p-3">
-                    {{ object.description|safe }}
-                </div>
-            </div>
-            <div class="mt-4">
-                <h4>Sélection de bière</h4>
-                <div class="rounded border-1-grey p-3">
-                    {{ object.beer_selection|linebreaksbr }}
-                </div>
-            </div>
-            <div class="mt-4">
-                <h4>Équipements supplémentaires</h4>
-                <ul>
-                    {% for item in object.items.all %}
-                        <li>{{ item }}</li>
-                    {% empty %}
-                        <li class="text-muted">Aucun équipement supplémentaire</li>
-                    {% endfor %}
-                </ul>
-            </div>
         </div>
     </div>
     {% if not object.validated %}
         <div class="row mt-4 mx-auto" style="max-width: 750px">
-            <a href="{% url "cla_reservation:manage:foyer-reject" object.pk %}" class="btn btn-outline-danger btn-block btn-lg my-2">Rejeter la réservation...</a>
-            <a href="{% url "cla_reservation:manage:foyer-validate" object.pk %}" class="btn btn-outline-success btn-block btn-lg my-2">Valider la réservation...</a>
+            <a href="{% url "cla_event:manage:event-reject" object.pk %}" class="btn btn-outline-danger btn-block btn-lg my-2">Rejeter l'événement...</a>
+            <a href="{% url "cla_event:manage:event-validate" object.pk %}" class="btn btn-outline-success btn-block btn-lg my-2">Valider l'événement'...</a>
         </div>
     {% endif %}
 {% endblock %}

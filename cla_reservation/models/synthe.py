@@ -7,6 +7,7 @@ from django.utils.safestring import mark_safe
 from django_summernote.fields import SummernoteTextField
 
 from cla_event.models import Event
+from cla_reservation.models._base import AbstractBlockedSlot
 
 
 class SportActivity(models.Model):
@@ -22,6 +23,12 @@ class SportActivity(models.Model):
 
 
 class ReservationSyntheManager(models.Manager):
+
+    def for_admin(self):
+        return self.filter(validated=True, admin_display=True)
+
+    def for_member(self):
+        return self.filter(validated=True, member_display=True)
 
     def to_validate(self):
         return self.filter(validated=False, sent=True).order_by('sent_on')
@@ -109,3 +116,10 @@ class ReservationSynthe(models.Model):
             return str(self.user)
         else:
             return self.starts_on
+
+
+class BlockedSlotSynthe(AbstractBlockedSlot):
+
+    class Meta:
+        verbose_name = "[SYNTHE] Créneau bloqué"
+        verbose_name_plural = "[SYNTHE] Créneaux bloqués"

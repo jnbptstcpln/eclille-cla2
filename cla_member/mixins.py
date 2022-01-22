@@ -7,15 +7,6 @@ from cla_association.models import AssociationMember
 class ClaMemberModuleMixin(LoginRequiredMixin):
     cla_member_active_section = None
 
-    RESERVATIONS_PERMISSIONS = [
-        "cla_reservation.change_reservationfoyer",
-        "cla_reservation.change_reservationbarbecue",
-        "cla_reservation.change_reservationsynthe"
-    ]
-
-    def has_any_reservation_permission(self):
-        return any([self.request.user.has_perm(p) for p in self.RESERVATIONS_PERMISSIONS])
-
     def get_sections_navigation(self):
         sections = [
             {
@@ -24,15 +15,25 @@ class ClaMemberModuleMixin(LoginRequiredMixin):
                 'href': resolve_url("cla_member:lobby")
             },
             {
+                'id': "account",
+                'label': "Mon compte",
+                'href': resolve_url("cla_member:account")
+            },
+            {
+                'id': "planning",
+                'label': "Calendrier",
+                'href': resolve_url("cla_event:public:index")
+            },
+            {
+                'id': "reservations",
+                'label': "Infrastructures",
+                'href': resolve_url("cla_reservation:index")
+            },
+            {
                 'id': "ticketing",
                 'label': "Billetteries",
                 'href': resolve_url("cla_member:ticketing")
             },
-            {
-                'id': "account",
-                'label': "Mon compte",
-                'href': resolve_url("cla_member:account")
-            }
         ]
 
         if AssociationMember.objects.filter(user=self.request.user, association__active=True).count() > 0:
@@ -40,13 +41,6 @@ class ClaMemberModuleMixin(LoginRequiredMixin):
                 'id': "association",
                 'label': "Mes associations",
                 'href': resolve_url("cla_member:associations")
-            })
-
-        if self.has_any_reservation_permission():
-            sections.append({
-                'id': "reservations",
-                'label': "Infrastructures",
-                'href': resolve_url("cla_reservation:manage:index")
             })
 
         if self.request.user.has_perm("cla_auth.upload_user_picture"):

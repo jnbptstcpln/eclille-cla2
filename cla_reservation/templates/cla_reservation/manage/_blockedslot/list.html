@@ -1,0 +1,72 @@
+{% extends "cla_reservation/manage/_layout.html" %}
+
+{% block page_title %}Créneaux bloqués | {{ infrastructure_name|capfirst }} | CLA{% endblock %}
+
+{% block section_title %}Créneaux bloqués{% endblock %}
+
+{% block section_content %}
+    <div class="mt-4">
+        <p class="mb-4">
+            Les créneaux bloqués vous permettent de facilement créer des moments de réservation ponctuels et même
+            récurrent. Seuls les créneaux à venir s'affiche dans la liste ci-dessous.
+        </p>
+        {% include "components/messages.html" %}
+        <table class="table w-100">
+            <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Date</th>
+                <th>Récurrence</th>
+                <th><a href="{{ create_href }}">Nouveau</a></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for slot in object_list %}
+                <tr>
+                    <td>
+                        {{ slot.name }}
+                    </td>
+                    <td>
+                        {{ slot.get_datetime_display }}
+                    </td>
+                    <td>
+                        {% if slot.recurring %}
+                            Tous les {{ slot.get_recurring_days_display }} de {{ slot.start_time|date:'H:i' }} à {{ slot.end_time|date:'H:i' }}
+                            {% if slot.end_recurring %}<small class="d-block text-muted">Jusqu'au {{ slot.end_recurring }}</small>{% endif %}
+                        {% else %}
+                            <p class="text-muted">Aucune</p>
+                        {% endif %}
+                    </td>
+                    <td><a href="{% url detail_url_scheme slot.pk %}">Détails...</a></td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center">
+                        Aucun créneau bloqué n'a encore été créé
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        {% if page_obj.paginator.num_pages > 1 %}
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous"> <span aria-hidden="true">«</span> <span class="sr-only">Previous</span> </a>
+                    </li>
+                {% endif %}
+
+                {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Next"> <span aria-hidden="true">»</span> <span class="sr-only">Next</span> </a>
+                    </li>
+                {% endif %}
+
+                <li class="page-item active">
+                    <a class="page-link" href="#">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</a>
+                </li>
+            </ul>
+        {% endif %}
+    </div>
+{% endblock %}

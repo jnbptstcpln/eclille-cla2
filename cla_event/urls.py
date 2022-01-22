@@ -1,14 +1,24 @@
 from django.urls import path, include
-from cla_event.views import association
+from cla_event.views import association, public, manage
 
 app_name = "cla_event"
 urlpatterns = [
     path('', include(
         (
             [
-                #path("", public.ListView.as_view(), name="list"),
-                #path("<str:slug>", public.DetailView.as_view(), name="detail")
+                path("", public.IndexView.as_view(), name="index")
             ], 'public'
+        )
+    )),
+    path('', include(
+        (
+            [
+                path("modifier/", manage.IndexView.as_view(), name="index"),
+                path("modifier/<int:pk>/", manage.EventDetailView.as_view(), name="event-detail"),
+                path("modifier/<int:pk>/modifier", manage.EventUpdateView.as_view(), name="event-update"),
+                path("modifier/<int:pk>/valider", manage.EventValidateView.as_view(), name="event-validate"),
+                path("modifier/<int:pk>/rejeter", manage.EventRejectView.as_view(), name="event-reject"),
+            ], 'manage'
         )
     )),
     path('', include(

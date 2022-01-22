@@ -1,0 +1,38 @@
+{% extends "cla_member/lobby/_layout.html" %}
+
+{% block page_title %}Planning {{ name|capfirst }} | CLA{% endblock %}
+
+{% block section_title %}Planning {{ name|capfirst }}{% endblock %}
+
+{% block section_content %}
+    <div class="mt-4">
+        <div id='calendar'></div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                var calendarEl = document.getElementById('calendar');
+                var calendar = new FullCalendar.Calendar(calendarEl, {
+                    timeZone: 'Europe/Paris',
+                    locale: 'fr',
+                    headerToolbar: {
+                        left: 'prev,next',
+                        center: 'title',
+                        right: 'dayGridMonth,timeGridWeek'
+                    },
+                    initialView: 'timeGridWeek',
+                    slotDuration: '01:00:00',
+                    nextDayThreshold: '08:00:00',
+                    height: 700,
+                    allDaySlot: false,
+                    events: {
+                        url: window.location.href,
+                        method: 'GET',
+                        extraParams: {
+                            format: 'json'
+                        }
+                    }
+                });
+                calendar.render();
+            });
+        </script>
+    </div>
+{% endblock %}

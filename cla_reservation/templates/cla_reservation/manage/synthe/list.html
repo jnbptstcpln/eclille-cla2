@@ -48,7 +48,7 @@
             {% for reservation in object_list %}
                 <tr>
                     <td>
-                        <td>{% if reservation.user %}{{ reservation.get_datetime_display }}{% else %}{{ reservation.event.get_datetime_display }}{% endif %}</td>
+                        {% if reservation.user %}{{ reservation.get_datetime_display }}{% else %}{{ reservation.event.get_datetime_display }}{% endif %}
                     </td>
                     <td>
                         {{ reservation }}

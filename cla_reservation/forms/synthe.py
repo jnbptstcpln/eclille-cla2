@@ -1,7 +1,10 @@
+import bleach
 from django import forms
+from django.conf import settings
 from django.utils import timezone
 
-from cla_reservation.models.synthe import ReservationSynthe
+from cla_reservation.forms._blockedslot import BlockedSlotForm
+from cla_reservation.models.synthe import ReservationSynthe, BlockedSlotSynthe
 
 
 class ReservationSyntheAssociationForm(forms.ModelForm):
@@ -27,6 +30,12 @@ class ReservationSyntheAssociationForm(forms.ModelForm):
             if hasattr(field.widget, 'input_type') and field.widget.input_type not in {'checkbox'}:
                 field.widget.attrs['class'] = field.widget.attrs.get('class', "") + "form-control"
 
+    def clean_description_event(self):
+        return bleach.clean(
+            self.cleaned_data['description_event'],
+            tags=settings.BLEACH_ALLOWED_TAGS,
+            attributes=settings.BLEACH_ALLOWED_ATTRIBUTES
+        )
 
 class ReservationSyntheMemberForm(forms.ModelForm):
     class Meta:
@@ -75,6 +84,12 @@ class ReservationSyntheAssociationAdminForm(forms.ModelForm):
             if not hasattr(field.widget, 'input_type') or field.widget.input_type not in {'checkbox'}:
                 field.widget.attrs['class'] = field.widget.attrs.get('class', "") + "form-control"
 
+    def clean_description_event(self):
+        return bleach.clean(
+            self.cleaned_data['description_event'],
+            tags=settings.BLEACH_ALLOWED_TAGS,
+            attributes=settings.BLEACH_ALLOWED_ATTRIBUTES
+        )
 
 class ReservationSyntheMemberAdminForm(forms.ModelForm):
     class Meta:
@@ -149,3 +164,8 @@ class ReservationSyntheRejectForm(forms.ModelForm):
     def save(self, commit=True):
         self.instance.sent = False
         return super().save(commit)
+
+
+class BlockedSlotSyntheForm(BlockedSlotForm):
+    class Meta(BlockedSlotForm.Meta):
+        model = BlockedSlotSynthe

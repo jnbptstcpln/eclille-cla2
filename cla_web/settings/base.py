@@ -1,3 +1,4 @@
+
 """
 Django settings for cla_web project.
 
@@ -17,7 +18,7 @@ from decouple import config
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 # Project Version
-PROJECT_VERSION = "0.3"
+PROJECT_VERSION = "0.4"
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
@@ -173,3 +174,38 @@ LOGIN_URL = "/connexion"
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 SESSION_COOKIE_AGE = 3600
 SESSION_SAVE_EVERY_REQUEST = True
+
+
+# Bleach default config
+BLEACH_ALLOWED_TAGS = [
+    "a",
+    "abbr",
+    "acronym",
+    "b",
+    "br",
+    "blockquote",
+    "code",
+    "em",
+    "i",
+    "u",
+    "li",
+    "ol",
+    "strong",
+    "span",
+    "ul",
+    "p",
+    "sup",
+    "sub"
+    "img",
+    "hr",
+    "div"
+]
+BLEACH_ALLOWED_ATTRIBUTES = {
+    "a": ["href", "title"],
+    "abbr": ["title"],
+    "acronym": ["title"],
+    "img": ["src"],
+    "div": ["style"],
+    "p": ["style"],
+    "span": ["style"]
+}

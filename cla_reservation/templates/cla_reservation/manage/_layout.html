@@ -11,7 +11,6 @@
                 <div class="row col-auto mr-1">
                     <div>
                         <i class="far fa-{{ reservation_item.icon }} text-{{ reservation_item.color }}" style="font-size: 4rem"></i>
-                        <h4>Foyer</h4>
                     </div>
                 </div>
                 <div class="row col-auto align-items-center justify-content-center">
@@ -39,12 +38,12 @@
                     <div class="text-center">
                         <i class="far fa-{{ reservation_item.icon }} text-{{ reservation_item.color }}" style="font-size: 4rem"></i>
                     </div>
-                    <h4 class="text-center mt-2" style="font-size: 1rem">{{ reservation_item.name }}</h4>
+                    <h4 class="text-center mt-2" style="font-size: 1.5rem">{{ reservation_item.name }}</h4>
                 </div>
 
                 <ul class="nav nav-section-menu mb-4 py-3 d-none d-md-block" style="position: relative; left: 1px;">
                     <li>
-                        <a href="{% url "cla_reservation:manage:index" %}" class="nav-link first bg-grey bg-hover-grey text-grey-dark"><i class="fa fa-angle-left"></i> Infrastructures</a>
+                        <a href="{% url "cla_reservation:index" %}" class="nav-link first bg-grey bg-hover-grey text-grey-dark"><i class="fa fa-angle-left"></i> Infrastructures</a>
                     </li>
                     {% for section in sections_navigation %}
                         <li>

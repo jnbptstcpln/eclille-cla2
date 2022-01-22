@@ -1,13 +1,20 @@
 from datetime import timedelta, date, datetime
 
+import bleach
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
+from django.db.models import Q
+from django.http import JsonResponse
 from django.shortcuts import redirect, render, resolve_url
+from django.utils import timezone
 
 from cla_event.mixins import EventAssociationMixin
 from cla_event.models import Event
 from cla_member.mixins import ClaMemberModuleMixin
 from cla_reservation.models import ReservationFoyer, ReservationBarbecue, ReservationSynthe
+from cla_reservation.models.barbecue import BlockedSlotBarbecue
+from cla_reservation.models.foyer import BlockedSlotFoyer
+from cla_reservation.models.synthe import BlockedSlotSynthe
 
 
 class ReservationAssociationMixin(EventAssociationMixin):
@@ -68,19 +75,11 @@ class ReservationAssociationMixin(EventAssociationMixin):
         return context
 
 
-class ReservationManageMixin(ClaMemberModuleMixin):
-    cla_member_active_section = "reservations"
-
-    def dispatch(self, request, *args, **kwargs):
-        if not self.has_any_reservation_permission():
-            raise PermissionDenied()
-        return super().dispatch(request, *args, **kwargs)
-
-
 class AbstractReservationItemManageMixin(ClaMemberModuleMixin):
     cla_member_active_section = "reservations"
     cla_reservation_active_section = "index"
     model = None
+    blocked_slot_model = None
     permission_name = None
     namespace = None
 
@@ -104,17 +103,28 @@ class AbstractReservationItemManageMixin(ClaMemberModuleMixin):
                 'href': resolve_url(f"cla_reservation:manage:{self.namespace}")
             },
             {
-                'id': "planning",
-                'label': "Planning",
-                'href': resolve_url(f"cla_reservation:manage:{self.namespace}")
+                'id': "blockedslot",
+                'label': "Créneaux bloqués",
+                'href': resolve_url(f"cla_reservation:manage:{self.namespace}-blockedslot-list")
             },
             {
-                'id': "beers",
-                'label': "Bières",
-                'href': resolve_url(f"cla_reservation:manage:{self.namespace}")
+                'id': "planning",
+                'label': "Planning",
+                'href': resolve_url(f"cla_reservation:manage:{self.namespace}-planning")
             }
         ]
         return sections
+
+    def is_range_free(self):
+        if hasattr(self, 'object'):
+            return self.model.objects.is_range_free(self.object.starts_on, self.object.ends_on) \
+                   and self.blocked_slot_model.objects.is_range_free(self.object.starts_on, self.object.ends_on)
+        return None
+
+    def is_event_range_free(self):
+        if hasattr(self, 'object') and hasattr(self.object, 'event'):
+            return Event.objects.is_range_free(self.object.event.starts_on, self.object.event.ends_on)
+        return None
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -122,9 +132,9 @@ class AbstractReservationItemManageMixin(ClaMemberModuleMixin):
             'page_active': 'cla_member',
             'sections_navigation': self.get_sections_navigation(),
             'section_active': self.cla_reservation_active_section,
-            'to_review': self.model.objects.to_validate(),
-            'is_range_free': self.model.objects.is_range_free(self.object.starts_on, self.object.ends_on) if hasattr(self, 'object') else None,
-            'event_is_range_free': Event.objects.is_range_free(self.object.event.starts_on, self.object.event.ends_on) if hasattr(self, 'object') else None,
+            'to_review': self.model.objects.to_validate() if hasattr(self.model.objects, 'to_validate') else None,
+            'is_range_free': self.is_range_free() if hasattr(self.model.objects, 'to_validate') else None,
+            'event_is_range_free': self.is_event_range_free(),
             'reservation_item': self.get_reservation_item()
         })
         return context
@@ -132,6 +142,7 @@ class AbstractReservationItemManageMixin(ClaMemberModuleMixin):
 
 class ReservationBarbecueManageMixin(AbstractReservationItemManageMixin):
     model = ReservationBarbecue
+    blocked_slot_model = BlockedSlotBarbecue
     permission_name = "cla_reservation.change_reservationbarbecue"
     namespace = "barbecue"
 
@@ -145,6 +156,7 @@ class ReservationBarbecueManageMixin(AbstractReservationItemManageMixin):
 
 class ReservationFoyerManageMixin(AbstractReservationItemManageMixin):
     model = ReservationFoyer
+    blocked_slot_model = BlockedSlotFoyer
     permission_name = "cla_reservation.change_reservationfoyer"
     namespace = "foyer"
 
@@ -158,6 +170,7 @@ class ReservationFoyerManageMixin(AbstractReservationItemManageMixin):
 
 class ReservationSyntheManageMixin(AbstractReservationItemManageMixin):
     model = ReservationSynthe
+    blocked_slot_model = BlockedSlotSynthe
     permission_name = "cla_reservation.change_reservationsynthe"
     namespace = "synthe"
 
@@ -167,3 +180,164 @@ class ReservationSyntheManageMixin(AbstractReservationItemManageMixin):
             'icon': "volleyball-ball",
             'color': "green",
         }
+
+
+class PlanningMixin:
+    planning_name = '__PLANNING_NAME__'
+    model = None
+    blocked_slot_model = None
+
+    config__reservation_clickable = True
+    config__slot_clickable = True
+    config__reservation_content = False
+    config__reservation_popover = False
+    config__reservation_non_public_attrs = {
+        'backgroundColor': '#aaa',
+        'textColor': '#222',
+        'borderColor': '#222'
+    }
+    config__reservation_non_validated_attrs = {
+        'backgroundColor': '#eee',
+        'textColor': '#888',
+        'borderColor': '#888',
+    }
+
+    def get_reservation_content(self, instance):
+        return {
+            'html': f"[{instance.association.name}]<br>{instance.name}"
+        }
+
+    def get_reservation_class_names(self, instance):
+        class_names = []
+        if not instance.validated:
+            class_names.append('border-dash')
+        return class_names
+
+    def get_reservation_url(self, instance):
+        return None
+
+    def get_slot_url(self, instance):
+        return None
+
+    def get_reservation_title(self, instance):
+        if instance.event and instance.event.public:
+            return instance.event.association.name
+        else:
+            return f"Réservé"
+
+    def get_reservation_popover(self, instance: Event):
+        return {
+            'popover': True,
+            'popover_content': bleach.clean(
+                (
+                    f"""
+                    <div class='text-center min-width-100'>
+                        <div class='font-weight-bold' style='text-lg'>{instance.event.name}</div>
+                    </div>
+                    """
+                ) if instance.event else (
+                    f"""
+                    <div class='text-center min-width-100'>
+                        <div class='font-weight-bold' style='text-lg'>{instance.user.first_name} {instance.user.last_name}</div>
+                    </div>
+                    """
+                )
+                ,
+                tags=['span', 'br', 'div'],
+                attributes={'span': ['class'], 'div': ['class']}
+            ),
+        }
+
+    def build_reservation(self, instance):
+        r = {
+            'title': self.get_reservation_title(instance),
+            'classNames': self.get_reservation_class_names(instance),
+            'start': instance.starts_on.astimezone(timezone.get_current_timezone()),
+            'end': instance.ends_on.astimezone(timezone.get_current_timezone()),
+        }
+
+        if self.config__reservation_clickable:
+            r['url'] = self.get_reservation_url(instance)
+        if instance.event and not instance.event.public and self.config__reservation_non_public_attrs:
+            r.update(self.config__reservation_non_public_attrs)
+        if not instance.validated:
+            r.update(self.config__reservation_non_validated_attrs)
+        if self.config__reservation_content:
+            r.update({'reservationContent': self.get_reservation_content(instance)})
+        if self.config__reservation_popover:
+            r.update(self.get_reservation_popover(instance))
+        return r
+
+    def build_slot(self, instance, recurring=False):
+
+        s = {
+            'title': instance.name,
+            'backgroundColor': '#eee',
+            'textColor': '#555',
+        }
+
+        if recurring:
+            s.update({
+                'daysOfWeek': instance.recurring_days,
+                'startTime': instance.start_time,
+                'endTime': instance.end_time,
+                'startRecur': instance.start_date.isoformat(),
+                'endRecur': instance.end_recurring.isoformat() if instance.end_recurring else None,
+            })
+        else:
+            s.update({
+                'start': instance.starts_on.astimezone(timezone.get_current_timezone()),
+                'end': instance.ends_on.astimezone(timezone.get_current_timezone()),
+            })
+
+        if self.config__slot_clickable:
+            s['url'] = self.get_slot_url(instance)
+
+        return s
+
+    def get_blocked_slot_base_queryset(self):
+        return self.blocked_slot_model.objects.for_member()
+
+    def get_reservation_base_queryset(self):
+        return self.model.objects.for_member()
+
+    def get_recurring_reservations(self, start, end):
+        slots = self.get_blocked_slot_base_queryset().filter(recurring=True, start_date__lte=end.date()).filter(Q(end_recurring__gte=start.date()) | Q(end_recurring__isnull=True))
+        return [
+            self.build_slot(s, recurring=True) for s in slots
+        ]
+
+    def get_fixed_reservations(self, start, end):
+        slots = self.get_blocked_slot_base_queryset().filter(starts_on__gte=start, ends_on__lte=end, recurring=False)
+        return [
+            self.build_slot(s) for s in slots
+        ]
+
+    def get_reservations(self, start, end):
+        reservations = self.get_reservation_base_queryset().filter(starts_on__gte=start, ends_on__lte=end)
+        return [
+            self.build_reservation(r) for r in reservations
+        ]
+
+    def get(self, request, *args, **kwargs):
+        if self.request.GET.get('format') == "json":
+            start = datetime.fromisoformat(self.request.GET.get('start', timezone.now() - timezone.timedelta(days=10)))
+            end = datetime.fromisoformat(self.request.GET.get('end', timezone.now() - timezone.timedelta(days=10)))
+            return JsonResponse(self.get_reservations(start, end) + self.get_fixed_reservations(start, end) + self.get_recurring_reservations(start, end), safe=False)
+        return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'name': self.planning_name
+        })
+        return context
+
+
+class PlanningAdminMixin(PlanningMixin):
+
+    def get_reservation_title(self, instance):
+        if instance.event:
+            return instance.event.association.name
+        else:
+            return f"Cotisant"

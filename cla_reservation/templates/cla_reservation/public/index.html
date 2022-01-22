@@ -1,0 +1,48 @@
+{% extends "cla_member/lobby/_layout.html" %}
+
+{% block page_title %}Infrastructures | CLA{% endblock %}
+
+{% block section_title %}Infrastructures{% endblock %}
+
+{% block section_content %}
+    <div class="row mt-4">
+        {% for infrastructure in infrastructures %}
+            <div class="col-12 col-lg-6 customer type-media">
+                <div class="card mb-4 bg-gradient bg-shadow">
+                    <div class="pt-3 px-3">
+                        <div class="d-flex align-items-center justify-content-center" style="height: 60px; background-color: white">
+                            <h4 class="m-0 text-uppercase text-gray-700" style="font-size: 2rem">
+                                <i class="fas fa-{{ infrastructure.icon }} mr-2 text-{{ infrastructure.color }}"></i>
+                                {{ infrastructure.name }}
+                            </h4>
+                        </div>
+                        <div class="card-body px-1 pt-0 pb-3 mt-3">
+                            <div class="">
+                                <div class="row my-2">
+                                    <div class="col-6">
+                                        <a href="{{ infrastructure.href.planning }}" class="btn btn-{{ infrastructure.color }} btn-block">
+                                            Planning <i class="far fa-calendar-alt ml-1"></i>
+                                        </a>
+                                    </div>
+                                    <div class="col-6">
+                                        <a href="{{ infrastructure.href.manage }}" class="btn btn-{{ infrastructure.color }} btn-block">
+                                            Réserver <i class="far fa-calendar-plus ml-1"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                {% if infrastructure.manage_permission %}
+                                    <div class="w-100 my-2">
+                                        <a href="{{ infrastructure.href.manage }}" class="btn btn-outline-grey-dark btn-block">
+                                            Gérer les réservations <i class="far fa-list ml-1"></i>
+                                        </a>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+
+    </div>
+{% endblock %}

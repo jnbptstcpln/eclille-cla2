@@ -1,6 +1,6 @@
 {% extends 'layout/main.html' %}
 
-{% block page_title %}__ASSOCIATION_MANAGE__{% endblock %}
+{% block page_title %}__EVENT__MANAGE{% endblock %}
 
 {% block content %}
     <div class="container">
@@ -10,19 +10,13 @@
             <div class="row justify-content-center align-items-center mb-3">
                 <div class="row col-auto mr-1">
                     <div>
-                        {% if association.logo %}
-                            <div style="height: 50px; width: 50px; background-image: url('{{ association.logo.url }}'); background-size: contain; background-repeat: no-repeat; background-position: center"></div>
-                        {% else %}
-                            <div class="d-flex align-items-center justify-content-center" style="height: 50px; width: 50px; background-color: #aaaaaa">
-                                <h4 class="m-0 text-uppercase text-gray-700" style="font-size: 1rem">{{ association.name }}</h4>
-                            </div>
-                        {% endif %}
+                        <i class="far fa-calendar-star text-primary" style="font-size: 4rem"></i>
                     </div>
                 </div>
                 <div class="row col-auto align-items-center justify-content-center">
                     <div>
                         <div class="row align-items-center flex-column flex-md-row justify-content-center justify-content-md-start">
-                            <h2 class="col-auto pr-md-1 m-0" style="font-size: 1.75rem">{{ association.name }}</h2>
+                            <h2 class="col-auto pr-md-1 m-0" style="font-size: 1.75rem">Événements</h2>
                         </div>
                     </div>
                 </div>
@@ -41,28 +35,32 @@
         <div class="row align-items-stretch flex-grow-1">
             <div class="col col-md-3 pr-0 d-none d-md-block" style="border-right: 1px solid #E6E6E6">
                 <div class="pt-3 px-3">
-                    {% if association.logo %}
-                        <div class="mx-auto" style="height: 100px; width: 100px; background-image: url('{{ association.logo.url }}'); background-size: contain; background-repeat: no-repeat; background-position: center"></div>
-                    {% else %}
-                        <div class="d-flex align-items-center justify-content-center mx-auto" style="height: 100px; width: 100px; background-color: #aaaaaa">
-                            <h4 class="m-0 text-uppercase text-gray-700" style="font-size: 1rem">{{ association.name }}</h4>
-                        </div>
-                    {% endif %}
-                    <h4 class="text-center mt-2" style="font-size: 1rem">{{ association.name }}</h4>
+                    <div class="text-center">
+                        <i class="far fa-calendar-star text-primary" style="font-size: 4rem"></i>
+                    </div>
+                    <h4 class="text-center mt-2" style="font-size: 1.5rem">Événements</h4>
                 </div>
 
                 <ul class="nav nav-section-menu mb-4 py-3 d-none d-md-block" style="position: relative; left: 1px;">
+                    <li>
+                        <a href="{% url "cla_event:public:index" %}" class="nav-link first bg-grey bg-hover-grey text-grey-dark"><i class="fa fa-angle-left"></i> Calendrier publique</a>
+                    </li>
                     {% for section in sections_navigation %}
                         <li>
-                            <a href="{{ section.href }}" class="nav-link{% if forloop.first %} first{% endif %}{% if section_active == section.id %} active{% endif %}"> {{ section.label }} <i class="fa fa-angle-right"></i> </a>
+                            <a href="{{ section.href }}" class="nav-link {% if section_active == section.id %} active{% endif %}"> {{ section.label }} <i class="fa fa-angle-right"></i> </a>
                         </li>
                     {% endfor %}
                 </ul>
             </div>
             <div class="col col-md-9">
-                <h2 style="font-size: 1.5rem">{% block section_title %}__SECTION_TITLE__{% endblock %}</h2>
+                <div class="px-md-4">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <h2 class="mb-0" style="font-size: 1.5rem">{% block section_title %}__SECTION_TITLE__{% endblock %}</h2>
+                        <div>{% block section_buttons %}{% endblock %}</div>
+                    </div>
 
-                {% block section_content %}__SECTION_CONTENT__{% endblock %}
+                    {% block section_content %}__SECTION_CONTENT__{% endblock %}
+                </div>
             </div>
         </div>
     </div>

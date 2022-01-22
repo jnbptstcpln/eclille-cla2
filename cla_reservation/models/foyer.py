@@ -4,12 +4,12 @@ from datetime import datetime, timedelta
 
 from django.contrib.auth.models import User
 from django.db import models
-from django.template.defaultfilters import date
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django_summernote.fields import SummernoteTextField
 
 from cla_event.models import Event
+from cla_reservation.models._base import AbstractBlockedSlot
 
 
 class FilePath:
@@ -96,6 +96,12 @@ class FoyerItem(models.Model):
 
 
 class ReservationFoyerManager(models.Manager):
+
+    def for_admin(self):
+        return self.filter(validated=True, admin_display=True)
+
+    def for_member(self):
+        return self.filter(validated=True, member_display=True)
 
     def to_validate(self):
         return self.filter(validated=False, sent=True).order_by('sent_on')
@@ -185,3 +191,10 @@ class ReservationFoyer(models.Model):
             return str(self.user)
         else:
             return self.starts_on
+
+
+class BlockedSlotFoyer(AbstractBlockedSlot):
+
+    class Meta:
+        verbose_name = "[FOYER] Créneau bloqué"
+        verbose_name_plural = "[FOYER] Créneaux bloqués"

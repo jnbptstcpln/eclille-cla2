@@ -59,6 +59,12 @@ class EventManager(models.Manager):
     def is_range_free(self, start, end):
         return self.filter(starts_on__lte=end, ends_on__gte=start, validated=True, public=True).count() == 0
 
+    def for_admin(self):
+        return self.filter(validated=True, admin_display=True, public=True)
+
+    def for_member(self):
+        return self.filter(validated=True, member_display=True, public=True)
+
 
 class Event(models.Model):
     objects = EventManager()
@@ -95,7 +101,8 @@ class Event(models.Model):
     validated_on = models.DateTimeField(null=True, blank=True, verbose_name="Validé le", editable=False, )
     validated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Validé par", editable=False, related_name="+")
 
-    admin_display = models.BooleanField(default=False, verbose_name="L'événement apparait sur le planning envoyé à l'administration")
+    admin_display = models.BooleanField(default=False, verbose_name="L'événement apparait sur le planning de l'administration")
+    member_display = models.BooleanField(default=True, verbose_name="L'événement apparait sur le planning des cotisants")
 
     rejected_for = SummernoteTextField(verbose_name="Raison du refus", null=True, blank=True)
 
@@ -161,6 +168,12 @@ class Event(models.Model):
                 self.validated_by = user
                 self.validated_on = timezone.now()
                 self.save()
+
+    def are_reservations_validated(self):
+        reservations = [r for _, r in self.reservations.items() if r is not None]
+        if len(reservations) > 0:
+            return all([r.validated for r in reservations])
+        return True
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         # Auto setup dates

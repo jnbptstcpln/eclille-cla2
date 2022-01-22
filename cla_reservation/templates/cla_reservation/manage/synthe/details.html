@@ -113,8 +113,7 @@
                                 <i class="far fa-check-circle" style="font-size: 1.25rem"></i>
                             </div>
                             <div class="flex-fill">
-                                Le synthe n'est pas occupé sur le créneau demandé ({{ object.get_datetime_display }})<br>
-                                <a href="#" class="alert-link link-success">Voir le planning...</a>
+                                Le synthe n'est pas occupé sur le créneau demandé ({{ object.get_datetime_display }})
                             </div>
                         </div>
                     {% else %}
@@ -123,8 +122,7 @@
                                 <i class="far fa-times-circle" style="font-size: 1.25rem"></i>
                             </div>
                             <div class="flex-fill">
-                                Le synthe est occupé sur le créneau demandé ({{ object.get_datetime_display }})<br>
-                                <a href="#" class="alert-link link-danger">Voir le planning...</a>
+                                Le synthe est occupé sur le créneau demandé ({{ object.get_datetime_display }})
                             </div>
                         </div>
                     {% endif %}
@@ -140,45 +138,48 @@
                     <dd>{{ object.ends_on|date:'d/m/Y - H\hi' }}</dd>
                 </dl>
             </div>
-            <hr>
-            {% if object.event %}
-                <div style="max-width: 700px">
-                    {% if not object.validated %}
-                        {% if event_is_range_free %}
-                            <div class="alert alert-success align-items-center d-flex">
-                                <div class="mr-4">
-                                    <i class="far fa-check-circle" style="font-size: 1.25rem"></i>
-                                </div>
-                                <div class="flex-fill">
-                                    Aucun événement n'a été validé sur ce créneau ({{ object.event.get_datetime_display }})<br>
-                                    <a href="#" class="alert-link link-success">Voir le planning...</a>
-                                </div>
-                            </div>
-                        {% else %}
-                            <div class="alert alert-warning align-items-center d-flex">
-                                <div class="mr-4">
-                                    <i class="far fa-exclamation-triangle" style="font-size: 1.25rem"></i>
-                                </div>
-                                <div class="flex-fill">
-                                    Un événement a déjà été validé sur ce créneau ({{ object.event.get_datetime_display }})<br>
-                                    <a href="#" class="alert-link link-warning">Voir le planning...</a>
-                                </div>
-                            </div>
-                        {% endif %}
-                    {% endif %}
-                </div>
-                <div class="row">
-                    <dl class="col-12 col-md-6">
-                        <dt>Début de l'événement</dt>
-                        <dd>{{ object.event.starts_on|date:'d/m/Y - H\hi' }}</dd>
-                    </dl>
-                    <dl class="col-12 col-md-6">
-                        <dt>Fin de l'événement</dt>
-                        <dd>{{ object.event.ends_on|date:'d/m/Y - H\hi' }}</dd>
-                    </dl>
-                </div>
-                <hr>
-            {% endif %}
+            <div class="border-1-grey rounded-10 p-1">
+                <div id="calendar"></div>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function () {
+                        var calendarEl = document.getElementById('calendar');
+                        var calendar = new FullCalendar.Calendar(calendarEl, {
+                            timeZone: 'Europe/Paris',
+                            locale: 'fr',
+                            headerToolbar: {
+                                left: 'prev,next',
+                                center: 'title',
+                                right: 'timeGridWeek'
+                            },
+                            initialView: 'timeGridWeek',
+                            slotDuration: '02:00:00',
+                            nextDayThreshold: '08:00:00',
+                            allDaySlot: false,
+                            height: 400,
+                            initialDate: '{{ object.starts_on|date:'Y-m-d' }}',
+                            events: {
+                                url: window.location.href,
+                                method: 'GET',
+                                extraParams: {
+                                    format: 'json'
+                                }
+                            },
+                            eventDidMount: function (e) {
+                                console.log(e)
+                                if (e.event.extendedProps.popover) {
+                                    $(e.el).popover({
+                                        trigger: 'hover',
+                                        html: true,
+                                        content: e.event._def.extendedProps.popover_content
+                                    })
+                                }
+
+                            }
+                        });
+                        calendar.render();
+                    });
+                </script>
+            </div>
             <div class="mt-4">
                 {% if object.user %}
                     <h4>Détail de la réservations</h4>
