@@ -2,8 +2,12 @@ import os
 import uuid
 from datetime import datetime, timedelta
 
-from django.contrib.auth.models import User
+from django.conf import settings
+from django.contrib.auth.models import User, Permission, Group
+from django.core.mail import send_mail
 from django.db import models
+from django.shortcuts import resolve_url
+from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django_summernote.fields import SummernoteTextField
@@ -65,7 +69,6 @@ class ReservationBarbecueManager(models.Manager):
 
 
 class ReservationBarbecue(models.Model):
-
     objects = ReservationBarbecueManager()
 
     class Meta:
@@ -76,7 +79,8 @@ class ReservationBarbecue(models.Model):
     event = models.OneToOneField(Event, on_delete=models.CASCADE, related_name="reservation_barbecue", null=True, blank=True, verbose_name="Réserver dans le cadre de cet événement", editable=False)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="+", null=True, blank=True, verbose_name="Réserver à titre personnel par ce cotisant", editable=False)
 
-    description_event = SummernoteTextField(verbose_name="Description de l'événement", help_text="Précisez ici comment va être organisé votre événement, quelles activités seront proposées et quels seront vos besoins (électrique, équipements particulier, ...)")
+    description_event = SummernoteTextField(verbose_name="Description de l'événement",
+                                            help_text="Précisez ici comment va être organisé votre événement, quelles activités seront proposées et quels seront vos besoins (électrique, équipements particulier, ...)")
     description_user = SummernoteTextField(verbose_name="Description de l'événement", help_text="Précisez ici dans quel cadre est organisée cette réservation et le nombre de personnes participantes")
 
     start_date = models.DateField(verbose_name="Date de début de l'installation", help_text="Indiquez ici la date à partir de laquelle vous souhaitez occuper le lieu pour l'installation")
@@ -121,6 +125,31 @@ class ReservationBarbecue(models.Model):
         else:
             return mark_safe("<span class='badge badge-secondary'>A envoyer</span>")
 
+    def send_notification(self):
+        try:
+            permission = Permission.objects.filter(content_type__app_label='cla_reservation', codename='change_reservationbarbecue').first()
+            groups = Group.objects.filter(permissions__in=[permission])
+            for group in groups:
+                try:
+                    send_mail(
+                        subject='[CLA][BARBECUE] Nouvelle demande de réservation',
+                        from_email=settings.EMAIL_HOST_FROM,
+                        recipient_list=[user.email for user in group.user_set.all()],
+                        message="Une demande de réservation du barbecue a été reçue",
+                        html_message=render_to_string(
+                            'cla_reservation/manage/mail.html',
+                            {
+                                'site_href': f"https://{settings.ALLOWED_HOSTS[0]}",
+                                'detail_href': f"https://{settings.ALLOWED_HOSTS[0]}{resolve_url('cla_reservation:manage:barbecue-detail', self.pk)}",
+                                'reservation': self
+                            }
+                        ),
+                    )
+                except Exception as e:
+                    print("barbecue", e)
+        except Exception as e:
+            print("barbecue", e)
+
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         # Auto setup dates
         if not self.manually_set_datetime:
@@ -142,7 +171,6 @@ class ReservationBarbecue(models.Model):
 
 
 class BlockedSlotBarbecue(AbstractBlockedSlot):
-
     class Meta:
         verbose_name = "[BARBECUE] Créneau bloqué"
         verbose_name_plural = "[BARBECUE] Créneaux bloqués"

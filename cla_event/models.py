@@ -2,9 +2,13 @@ import os
 import uuid
 from datetime import datetime, timedelta
 
-from django.contrib.auth.models import User
+from django.conf import settings
+from django.contrib.auth.models import User, Group, Permission
+from django.core.mail import send_mail
 from django.db import models
+from django.shortcuts import resolve_url
 from django.template.defaultfilters import date
+from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django_resized import ResizedImageField
@@ -89,7 +93,8 @@ class Event(models.Model):
     ends_on = models.DateTimeField(verbose_name="Date et heure de fin", help_text="Calculée automatiquement sauf si la case précédente est cochée")
     poster = ResizedImageField(size=[827, 1170], force_format="PNG", upload_to=FilePath.event_poster, null=True, blank=True, verbose_name="Affiche de l'événement", help_text="Au format A4 (827px*1170px)")
 
-    public = models.BooleanField(default=True, verbose_name="Événement public à faire apparaitre sur le planning", help_text="Décocher cette case si cet événement correspond aux activités internes de votre association (par exemple une réunion pour laquelle vous souhaitez réserver un local)")
+    public = models.BooleanField(default=True, verbose_name="Événement public à faire apparaitre sur le planning",
+                                 help_text="Décocher cette case si cet événement correspond aux activités internes de votre association (par exemple une réunion pour laquelle vous souhaitez réserver un local)")
 
     sent = models.BooleanField(default=False, verbose_name="Envoyé")
     sent_on = models.DateTimeField(editable=False, null=True, default=None, verbose_name="Envoyé le")
@@ -148,7 +153,7 @@ class Event(models.Model):
         return {
             'barbecue': self.get_reservation_barbecue(),
             'foyer': self.get_reservation_foyer(),
-            'synthe': self.get_reservation_foyer()
+            'synthe': self.get_reservation_synthe()
         }
 
     def reject(self, rejected_for):
@@ -174,6 +179,31 @@ class Event(models.Model):
         if len(reservations) > 0:
             return all([r.validated for r in reservations])
         return True
+
+    def send_notification(self):
+        try:
+            permission = Permission.objects.filter(content_type__app_label='cla_event', codename='change_event').first()
+            groups = Group.objects.filter(permissions__in=[permission])
+            for group in groups:
+                try:
+                    send_mail(
+                        subject='[CLA] Nouvel événement à valider',
+                        from_email=settings.EMAIL_HOST_FROM,
+                        recipient_list=[user.email for user in group.user_set.all()],
+                        message="Une demande de validation d'événement a été reçu",
+                        html_message=render_to_string(
+                            'cla_event/manage/mail.html',
+                            {
+                                'site_href': f"https://{settings.ALLOWED_HOSTS[0]}",
+                                'detail_href': f"https://{settings.ALLOWED_HOSTS[0]}{resolve_url('cla_event:manage:detail', self.pk)}",
+                                'event': self
+                            }
+                        ),
+                    )
+                except Exception as e:
+                    print("event", e)
+        except Exception as e:
+            print("event", e)
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         # Auto setup dates

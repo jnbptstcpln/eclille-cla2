@@ -1,7 +1,11 @@
 from datetime import datetime, timedelta
 
-from django.contrib.auth.models import User
+from django.conf import settings
+from django.contrib.auth.models import User, Permission, Group
+from django.core.mail import send_mail
 from django.db import models
+from django.shortcuts import resolve_url
+from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django_summernote.fields import SummernoteTextField
@@ -97,6 +101,32 @@ class ReservationSynthe(models.Model):
             return mark_safe("<span class='badge badge-warning'>Rejetée</span>")
         else:
             return mark_safe("<span class='badge badge-secondary'>A envoyer</span>")
+
+    def send_notification(self):
+        try:
+            permission = Permission.objects.filter(content_type__app_label='cla_reservation', codename='change_reservationsynthe').first()
+            groups = Group.objects.filter(permissions__in=[permission])
+            for group in groups:
+                try:
+                    send_mail(
+                        subject='[CLA][SYNTHÉ] Nouvelle demande de réservation',
+                        from_email=settings.EMAIL_HOST_FROM,
+                        recipient_list=[user.email for user in group.user_set.all()],
+                        message="Une demande de réservation du synthé a été reçue",
+                        html_message=render_to_string(
+                            'cla_reservation/manage/mail.html',
+                            {
+                                'site_href': f"https://{settings.ALLOWED_HOSTS[0]}",
+                                'detail_href': f"https://{settings.ALLOWED_HOSTS[0]}{resolve_url('cla_reservation:manage:synthe-detail', self.pk)}",
+                                'reservation': self
+                            }
+                        ),
+                    )
+                except Exception as e:
+                    print("synthé", e)
+        except Exception as e:
+            print("synthé", e)
+
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         # Auto setup dates

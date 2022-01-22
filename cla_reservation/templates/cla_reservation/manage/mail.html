@@ -1,0 +1,42 @@
+<html>
+<head>
+    <title>CLA - Nouvelle réservation à valider</title>
+    <meta charset="utf-8">
+    <style>
+
+    </style>
+</head>
+<body>
+<p>
+    Une demande de réservation a été reçue :
+</p>
+{% if reservation.event %}
+    <p>
+        La réservation a été effectuée par une association dans le cadre de l'un de ses événement.
+    </p>
+    <p>
+        <b>Association :</b> {{ reservation.event.association.name }}
+        <b>Nom de l'événement :</b> {{ reservation.event.name }}
+        <b>Date et horaire de l'événement :</b> {{ reservation.event.get_datetime_display }}
+        <b>Date et horaire d'ouverture :</b> {{ reservation.get_datetime_display }}
+        <b>Type d'événement :</b> {{ event.type }}
+    </p>
+{% else %}
+    <p>
+        La réservation a été effectuée par un cotisant à titre personnel
+    </p>
+    <p>
+        <b>Cotisant :</b> {{ reservation.user.first_name }} {{ reservation.user.last_name }}
+        <b>Email :</b> {{ reservation.user.email }}
+        <b>Téléphone :</b> {{ reservation.user.infos.phone }}
+        <b>Date et horaire d'ouverture :</b> {{ reservation.get_datetime_display }}
+    </p>
+{% endif %}
+<p>
+    Utiliser le lien ci-dessous pour en savoir plus et procéder à la validation ou rejet de cette réservation :
+</p>
+<p>
+    <a href="{{ detail_href }}">{{ detail_href }}</a>
+</p>
+</body>
+</html>

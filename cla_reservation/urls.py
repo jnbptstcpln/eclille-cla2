@@ -10,6 +10,9 @@ urlpatterns = [
                 path("planning/barbecue/", public.PlanningBarbecueView.as_view(), name="barbecue-planning"),
                 path("planning/foyer/", public.PlanningFoyerView.as_view(), name="foyer-planning"),
                 path("planning/synthe/", public.PlanningSyntheView.as_view(), name="synthe-planning"),
+                path("reserver/barbecue/", public.ReservationBarbecueView.as_view(), name="barbecue-reservation"),
+                path("reserver/foyer/", public.ReservationFoyerView.as_view(), name="foyer-reservation"),
+                path("reserver/synthe/", public.ReservationSyntheView.as_view(), name="synthe-reservation"),
             ], 'public'
         )
     )),

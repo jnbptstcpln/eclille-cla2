@@ -37,7 +37,8 @@ class IndexView(ClaMemberModuleMixin, TemplateView):
                     'manage_permission': self.request.user.has_perm("cla_reservation.change_reservationbarbecue"),
                     'href': {
                         'manage': resolve_url("cla_reservation:manage:barbecue"),
-                        'planning': resolve_url("cla_reservation:public:barbecue-planning")
+                        'planning': resolve_url("cla_reservation:public:barbecue-planning"),
+                        'reservation': resolve_url("cla_reservation:public:barbecue-reservation"),
                     }
                 },
                 {
@@ -48,7 +49,8 @@ class IndexView(ClaMemberModuleMixin, TemplateView):
                     'manage_permission': self.request.user.has_perm("cla_reservation.change_reservationfoyer"),
                     'href': {
                         'manage': resolve_url("cla_reservation:manage:foyer"),
-                        'planning': resolve_url("cla_reservation:public:foyer-planning")
+                        'planning': resolve_url("cla_reservation:public:foyer-planning"),
+                        'reservation': resolve_url("cla_reservation:public:foyer-reservation"),
                     }
                 }, {
                     'name': "Synthé",
@@ -58,7 +60,8 @@ class IndexView(ClaMemberModuleMixin, TemplateView):
                     'manage_permission': self.request.user.has_perm("cla_reservation.change_reservationsynthe"),
                     'href': {
                         'manage': resolve_url("cla_reservation:manage:synthe"),
-                        'planning': resolve_url("cla_reservation:public:synthe-planning")
+                        'planning': resolve_url("cla_reservation:public:synthe-planning"),
+                        'reservation': resolve_url("cla_reservation:public:synthe-reservation"),
                     }
 
                 }
@@ -80,13 +83,28 @@ class PlanningBarbecueView(AbstractPlanningView):
     blocked_slot_model = BlockedSlotBarbecue
 
 
+class ReservationBarbecueView(ClaMemberModuleMixin, TemplateView):
+    template_name = "cla_reservation/public/reservation/barbecue/index.html"
+    cla_member_active_section = "reservations"
+
+
 class PlanningFoyerView(AbstractPlanningView):
     planning_name = 'foyer'
     model = ReservationFoyer
     blocked_slot_model = BlockedSlotFoyer
 
 
+class ReservationFoyerView(ClaMemberModuleMixin, TemplateView):
+    template_name = "cla_reservation/public/reservation/foyer/index.html"
+    cla_member_active_section = "reservations"
+
+
 class PlanningSyntheView(AbstractPlanningView):
     planning_name = 'synthé'
     model = ReservationSynthe
     blocked_slot_model = BlockedSlotSynthe
+
+
+class ReservationSyntheView(ClaMemberModuleMixin, TemplateView):
+    template_name = "cla_reservation/public/reservation/synthe/index.html"
+    cla_member_active_section = "reservations"

@@ -113,11 +113,16 @@
                     {% with reservation=event.get_reservation_foyer %}
                         <div class="border border-1-grey rounded p-4 d-flex align-items-center justify-content-between">
                             <div>
-                                <h4 class="mb-2">Réservation du foyer</h4>
+                                <h4 class="mb-2">Réservation du foyer {% if reservation %}{{ reservation.get_status_display }}{% endif %}</h4>
                                 {% if reservation %}
-                                    {{ reservation.get_status_display }}
+                                    <dl>
+                                        <dt>Ouverture pour installation</dt>
+                                        <dd>{{ reservation.starts_on|date:'d/m/Y - H\hi' }}</dd>
+                                        <dt>Fin du rangement</dt>
+                                        <dd>{{ reservation.ends_on|date:'d/m/Y - H\hi' }}</dd>
+                                    </dl>
                                 {% else %}
-                                    <p class="text-muted mb-0">Pas de réservation associé à votre événement</p>
+                                    <p class="text-muted mb-0">Pas de réservation associée à votre événement</p>
                                 {% endif %}
                             </div>
                             <div>
@@ -133,11 +138,16 @@
                     {% with reservation=event.get_reservation_synthe %}
                         <div class="border border-1-grey rounded p-4 d-flex align-items-center justify-content-between mt-3">
                             <div>
-                                <h4 class="mb-2">Réservation du synthé</h4>
+                                <h4 class="mb-2">Réservation du synthé {% if reservation %}{{ reservation.get_status_display }}{% endif %}</h4>
                                 {% if reservation %}
-                                    {{ reservation.get_status_display }}
+                                    <dl>
+                                        <dt>Ouverture pour installation</dt>
+                                        <dd>{{ reservation.starts_on|date:'d/m/Y - H\hi' }}</dd>
+                                        <dt>Fin du rangement</dt>
+                                        <dd>{{ reservation.ends_on|date:'d/m/Y - H\hi' }}</dd>
+                                    </dl>
                                 {% else %}
-                                    <p class="text-muted mb-0">Pas de réservation associé à votre événement</p>
+                                    <p class="text-muted mb-0">Pas de réservation associée à votre événement</p>
                                 {% endif %}
                             </div>
                             <div>
@@ -153,11 +163,16 @@
                     {% with reservation=event.get_reservation_barbecue %}
                         <div class="border border-1-grey rounded p-4 d-flex align-items-center justify-content-between mt-3">
                             <div>
-                                <h4 class="mb-2">Réservation du barbecue</h4>
+                                <h4 class="mb-2">Réservation du barbecue {% if reservation %}{{ reservation.get_status_display }}{% endif %}</h4>
                                 {% if reservation %}
-                                    {{ reservation.get_status_display }}
+                                    <dl>
+                                        <dt>Ouverture pour installation</dt>
+                                        <dd>{{ reservation.starts_on|date:'d/m/Y - H\hi' }}</dd>
+                                        <dt>Fin du rangement</dt>
+                                        <dd>{{ reservation.ends_on|date:'d/m/Y - H\hi' }}</dd>
+                                    </dl>
                                 {% else %}
-                                    <p class="text-muted mb-0">Pas de réservation associé à votre événement</p>
+                                    <p class="text-muted mb-0">Pas de réservation associée à votre événement</p>
                                 {% endif %}
                             </div>
                             <div>

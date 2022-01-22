@@ -16,7 +16,26 @@
                     <i class="far fa-check-circle" style="font-size: 1.25rem"></i>
                 </div>
                 <div class="flex-fill">
-                    Cette réservation a été validée par {{ object.validated_by.first_name }} {{ object.validated_by.last_name }} le {{ object.validated_on|date:'d/m/Y à H:i' }}.
+                    Cet événement a été validée par {{ object.validated_by.first_name }} {{ object.validated_by.last_name }} le {{ object.validated_on|date:'d/m/Y à H:i' }}.
+                </div>
+            </div>
+        {% endif %}
+
+        {% if not object.are_reservations_validated %}
+            <div class="alert alert-info align-items-center d-flex mb-5">
+                <div class="mr-4">
+                    <i class="far fa-info-circle" style="font-size: 1.25rem"></i>
+                </div>
+                <div class="flex-fill">
+                    <p class="mb-1 font-weight-bold">Des demandes de réservations liées à cet événement sont encore en attente :</p>
+                    <ul class="mb-1">
+                        {% for name, r in object.reservations.items %}
+                            {% if r and not r.validated %}
+                                <li>{{ name|capfirst }}</li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                    <p>L'événement ne pourra être validé qu'une fois que toutes les demandes de réservations auront été validées.</p>
                 </div>
             </div>
         {% endif %}
@@ -142,12 +161,12 @@
                                     format: 'json'
                                 }
                             },
-                            eventDidMount: function(e) {
+                            eventDidMount: function (e) {
                                 console.log(e)
                                 if (e.event.extendedProps.popover) {
                                     $(e.el).popover({
-                                        trigger:'hover',
-                                        html:true,
+                                        trigger: 'hover',
+                                        html: true,
                                         content: e.event._def.extendedProps.popover_content
                                     })
                                 }
@@ -163,7 +182,11 @@
     {% if not object.validated %}
         <div class="row mt-4 mx-auto" style="max-width: 750px">
             <a href="{% url "cla_event:manage:event-reject" object.pk %}" class="btn btn-outline-danger btn-block btn-lg my-2">Rejeter l'événement...</a>
-            <a href="{% url "cla_event:manage:event-validate" object.pk %}" class="btn btn-outline-success btn-block btn-lg my-2">Valider l'événement'...</a>
+            {% if object.are_reservations_validated %}
+                <a href="{% url "cla_event:manage:event-validate" object.pk %}" class="btn btn-outline-success btn-block btn-lg my-2">Valider l'événement...</a>
+            {% else %}
+                <a href="#" class="btn btn-outline-success btn-block btn-lg my-2 disabled">Valider l'événement'...</a>
+            {% endif %}
         </div>
     {% endif %}
 {% endblock %}

@@ -15,7 +15,7 @@ class AbstractBlockedSlotManager(models.Manager):
         return self.filter(member_display=True)
 
     def is_range_free(self, start, end):
-        if not self.filter(starts_on__lte=end, ends_on__gte=start, validated=True).count() == 0:
+        if not self.filter(starts_on__lte=end, ends_on__gte=start).count() == 0:
             return False
         events = self.filter(starts_on__lte=start, recurring=True).filter(Q(end_recurring__gte=end) | Q(end_recurring__isnull=True))
         for event in events:

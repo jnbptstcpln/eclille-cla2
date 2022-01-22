@@ -80,6 +80,16 @@
                     <dd>{{ object.event.ends_on|date:'d/m/Y H\hi' }}</dd>
                 </dl>
             </div>
+            <div class="row">
+                <dl class="col-12 col-md-6">
+                    <dt>Ouverture du foyer pour débuter l'installation</dt>
+                    <dd>{{ object.starts_on|date:'d/m/Y - H\hi' }}</dd>
+                </dl>
+                <dl class="col-12 col-md-6">
+                    <dt>Fin du rangement</dt>
+                    <dd>{{ object.ends_on|date:'d/m/Y - H\hi' }}</dd>
+                </dl>
+            </div>
             <div style="max-width: 700px">
                 {% if not object.validated %}
                     {% if is_range_free %}
@@ -102,16 +112,6 @@
                         </div>
                     {% endif %}
                 {% endif %}
-            </div>
-            <div class="row">
-                <dl class="col-12 col-md-6">
-                    <dt>Ouverture du foyer pour débuter l'installation</dt>
-                    <dd>{{ object.starts_on|date:'d/m/Y - H\hi' }}</dd>
-                </dl>
-                <dl class="col-12 col-md-6">
-                    <dt>Fin du rangement</dt>
-                    <dd>{{ object.ends_on|date:'d/m/Y - H\hi' }}</dd>
-                </dl>
             </div>
             <div class="border-1-grey rounded-10 p-1">
                 <div id="calendar"></div>
@@ -164,7 +164,11 @@
             <div class="mt-4">
                 <h4>Sélection de bière</h4>
                 <div class="rounded border-1-grey p-3">
-                    {{ object.beer_selection|linebreaksbr }}
+                    {% if object.beer_selection %}
+                        {{ object.beer_selection|linebreaksbr }}
+                    {% else %}
+                        <p class="text-muted">Pas de demande de bière</p>
+                    {% endif %}
                 </div>
             </div>
             <div class="mt-4">

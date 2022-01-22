@@ -66,6 +66,7 @@ class EventSendView(LoginRequiredMixin, EventAssociationMixin, View):
         self.event.sent = True
         self.event.sent_on = timezone.now()
         self.event.save()
+        self.event.send_notification()
 
         reservations = [
             self.event.get_reservation_barbecue(),
@@ -77,6 +78,7 @@ class EventSendView(LoginRequiredMixin, EventAssociationMixin, View):
                 r.sent = True
                 r.sent_on = timezone.now()
                 r.save()
+                r.send_notification()
 
         messages.success(request, "Votre événement a bien été envoyé !")
         return redirect("cla_event:association:list", self.association.slug)
