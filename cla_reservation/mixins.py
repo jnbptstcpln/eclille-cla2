@@ -321,8 +321,8 @@ class PlanningMixin:
 
     def get(self, request, *args, **kwargs):
         if self.request.GET.get('format') == "json":
-            start = datetime.fromisoformat(self.request.GET.get('start', timezone.now() - timezone.timedelta(days=10)))
-            end = datetime.fromisoformat(self.request.GET.get('end', timezone.now() - timezone.timedelta(days=10)))
+            start = datetime.strptime(self.request.GET.get('start'), "%Y-%m-%dT%H:%M:%S")
+            end = datetime.strptime(self.request.GET.get('end'), "%Y-%m-%dT%H:%M:%S")
             return JsonResponse(self.get_reservations(start, end) + self.get_fixed_reservations(start, end) + self.get_recurring_reservations(start, end), safe=False)
         return super().get(request, *args, **kwargs)
 
