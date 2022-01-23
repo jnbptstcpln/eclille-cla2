@@ -66,7 +66,11 @@ class EventSendView(LoginRequiredMixin, EventAssociationMixin, View):
         self.event.sent = True
         self.event.sent_on = timezone.now()
         self.event.save()
-        self.event.send_notification()
+
+        # Only send notification when reservation are validated because
+        # event validation required that all associated reservations are validated
+        if self.event.are_reservations_validated():
+            self.event.send_notification()
 
         reservations = [
             self.event.get_reservation_barbecue(),

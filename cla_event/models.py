@@ -167,12 +167,19 @@ class Event(models.Model):
                 reservation.save()
 
     def check_validation(self, user):
-        if not self.public:
-            if all([r.validated for _, r in self.reservations.items() if r is not None]):
+        if self.are_reservations_validated():
+            # If the event is not public (it doesn't appear on planning) then
+            # we can automatically validated the event when all associated reservations
+            # are validated
+            if not self.public:
                 self.validated = True
                 self.validated_by = user
                 self.validated_on = timezone.now()
                 self.save()
+            else:
+                # All reservation are validated meaning the event can be validated,
+                # sending a notification to ask for the event validation
+                self.send_notification()
 
     def are_reservations_validated(self):
         reservations = [r for _, r in self.reservations.items() if r is not None]
