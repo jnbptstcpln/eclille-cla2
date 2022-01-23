@@ -8,6 +8,10 @@ from cla_event.models import Event
 
 
 class IndexView(PlanningMixin, EventManageMixin, TemplateView):
+    association_manage_active_section = "index"
+    template_name = "cla_event/manage/planning.html"
+
+    config__event_popover = True
 
     def get_event_base_queryset(self):
         return Event.objects.filter(sent=True)
@@ -15,10 +19,12 @@ class IndexView(PlanningMixin, EventManageMixin, TemplateView):
     def get_event_url(self, instance: Event):
         return resolve_url("cla_event:manage:event-detail", instance.pk)
 
-    config__event_popover = True
-
-    association_manage_active_section = "index"
-    template_name = "cla_event/manage/planning.html"
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'to_review': Event.objects.filter(sent=True, validated=False, public=True)
+        })
+        return context
 
 
 class EventDetailView(PlanningMixin, EventManageMixin, DetailView):
