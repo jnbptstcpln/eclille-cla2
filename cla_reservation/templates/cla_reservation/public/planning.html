@@ -2,6 +2,10 @@
 
 {% block page_title %}Planning {{ name|capfirst }} | CLA{% endblock %}
 
+{% block section_top %}
+    <a href="{% url "cla_reservation:index" %}"><i class="far fa-angle-left"></i> Revenir aux infrastructures</a>
+{% endblock %}
+
 {% block section_title %}Planning {{ name|capfirst }}{% endblock %}
 
 {% block section_content %}

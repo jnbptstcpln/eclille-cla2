@@ -2,6 +2,10 @@
 
 {% block page_title %}{{ object.name }} | {{ association.name }} | CLA{% endblock %}
 
+{% block section_top %}
+    <a href="{% url "cla_event:association:list" association.slug %}"><i class="far fa-angle-left"></i> Revenir à la liste des événements</a>
+{% endblock %}
+
 {% block section_title %}{{ object.name }} - {{ object.starts_on|date:'d/m' }}{% endblock %}
 
 {% block section_content %}

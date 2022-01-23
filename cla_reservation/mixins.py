@@ -232,7 +232,8 @@ class PlanningMixin:
                 (
                     f"""
                     <div class='text-center min-width-100'>
-                        <div class='font-weight-bold' style='text-lg'>{instance.event.name}</div>
+                        <div class='font-weight-bold text-lg'>{instance.event.association.name}</div>
+                        <div>{instance.event.name}</div>
                     </div>
                     """
                 ) if instance.event else (

@@ -105,7 +105,8 @@ class PlanningMixin:
             'popover_content': bleach.clean(
                 f"""
                 <div class='text-center min-width-100'>
-                    <div class='font-weight-bold' style='text-lg'>{instance.name}</div>
+                    <div class='font-weight-bold text-sm text-muted'>{instance.association.name}</div>
+                    <div class='font-weight-bold text-lg'>{instance.name}</div>
                     <div class='text-muted text-sm'>{instance.place.name}</span>
                 </div>
                 """,

@@ -2,6 +2,10 @@
 
 {% block page_title %}{{ object.event.name }} | Réservations du barbecue | CLA{% endblock %}
 
+{% block section_top %}
+    <a href="{%  url "cla_reservation:manage:barbecue-detail" object.pk %}"><i class="far fa-angle-left"></i> Revenir aux détails de la réservation</a>
+{% endblock %}
+
 {% block section_title %}{{ object.event.name }} | {{ object.event.get_datetime_display }}{% endblock %}
 
 {% block section_buttons %}{% endblock %}

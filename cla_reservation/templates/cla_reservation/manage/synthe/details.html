@@ -2,6 +2,10 @@
 
 {% block page_title %}{{ object.event.name }} | Réservations du synthé | CLA{% endblock %}
 
+{% block section_top %}
+    <a href="{%  url "cla_reservation:manage:synthe" %}"><i class="far fa-angle-left"></i> Revenir à la liste des réservations</a>
+{% endblock %}
+
 {% block section_title %}{{ object.event.name }} | {{ object.event.get_datetime_display }}{% endblock %}
 
 {% block section_buttons %}
@@ -17,6 +21,15 @@
                 </div>
                 <div class="flex-fill">
                     Cette réservation a été validée par {{ object.validated_by.first_name }} {{ object.validated_by.last_name }} le {{ object.validated_on|date:'d/m/Y à H:i' }}.
+                </div>
+            </div>
+        {% else %}
+            <div class="alert alert-info align-items-center d-flex mb-5">
+                <div class="mr-4">
+                    <i class="far fa-info-circle" style="font-size: 1.25rem"></i>
+                </div>
+                <div class="flex-fill">
+                    Cette réservation n'a pas encore été validée
                 </div>
             </div>
         {% endif %}

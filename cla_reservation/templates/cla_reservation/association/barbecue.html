@@ -2,7 +2,11 @@
 
 {% block page_title %}Réserver le barbecue | {{ event.name }} | CLA{% endblock %}
 
-{% block section_title %}<a class="text-black" href="{% url "cla_event:association:update" association.slug event.pk %}"><i class="far fa-angle-left mr-2"></i> {{ event.name }}</a>{% endblock %}
+{% block section_top %}
+    <a href="{% url "cla_event:association:update" association.slug event.pk %}"><i class="far fa-angle-left"></i> Revenir à la fiche de l'événement</a>
+{% endblock %}
+
+{% block section_title %}{{ event.name }}{% endblock %}
 
 {% block section_content %}
     <h3 style="font-size: 1.25rem" class="mt-3">Réserver le barbecue</h3>
