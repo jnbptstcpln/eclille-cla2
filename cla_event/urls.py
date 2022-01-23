@@ -1,5 +1,7 @@
 from django.urls import path, include
-from cla_event.views import association, public, manage
+
+from cla_event.mixins import PlanningSchoolAdminMixin
+from cla_event.views import association, public, manage, school_admin
 
 app_name = "cla_event"
 urlpatterns = [
@@ -30,5 +32,12 @@ urlpatterns = [
                 path("associations/<str:slug>/<int:pk>/envoyer/", association.EventSendView.as_view(), name="send"),
             ], 'association'
         )
-    ))
+    )),
+    path('', include(
+        (
+            [
+                path(f"ec/{PlanningSchoolAdminMixin.TOKEN}", school_admin.IndexView.as_view(), name="index")
+            ], 'school_admin'
+        )
+    )),
 ]

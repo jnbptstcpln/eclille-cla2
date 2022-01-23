@@ -1,5 +1,7 @@
 from django.urls import path, include
-from cla_reservation.views import association, manage, public
+
+from cla_reservation.mixins import PlanningSchoolAdminMixin
+from cla_reservation.views import association, manage, public, school_admin
 
 app_name = "cla_reservation"
 urlpatterns = [
@@ -63,5 +65,14 @@ urlpatterns = [
                 path("associations/<str:slug>/<int:pk>/synthe/supprimer/", association.ReservationSyntheDeleteView.as_view(), name="synthe-delete"),
             ], 'association'
         )
-    ))
+    )),
+    path('', include(
+        (
+            [
+                path(f"barbecue/ec/{PlanningSchoolAdminMixin.TOKEN_BARBECUE}", school_admin.BarbecueView.as_view(), name="barbecue"),
+                path(f"barbecue/ec/{PlanningSchoolAdminMixin.TOKEN_FOYER}", school_admin.FoyerView.as_view(), name="foyer"),
+                path(f"barbecue/ec/{PlanningSchoolAdminMixin.TOKEN_SYNTHE}", school_admin.SyntheView.as_view(), name="synthe")
+            ], 'school_admin'
+        )
+    )),
 ]

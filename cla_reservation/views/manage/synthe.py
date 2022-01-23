@@ -35,6 +35,13 @@ class SynthePlanningView(PlanningAdminMixin, ReservationSyntheManageMixin, Templ
     def get_reservation_base_queryset(self):
         return self.model.objects.all()
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'school_admin_planning_href': resolve_url('cla_reservation:school_admin:synthe')
+        })
+        return context
+
 
 class SyntheDetailView(PlanningAdminMixin, ReservationSyntheManageMixin, DetailView):
     template_name = "cla_reservation/manage/synthe/details.html"

@@ -1,0 +1,64 @@
+{% extends "layout/standalone.html" %}
+
+{% block page_title %}Réservations : {{ infrastructure_name }}{% endblock %}
+
+{% block content_align %}align-items-center{% endblock %}
+
+{% block content %}
+    <div id="main" class="card" style="max-width: 1250px; height: initial">
+        <div class="card-body w-100 overflow-auto">
+            <div>
+                <div class="mt-4">
+                    <h2 class="text-center text-uppercase text-muted mb-1" style="font-size: 1.25rem">{{ infrastructure_name }}</h2>
+                    <h1 class="text-center mb-4">Planning des réservations</h1>
+                    <div id='calendar'></div>
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function () {
+                            var calendarEl = document.getElementById('calendar');
+                            var calendar = new FullCalendar.Calendar(calendarEl, {
+                                timeZone: 'Europe/Paris',
+                                locale: 'fr',
+                                headerToolbar: {
+                                    left: 'prev,next',
+                                    center: 'title',
+                                    right: 'timeGridWeek'
+                                },
+                                initialView: 'timeGridWeek',
+                                slotDuration: '01:00:00',
+                                nextDayThreshold: '08:00:00',
+                                allDaySlot: false,
+                                height: 700,
+                                events: {
+                                    url: window.location.href,
+                                    method: 'GET',
+                                    extraParams: {
+                                        format: 'json'
+                                    }
+                                },
+                                eventClick: function (info) {
+                                    info.jsEvent.preventDefault(); // don't let the browser navigate
+                                    if (info.event.url) {
+                                        window.open(info.event.url);
+                                    }
+                                    //info.el.style.borderColor = 'red';
+                                },
+                                eventDidMount: function (e) {
+
+                                    if (e.event.extendedProps.popover) {
+                                        $(e.el).popover({
+                                            trigger: 'hover',
+                                            html: true,
+                                            content: e.event._def.extendedProps.popover_content
+                                        })
+                                    }
+
+                                },
+                            });
+                            calendar.render();
+                        });
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -98,5 +98,18 @@
 
             });
         </script>
+        <div class="alert alert-info align-items-center d-flex mt-5">
+            <div class="mr-4">
+                <i class="far fa-info-circle" style="font-size: 1.25rem"></i>
+            </div>
+            <div class="flex-fill">
+                <p class="mb-2">
+                    L'administration de l'école peut accéder à un planning spécifique à l'aide de ce lien :
+                </p>
+                <p class="text-center">
+                    <a class="alert-link link-info" target="_blank" href="{% url "cla_event:school_admin:index" %}"><i class="far fa-calendar-week mr-1"></i> Calendrier de l'administration</a>
+                </p>
+            </div>
+        </div>
     </div>
 {% endblock %}

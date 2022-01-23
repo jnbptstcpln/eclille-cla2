@@ -151,3 +151,31 @@ class PlanningMixin:
                 self.get_events(start, end)
                 , safe=False)
         return super().get(request, *args, **kwargs)
+
+
+class PlanningSchoolAdminMixin(PlanningMixin):
+
+    TOKEN = "9sF8CpphEVLnOkerPKTe"
+
+    config__event_clickable = False
+    config__event_popover = True
+
+    def get_event_base_queryset(self):
+        return Event.objects.for_admin()
+
+    def get_event_popover(self, instance: Event):
+        return {
+            'popover': True,
+            'popover_content': bleach.clean(
+                f"""
+                <div class='text-center min-width-100'>
+                    <div class='font-weight-bold text-sm text-muted'>{instance.association.name}</div>
+                    <div class='font-weight-bold text-lg'>{instance.name_school}</div>
+                    <div class='text-grey-dark text-sm'>{instance.type}</div>
+                    <div class='text-muted text-sm'>{instance.place.name}</span>
+                </div>
+                """,
+                tags=['span', 'br', 'div'],
+                attributes={'span': ['class'], 'div': ['class']}
+            ),
+        }

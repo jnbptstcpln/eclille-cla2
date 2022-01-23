@@ -19,6 +19,15 @@
                     Cet événement a été validée par {{ object.validated_by.first_name }} {{ object.validated_by.last_name }} le {{ object.validated_on|date:'d/m/Y à H:i' }}.
                 </div>
             </div>
+        {% else %}
+            <div class="alert alert-info align-items-center d-flex mb-5">
+                <div class="mr-4">
+                    <i class="far fa-info-circle" style="font-size: 1.25rem"></i>
+                </div>
+                <div class="flex-fill">
+                    Cette événement n'a pas encore été validé
+                </div>
+            </div>
         {% endif %}
 
         {% if not object.are_reservations_validated %}

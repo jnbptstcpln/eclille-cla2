@@ -342,3 +342,61 @@ class PlanningAdminMixin(PlanningMixin):
             return instance.event.association.name
         else:
             return f"Cotisant"
+
+
+class PlanningSchoolAdminMixin(PlanningMixin):
+
+    TOKEN_BARBECUE = "S3qyQLouijRL13xGN2eF"
+    TOKEN_FOYER = "2zlSMSyL35I6dfjQ8P0u"
+    TOKEN_SYNTHE = "FSh8ssZ3deZ4Nr3bfRlK"
+
+    config__reservation_clickable = False
+    config__slot_clickable = False
+    config__reservation_popover = True
+
+    def get_reservation_base_queryset(self):
+        return self.model.objects.for_admin()
+
+    def get_blocked_slot_base_queryset(self):
+        return self.blocked_slot_model.objects.for_admin()
+
+    def get_reservation_title(self, instance):
+        if instance.event:
+            return instance.event.association.name
+        else:
+            return f"Cotisant"
+
+    def get_reservation_popover(self, instance: Event):
+
+        try:
+            phone = instance.created_by.infos.phone
+        except:
+            phone = "Non spécifié"
+
+        return {
+            'popover': True,
+            'popover_content': bleach.clean(
+                (
+                    f"""
+                    <div class='text-center min-width-100'>
+                        <div class='font-weight-bold text-lg'>{instance.event.association.name}</div>
+                        <div class='font-weight-bold text-lg'>{instance.event.type.name}</div>
+                        <div>{instance.event.name}</div>
+                        <hr>
+                        <div>{instance.created_by.first_name} {instance.created_by.last_name}</div>
+                        <div class='text-sm'>Tel : {phone}</div>
+                    </div>
+                    """
+                ) if instance.event else (
+                    f"""
+                    <div class='text-center min-width-100'>
+                        <div class='font-weight-bold' style='text-lg'>{instance.user.first_name} {instance.user.last_name}</div>
+                        <div class='text-sm'>Tel : {phone}</div>
+                    </div>
+                    """
+                )
+                ,
+                tags=['span', 'br', 'div', 'hr'],
+                attributes={'span': ['class'], 'div': ['class']}
+            ),
+        }
