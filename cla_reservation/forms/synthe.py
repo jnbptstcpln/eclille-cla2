@@ -1,7 +1,9 @@
 import bleach
 from django import forms
 from django.conf import settings
+from django.shortcuts import resolve_url
 from django.utils import timezone
+from django.utils.safestring import mark_safe
 
 from cla_reservation.forms._blockedslot import BlockedSlotForm
 from cla_reservation.models.synthe import ReservationSynthe, BlockedSlotSynthe
@@ -23,6 +25,7 @@ class ReservationSyntheAssociationForm(forms.ModelForm):
 
         self.fields['start_date'].widget.attrs['data-plugin'] = "datepicker"
         self.fields['start_date'].widget.attrs['autocomplete'] = "off"
+        self.fields['start_date'].help_text = mark_safe(f"Pensez à consulter <a target='_blank' href='{resolve_url('cla_reservation:public:synthe-planning')}'>le calendrier des réservations</a>")
         self.fields['description_event'].required = True
 
         # Customising all fields

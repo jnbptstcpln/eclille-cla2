@@ -1,5 +1,7 @@
 from django import forms
+from django.shortcuts import resolve_url
 from django.utils import timezone
+from django.utils.safestring import mark_safe
 
 from cla_event.models import Event
 
@@ -27,6 +29,7 @@ class EventAssociationDefaultForm(forms.ModelForm):
 
         self.fields['start_date'].widget.attrs['data-plugin'] = "datepicker"
         self.fields['start_date'].widget.attrs['autocomplete'] = "off"
+        self.fields['start_date'].help_text = mark_safe(f"Pensez à consulter <a target='_blank' href='{resolve_url('cla_event:public:index')}'>le calendrier des évéments</a>")
 
         # Customising all fields
         for field_name, field in self.fields.items():
