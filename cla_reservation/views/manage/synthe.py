@@ -182,6 +182,12 @@ class SyntheIcsFileView(PlanningAdminMixin, JWTMixin, View):
     model = ReservationSynthe
     blocked_slot_model = BlockedSlotSynthe
 
+    def get_blocked_slot_base_queryset(self):
+        return self.blocked_slot_model.objects.all()
+
+    def get_reservation_base_queryset(self):
+        return self.model.objects.filter(validated=True)
+
     def get(self, request, *args, **kwargs):
         cal = Calendar()
         for e in self.get_planning_items(timezone.now(), timezone.now() + timedelta(days=60)):
