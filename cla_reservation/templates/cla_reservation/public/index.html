@@ -11,7 +11,7 @@
                 <div class="card mb-4 bg-gradient bg-shadow">
                     <div class="pt-3 px-3">
                         <div class="d-flex align-items-center justify-content-center" style="height: 60px; background-color: white">
-                            <h4 class="m-0 text-uppercase text-gray-700" style="font-size: 2rem">
+                            <h4 class="m-0 text-uppercase text-gray-700" style="font-size: 2.25rem">
                                 <i class="fas fa-{{ infrastructure.icon }} mr-2 text-{{ infrastructure.color }}"></i>
                                 {{ infrastructure.name }}
                             </h4>
@@ -30,13 +30,7 @@
                                         </a>
                                     </div>
                                 </div>
-                                {% if infrastructure.manage_permission %}
-                                    <div class="w-100 my-2">
-                                        <a href="{{ infrastructure.href.manage }}" class="btn btn-outline-grey-dark btn-block">
-                                            Gérer les réservations <i class="far fa-list ml-1"></i>
-                                        </a>
-                                    </div>
-                                {% endif %}
+
                             </div>
                         </div>
                     </div>

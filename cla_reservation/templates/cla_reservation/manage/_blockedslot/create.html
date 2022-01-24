@@ -1,5 +1,9 @@
 {% extends "cla_reservation/manage/_layout.html" %}
 
+{% block section_top %}
+    <a href="{{ back_href }}"><i class="far fa-angle-left"></i> Revenir à la liste des créneaux</a>
+{% endblock %}
+
 {% block page_title %}Créneaux bloqués | {{ infrastructure_name|capfirst }} | CLA{% endblock %}
 
 {% block section_title %}Créneaux bloqués{% endblock %}

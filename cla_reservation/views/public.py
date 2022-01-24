@@ -82,6 +82,14 @@ class PlanningBarbecueView(AbstractPlanningView):
     model = ReservationBarbecue
     blocked_slot_model = BlockedSlotBarbecue
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'manage_permission': self.request.user.has_perm("cla_reservation.change_reservationbarbecue"),
+            'manage_href': resolve_url("cla_reservation:manage:barbecue")
+        })
+        return context
+
 
 class ReservationBarbecueView(ClaMemberModuleMixin, TemplateView):
     template_name = "cla_reservation/public/reservation/barbecue/index.html"
@@ -93,6 +101,14 @@ class PlanningFoyerView(AbstractPlanningView):
     model = ReservationFoyer
     blocked_slot_model = BlockedSlotFoyer
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'manage_permission': self.request.user.has_perm("cla_reservation.change_reservationfoyer"),
+            'manage_href': resolve_url("cla_reservation:manage:foyer")
+        })
+        return context
+
 
 class ReservationFoyerView(ClaMemberModuleMixin, TemplateView):
     template_name = "cla_reservation/public/reservation/foyer/index.html"
@@ -103,6 +119,14 @@ class PlanningSyntheView(AbstractPlanningView):
     planning_name = 'synthé'
     model = ReservationSynthe
     blocked_slot_model = BlockedSlotSynthe
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'manage_permission': self.request.user.has_perm("cla_reservation.change_reservationsynthe"),
+            'manage_href': resolve_url("cla_reservation:manage:synthe")
+        })
+        return context
 
 
 class ReservationSyntheView(ClaMemberModuleMixin, TemplateView):

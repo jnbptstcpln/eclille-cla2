@@ -8,6 +8,16 @@
 
 {% block section_title %}Planning {{ name|capfirst }}{% endblock %}
 
+{% block section_buttons %}
+    {% if manage_permission %}
+        <div>
+            <a href="{{ manage_href }}" class="btn btn-outline-primary">
+                Gérer les réservations <i class="far fa-list ml-1"></i>
+            </a>
+        </div>
+    {% endif %}
+{% endblock %}
+
 {% block section_content %}
     <div class="mt-4">
         <div id='calendar'></div>

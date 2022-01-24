@@ -74,6 +74,13 @@ class AbstractBlockedSlot(models.Model):
         else:
             return f"{self.starts_on.strftime('%d/%m/%Y')} - {start_time} / {self.ends_on.strftime('%d/%m/%Y')} - {end_time}"
 
+    def get_recurring_days_labels(self):
+        days = dict(self.Days.choices)
+        output = []
+        for d in self.recurring_days:
+            output.append(days[int(d)])
+        return output
+
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         self.starts_on = datetime.combine(self.start_date, self.start_time)
         if self.start_time >= self.end_time:

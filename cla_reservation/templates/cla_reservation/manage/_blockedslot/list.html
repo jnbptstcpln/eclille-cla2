@@ -31,7 +31,7 @@
                     </td>
                     <td>
                         {% if slot.recurring %}
-                            Tous les {{ slot.get_recurring_days_display }} de {{ slot.start_time|date:'H:i' }} à {{ slot.end_time|date:'H:i' }}
+                            Tous les {% for d in slot.get_recurring_days_labels %}<span class="badge badge-secondary mx-1 pos-relative" style="top: 3px">{{ d }}</span>{% endfor %} de {{ slot.start_time|date:'H:i' }} à {{ slot.end_time|date:'H:i' }}
                             {% if slot.end_recurring %}<small class="d-block text-muted">Jusqu'au {{ slot.end_recurring }}</small>{% endif %}
                         {% else %}
                             <p class="text-muted">Aucune</p>
