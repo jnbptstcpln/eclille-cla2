@@ -8,7 +8,8 @@ urlpatterns = [
     path('', include(
         (
             [
-                path("", public.IndexView.as_view(), name="index")
+                path("", public.IndexView.as_view(), name="index"),
+                path("export/ical/", public.IcsFileView.as_view(), name="export"),
             ], 'public'
         )
     )),

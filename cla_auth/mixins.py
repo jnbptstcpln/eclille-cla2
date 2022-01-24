@@ -1,8 +1,11 @@
+import random
+
+import jwt
+from django.conf import settings
 from django.contrib.auth.mixins import AccessMixin
 from django.core.exceptions import PermissionDenied
+from django.http import HttpRequest, Http404
 from django.shortcuts import render
-
-from django.http import HttpRequest
 
 from cla_auth.models import UserMembership
 
@@ -42,5 +45,37 @@ class HasMembershipMixin(AccessMixin):
             raise PermissionDenied()
 
         self.membership = request.user.infos.get_active_membership()
+
+        return super().dispatch(request, *args, **kwargs)
+
+
+class JWTMixin:
+
+    jwt_payload_key = "default-payload"
+
+    @classmethod
+    def generate_token(cls):
+        return jwt.encode(
+            payload={
+                'key': cls.jwt_payload_key
+            },
+            key=settings.SECRET_KEY,
+            algorithm="HS256"
+        )
+
+    def dispatch(self, request: HttpRequest, *args, **kwargs):
+        token = request.GET.get('token')
+        try:
+            jwt_payload = jwt.decode(
+                token,
+                key=settings.SECRET_KEY,
+                algorithms=["HS256"]
+            )
+
+        except:
+            raise Http404
+
+        if jwt_payload.get('key') != self.jwt_payload_key:
+            raise Http404
 
         return super().dispatch(request, *args, **kwargs)

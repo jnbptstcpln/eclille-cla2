@@ -51,6 +51,7 @@
 
                 var refetchEventsInternal = null
                 var refetchEventsTimeout = null
+
                 function setupInternal() {
                     clearTimeout(refetchEventsTimeout);
                     clearInterval(refetchEventsInternal);
@@ -61,6 +62,7 @@
                         clearInterval(refetchEventsInternal)
                     }, 5 * 60 * 1000) // Stop the auto-reloading after 5 minutes
                 }
+
                 document.addEventListener('click', setupInternal)
             });
         </script>
@@ -76,6 +78,10 @@
                     <a class="alert-link link-info" target="_blank" href="{{ school_admin_planning_href }}"><i class="far fa-calendar-week mr-1"></i> Planning pour l'administration</a>
                 </p>
             </div>
+        </div>
+        <div class="border border-1-grey p-4 text-sm text-muted mt-5 mx-auto" style="width: 100%; max-width: 750px;">
+            <p class="text-center">Utiliser le lien suivant pour ajouter automatiquement les réservations à votre calendrier :</p>
+            <input class="form-control form-control-sm" style="width: 100%;" value="{{ sync_href }}"/>
         </div>
     </div>
 {% endblock %}

@@ -1,7 +1,15 @@
-from django.contrib import messages
-from django.shortcuts import resolve_url
-from django.views.generic import ListView, DetailView, UpdateView, TemplateView
+from datetime import timedelta
 
+from django.conf import settings
+from django.contrib import messages
+from django.http import HttpResponse
+from django.shortcuts import resolve_url
+from django.utils import timezone
+from django.views import View
+from django.views.generic import ListView, DetailView, UpdateView, TemplateView
+from icalendar import Event, Calendar
+
+from cla_auth.mixins import JWTMixin
 from cla_reservation.forms.barbecue import ReservationBarbecueAssociationAdminForm, ReservationBarbecueValidateForm, ReservationBarbecueRejectForm, ReservationBarbecueMemberAdminForm, BlockedSlotBarbecueForm
 from cla_reservation.mixins import ReservationBarbecueManageMixin, PlanningAdminMixin
 from cla_reservation.models import ReservationBarbecue
@@ -38,7 +46,8 @@ class BarbecuePlanningView(PlanningAdminMixin, ReservationBarbecueManageMixin, T
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({
-            'school_admin_planning_href': resolve_url('cla_reservation:school_admin:barbecue')
+            'school_admin_planning_href': resolve_url('cla_reservation:school_admin:barbecue'),
+            'sync_href': f"https://{settings.ALLOWED_HOSTS[0]}{resolve_url('cla_reservation:manage:barbecue-export')}?token={BarbecueIcsFileView.generate_token()}"
         })
         return context
 
@@ -148,3 +157,22 @@ class BarbecueBlockedSlotDeleteView(ReservationBarbecueManageMixin, AbstractBloc
 
     cla_reservation_active_section = "blockedslot"
     model = BlockedSlotBarbecue
+
+
+class BarbecueIcsFileView(PlanningAdminMixin, JWTMixin, View):
+    jwt_payload_key = "cla_reservation:manage:barbecue"
+    model = ReservationBarbecue
+    blocked_slot_model = BlockedSlotBarbecue
+
+    def get(self, request, *args, **kwargs):
+        cal = Calendar()
+        for e in self.get_planning_items(timezone.now(), timezone.now() + timedelta(days=60)):
+            event = Event()
+            event.add('summary', e.get('title'))
+            event.add('dtstart', e.get('start'))
+            event.add('dtend', e.get('end'))
+            event.add('description', e.get('name'))
+            event.add('location', e.get('Barbecue'))
+            cal.add_component(event)
+
+        return HttpResponse(content=cal.to_ical(), content_type='text/calendar')

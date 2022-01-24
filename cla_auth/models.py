@@ -209,6 +209,17 @@ class UserInfos(models.Model):
         except:
             return False
 
+    def check_calendar_jwt(self, token):
+        try:
+            payload = jwt.decode(
+                jwt=token,
+                key=f"{settings.SECRET_KEY}-{self.user.username}",
+                algorithms=["HS256"]
+            )
+            return True
+        except:
+            return False
+
     @property
     def validation_request(self):
         validation_request, created = ValidationRequest.objects.get_or_create(

@@ -121,6 +121,8 @@ class PlanningMixin:
             'classNames': self.get_event_class_names(instance),
             'start': instance.starts_on.astimezone(timezone.get_current_timezone()),
             'end': instance.ends_on.astimezone(timezone.get_current_timezone()),
+            'place': instance.place.name,
+            'name': instance.name,
         }
         if self.config__event_clickable:
             e['url'] = self.get_event_url(instance)
@@ -143,12 +145,15 @@ class PlanningMixin:
             self.build_event(e) for e in events
         ]
 
+    def get_planning_items(self, start, end):
+        return self.get_events(start, end)
+
     def get(self, request, *args, **kwargs):
         if self.request.GET.get('format') == "json":
             start = datetime.strptime(self.request.GET.get('start'), "%Y-%m-%dT%H:%M:%S")
             end = datetime.strptime(self.request.GET.get('end'), "%Y-%m-%dT%H:%M:%S")
             return JsonResponse(
-                self.get_events(start, end)
+                self.get_planning_items(start, end)
                 , safe=False)
         return super().get(request, *args, **kwargs)
 

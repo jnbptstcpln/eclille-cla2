@@ -320,11 +320,14 @@ class PlanningMixin:
             self.build_reservation(r) for r in reservations
         ]
 
+    def get_planning_items(self, start, end):
+        return self.get_reservations(start, end) + self.get_fixed_reservations(start, end) + self.get_recurring_reservations(start, end)
+
     def get(self, request, *args, **kwargs):
         if self.request.GET.get('format') == "json":
             start = datetime.strptime(self.request.GET.get('start'), "%Y-%m-%dT%H:%M:%S")
             end = datetime.strptime(self.request.GET.get('end'), "%Y-%m-%dT%H:%M:%S")
-            return JsonResponse(self.get_reservations(start, end) + self.get_fixed_reservations(start, end) + self.get_recurring_reservations(start, end), safe=False)
+            return JsonResponse(self.get_planning_items(start, end), safe=False)
         return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
