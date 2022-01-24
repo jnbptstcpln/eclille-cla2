@@ -14,17 +14,18 @@
     <div class="mt-4">
         <div id='calendar'></div>
         <script>
+
             document.addEventListener('DOMContentLoaded', function () {
                 var calendarEl = document.getElementById('calendar');
                 var calendar = new FullCalendar.Calendar(calendarEl, {
                     timeZone: 'Europe/Paris',
                     locale: 'fr',
                     headerToolbar: {
-                        left: 'prev,next',
+                        left: window.innerWidth >= 600 ? 'prev,next' : 'timeGridDay,listMonth',
                         center: 'title',
-                        right: 'dayGridMonth,timeGridWeek,listMonth'
+                        right: window.innerWidth >= 600 ? 'dayGridMonth,timeGridWeek,listMonth' : 'prev,next',
                     },
-                    initialView: 'timeGridWeek',
+                    initialView: window.innerWidth >= 600 ? 'timeGridWeek' : 'timeGridDay',
                     slotDuration: '01:00:00',
                     nextDayThreshold: '08:00:00',
                     allDaySlot: false,
