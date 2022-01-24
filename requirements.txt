@@ -10,6 +10,7 @@ django-qr-code==2.2.0
 django-resized==0.3.11
 django-summernote==0.8.11.6
 django-weasyprint==1.1.0.post1
+icalendar==4.0.9
 idna==3.2
 marshmallow==3.12.1
 mysqlclient==2.0.3
