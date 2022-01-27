@@ -5,7 +5,7 @@ from django.shortcuts import render, redirect, resolve_url
 from django.template.loader import render_to_string
 from django.views.generic import CreateView, DetailView
 from cla_registration.models import RegistrationSession, Registration
-from cla_registration.forms import RegistrationForm, RegistrationPackForm
+from cla_registration.forms import RegistrationForm, RegistrationPackForm, EnsclRegistrationForm
 
 
 def register_introduction(req):
@@ -154,6 +154,15 @@ class ITEEMCLARegistrationView(AbstractRegistrationView):
     registration_type = Registration.Types.ITEEM_CLA
     contribution = 360
     description = "Étudiante ou étudiant à l'ITEEM, vous souhaitez adhérer à Centrale Lille Associations."
+    send_email_notification = True
+
+
+class ENSCLCLARegistrationView(AbstractRegistrationView):
+    form_class = EnsclRegistrationForm
+    school_domain = Registration.SchoolDomains.ENSCL
+    registration_type = Registration.Types.ENSCL_CLA
+    contribution = 265
+    description = "Étudiante ou étudiant à l'ENSCL, vous souhaitez adhérer à Centrale Lille Associations."
     send_email_notification = True
 
 

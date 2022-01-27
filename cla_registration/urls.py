@@ -12,6 +12,7 @@ urlpatterns = [
     path("adherer/cla/centrale", user.CentraleCLARegistrationView.as_view(), name="register_cla_centrale"),
     path("adherer/cla/centrale/dd", user.CentraleCLADDRegistrationView.as_view(), name="register_cla_centrale_dd"),
     path("adherer/cla/iteem", user.ITEEMCLARegistrationView.as_view(), name="register_cla_iteem"),
+    path("adherer/cla/enscl", user.ENSCLCLARegistrationView.as_view(), name="register_cla_enscl"),
     path("adherer/<uuid:pk>", user.RegistrationPaiementView.as_view(), name="register_paiement"),
     path("adherer/<uuid:pk>/cheque", user.RegistrationPaiementCheckView.as_view(), name="register_paiement_check"),
 

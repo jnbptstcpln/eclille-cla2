@@ -9,7 +9,7 @@ from cla_registration.strings import RGPD_AGREEMENT_CLA, RGPD_AGREEMENT_ALUMNI
 from cla_registration.utils import capitalize_name
 
 
-class RegistrationForm(forms.ModelForm):
+class AbstractRegistrationForm(forms.ModelForm):
 
     class Meta:
         model = Registration
@@ -21,8 +21,12 @@ class RegistrationForm(forms.ModelForm):
             'phone',
             'birthdate',
             'rgpd_agreement',
-            'rgpd_sharing_alumni',
         ]
+
+    rgpd_agreement = forms.BooleanField(
+        label=RGPD_AGREEMENT_CLA,
+        required=True
+    )
 
     def __init__(self, *args, **kwargs):
         self.school_domain = kwargs.pop("school_domain", "centralelille.fr")
@@ -51,15 +55,6 @@ class RegistrationForm(forms.ModelForm):
                 continue
             field.widget.attrs['class'] = field.widget.attrs.get('class', "") + "form-control"
 
-    rgpd_agreement = forms.BooleanField(
-        label=RGPD_AGREEMENT_CLA,
-        required=True
-    )
-    rgpd_sharing_alumni = forms.BooleanField(
-        label=RGPD_AGREEMENT_ALUMNI,
-        required=False
-    )
-
     def clean_email_school(self):
         email = self.cleaned_data['email']
         email_school = self.cleaned_data['email_school']
@@ -76,11 +71,39 @@ class RegistrationForm(forms.ModelForm):
         return capitalize_name(self.cleaned_data['last_name'])
 
 
+class RegistrationForm(AbstractRegistrationForm):
+
+    class Meta:
+        model = Registration
+        fields = [
+            'first_name',
+            'last_name',
+            'email',
+            'email_school',
+            'phone',
+            'birthdate',
+            'rgpd_agreement',
+            'rgpd_sharing_alumni',
+        ]
+
+    rgpd_sharing_alumni = forms.BooleanField(
+        label=RGPD_AGREEMENT_ALUMNI,
+        required=False
+    )
+
+
 class RegistrationPackForm(RegistrationForm):
     rgpd_sharing_alumni = forms.BooleanField(
         label=RGPD_AGREEMENT_ALUMNI,
         required=True
     )
+
+
+class EnsclRegistrationForm(AbstractRegistrationForm):
+
+    def save(self, commit=True):
+        self.instance.rgpd_sharing_alumni = False
+        return super().save(commit)
 
 
 class RegistrationAdminForm(forms.ModelForm):

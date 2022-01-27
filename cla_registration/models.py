@@ -153,6 +153,7 @@ class Registration(models.Model):
         CENTRALE_DD_CLA = "centrale_dd_cla", "[Centrale Lille][Double diplôme] Adhésion CLA"
         ITEEM_PACK = "iteem_pack", "[ITEEM] Pack Alumni+CLA"
         ITEEM_CLA = "iteem_cla", "[ITEEM] Adhésion CLA"
+        ENSCL_CLA = "enscl_cla", "[ENSCL] Ahésion CLA"
 
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     datetime_registration = models.DateTimeField(auto_now_add=True, editable=False, verbose_name="Date de l'inscription")
