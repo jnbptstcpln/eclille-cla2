@@ -16,10 +16,18 @@
     </p>
     <p>
         <b>Association :</b> {{ reservation.event.association.name }}
+    </p>
+    <p>
         <b>Nom de l'événement :</b> {{ reservation.event.name }}
+    </p>
+    <p>
         <b>Date et horaire de l'événement :</b> {{ reservation.event.get_datetime_display }}
+    </p>
+    <p>
         <b>Date et horaire d'ouverture :</b> {{ reservation.get_datetime_display }}
-        <b>Type d'événement :</b> {{ event.type }}
+    </p>
+    <p>
+        <b>Type d'événement :</b> {{ reservation.event.type }}
     </p>
 {% else %}
     <p>
@@ -27,8 +35,14 @@
     </p>
     <p>
         <b>Cotisant :</b> {{ reservation.user.first_name }} {{ reservation.user.last_name }}
+    </p>
+    <p>
         <b>Email :</b> {{ reservation.user.email }}
+    </p>
+    <p>
         <b>Téléphone :</b> {{ reservation.user.infos.phone }}
+    </p>
+    <p>
         <b>Date et horaire d'ouverture :</b> {{ reservation.get_datetime_display }}
     </p>
 {% endif %}
