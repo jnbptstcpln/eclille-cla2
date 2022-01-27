@@ -161,7 +161,7 @@ class ENSCLCLARegistrationView(AbstractRegistrationView):
     form_class = EnsclRegistrationForm
     school_domain = Registration.SchoolDomains.ENSCL
     registration_type = Registration.Types.ENSCL_CLA
-    contribution = 265
+    contribution = 225
     description = "Étudiante ou étudiant à l'ENSCL, vous souhaitez adhérer à Centrale Lille Associations."
     send_email_notification = True
 
