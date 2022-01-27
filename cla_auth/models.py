@@ -66,7 +66,14 @@ class UserInfos(models.Model):
         IE4 = 'ie4', 'IE4'
         IE5 = 'ie5', 'IE5'
         ALUMNI_ITEEM = 'alumni-iteem', 'Diplomé de l\'ITEEM'
+        CPI1 = 'cpi1', "CPI1"
+        CPI2 = 'cpi2', "CPI2"
+        CH1 = 'ch1', "ch1"
+        CH2 = 'ch2', "ch2"
+        CH3 = 'ch3', "ch3"
+        ALUMNI_ENSCL = 'alumni-enscl', 'Diplomé de l\'ENSCL'
         PHD = 'phd', 'Doctorant'
+        OTHER = 'other', "Autre"
 
     class CursusChoices(models.TextChoices):
 
@@ -127,6 +134,25 @@ class UserInfos(models.Model):
         IE5_DIPLOME = "IE5-DIPLOME", 'Diplomé de l\ITEEM'
 
         # # # # # # # # #
+        # CURSUS CHIMIE #
+        # # # # # # # # #
+
+        # CPI, preparatory classes
+        CPI1 = "CPI1", "ENSCL CPI1"
+        CPI1P = "CPI1P", "ENSCL CPI1'"
+        CPI2 = "CPI2", "ENSCL CPI2"
+        CPI2P = "CPI2P", "ENSCL CPI2'"
+
+        # CH, chemical engineer
+        CH1 = "CH1", "ENSCL 1A"
+        CH1P = "CH1P", "ENSCL 1A'"
+        CH2 = "CH2", "ENSCL 2A"
+        CH2P = "CH2P", "ENSCL 2A'"
+        CH3 = "CH3", "ENSCL 3A"
+
+        CH3_DIPLOME = "CH3-DIPLOME", "Diplomé de l'ENSCL"
+
+        # # # # # # # # #
         #  DOCTORANTS   #
         # # # # # # # # #
 
@@ -165,10 +191,16 @@ class UserInfos(models.Model):
     )
 
     def is_from_centrale(self):
-        return re.match(r'^G\d.*', self.cursus)
+        return re.match(r'^G.*', self.cursus)
 
     def is_from_iteem(self):
-        return re.match(r'^IE\d.*', self.cursus)
+        return re.match(r'^IE.*', self.cursus)
+
+    def is_from_enscl_cpi(self):
+        return re.match(r'^CPI.*', self.cursus)
+
+    def is_from_enscl(self):
+        return re.match(r'^CH.*', self.cursus)
 
     def is_phd(self):
         return self.cursus == self.CursusChoices.CENTRALE_PHD
@@ -239,20 +271,59 @@ class UserInfos(models.Model):
 
     @property
     def college(self):
-        if self.promo <= current_school_year() and self.valid_until < timezone.now():
-            return self.Colleges.ALUMNI_CENTRALE if self.is_from_centrale() else self.Colleges.ALUMNI_ITEEM
-        elif self.promo <= current_school_year() + 1:
-            return self.Colleges.G3 if self.is_from_centrale() else self.Colleges.IE5
-        elif self.promo == current_school_year() + 2:
-            return self.Colleges.G2 if self.is_from_centrale() else self.Colleges.IE4
-        elif self.promo == current_school_year() + 3:
-            return self.Colleges.G1 if self.is_from_centrale() else self.Colleges.IE3
-        elif self.promo == current_school_year() + 4:
-            return self.Colleges.IE1_IE2
-        elif self.promo == current_school_year() + 5:
-            return self.Colleges.IE1_IE2
-        elif self.cursus == self.CursusChoices.CENTRALE_PHD:
-            return self.Colleges.PHD
+
+        if self.is_from_centrale():
+            if self.cursus == self.CursusChoices.CENTRALE_PHD:
+                return self.Colleges.PHD
+            elif self.promo <= current_school_year() and self.valid_until < timezone.now():
+                return self.Colleges.ALUMNI_CENTRALE
+            elif self.promo <= current_school_year() + 1:
+                return self.Colleges.G3
+            elif self.promo == current_school_year() + 2:
+                return self.Colleges.G2
+            elif self.promo == current_school_year() + 3:
+                return self.Colleges.G1
+            else:
+                return self.Colleges.OTHER
+
+        if self.is_from_iteem():
+            if self.promo <= current_school_year() and self.valid_until < timezone.now():
+                return self.Colleges.ALUMNI_ITEEM
+            elif self.promo <= current_school_year() + 1:
+                return self.Colleges.IE5
+            elif self.promo == current_school_year() + 2:
+                return self.Colleges.IE4
+            elif self.promo == current_school_year() + 3:
+                return self.Colleges.IE3
+            elif self.promo == current_school_year() + 4:
+                return self.Colleges.IE1_IE2
+            elif self.promo == current_school_year() + 5:
+                return self.Colleges.IE1_IE2
+            else:
+                return self.Colleges.OTHER
+
+        if self.is_from_enscl():
+            if self.promo <= current_school_year() and self.valid_until < timezone.now():
+                return self.Colleges.ALUMNI_ENSCL
+            elif self.promo <= current_school_year() + 1:
+                return self.Colleges.CH3
+            elif self.promo == current_school_year() + 2:
+                return self.Colleges.CH2
+            elif self.promo == current_school_year() + 3:
+                return self.Colleges.CH1
+            else:
+                return self.Colleges.OTHER
+
+        if self.is_from_enscl_cpi():
+            if self.promo <= current_school_year() and self.valid_until < timezone.now():
+                return self.Colleges.OTHER
+            elif self.promo <= current_school_year() + 1:
+                return self.Colleges.CPI2
+            elif self.promo == current_school_year() + 2:
+                return self.Colleges.CPI1
+            else:
+                return self.Colleges.OTHER
+
 
     @property
     def next_cursus_choices(self):
@@ -400,6 +471,27 @@ class UserInfos(models.Model):
             class NextCursusChoices(models.TextChoices):
                 IE5 = self.CursusChoices.IE5.value, self.CursusChoices.IE5.label
                 IE5_DIPLOME = self.CursusChoices.IE5_DIPLOME.value, self.CursusChoices.IE5_DIPLOME.label
+
+            return NextCursusChoices
+
+        if self.cursus in {self.CursusChoices.CH1, self.CursusChoices.CH1P}:
+            class NextCursusChoices(models.TextChoices):
+                CH2 = self.CursusChoices.CH2.value, self.CursusChoices.CH2.label
+                CH1P = self.CursusChoices.CH1P.value, self.CursusChoices.CH1P.label
+
+            return NextCursusChoices
+
+        elif self.cursus in {self.CursusChoices.CH2, self.CursusChoices.CH2P}:
+            class NextCursusChoices(models.TextChoices):
+                CH3 = self.CursusChoices.CH3.value, self.CursusChoices.CH3.label
+                CH2P = self.CursusChoices.CH2P.value, self.CursusChoices.CH2P.label
+
+            return NextCursusChoices
+
+        elif self.cursus in {self.CursusChoices.CH3}:
+            class NextCursusChoices(models.TextChoices):
+                CH3 = self.CursusChoices.CH3.value, self.CursusChoices.CH3.label
+                CH3_DIPLOME = self.CursusChoices.CH3_DIPLOME.value, self.CursusChoices.CH3_DIPLOME.label
 
             return NextCursusChoices
 
