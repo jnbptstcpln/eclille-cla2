@@ -1,0 +1,55 @@
+{% extends "layout/_base.html" %}
+{% load static %}
+
+{% block css %}
+    {{ block.super }}
+    <style>
+        body {
+            height: 100%;
+        }
+
+        html {
+            height: 100%
+        }
+        #wrapper1 {
+            height: 100%;
+        }
+
+        #wrapper1 .background {
+            height: 100vh;
+            width: 100vw;
+            position: fixed;
+            background-position: center;
+            background-size: cover;
+        }
+
+        #wrapper2 {
+            padding: 2rem;
+        }
+
+        #main {
+            margin: auto;
+        }
+
+        @media (max-width: 768px) {
+            #wrapper2 {
+                padding: .5rem;
+                font-size: 90%;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div id="wrapper1" class="position-relative">
+        <div class="background" style="background-image: url('{% block background_image_url %}{% static "app/img/rez_blur.jpg" %}{% endblock %}')"></div>
+        <div id="wrapper2">
+            <div>
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </div>
+    <footer class="position-fixed p-2 w-100 text-center text-white d-none d-md-block" style="font-size: .75rem; bottom: 0; background: linear-gradient(to top, rgba(0,0,0,0.75), rgba(0,0,0,0)); z-index: 10;">
+        {% now "Y" %} © <a class="text-white" href="{% url "cla_public:index" %}">Centrale Lille Associations</a>
+    </footer>
+{% endblock %}

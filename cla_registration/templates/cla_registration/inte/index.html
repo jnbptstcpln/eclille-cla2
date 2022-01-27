@@ -1,4 +1,4 @@
-{% extends "layout/standalone_legacy.html" %}
+{% extends "layout/standalone_safe.html" %}
 {% load static %}
 
 {% block page_title %}Adhérer | CLA{% endblock %}
@@ -34,7 +34,7 @@
     <div id="main" style="max-width: 750px" class="card">
         <div class="card-body w-100">
             <form method="post" class="d-flex flex-column justify-content-center h-100">
-                <div style="flex: auto; overflow: auto">
+                <div style="flex: auto">
 
                     <h1 class="d-flex align-items-center justify-content-center mb-4">
                         <div class="mr-2">
