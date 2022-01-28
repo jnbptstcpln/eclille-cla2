@@ -15,7 +15,7 @@ from cla_association.models import Association
 
 from cla_member.mixins import ClaMemberModuleMixin
 from cla_reservation.mixins import PlanningMixin
-from cla_reservation.models import ReservationBarbecue, ReservationFoyer, ReservationSynthe
+from cla_reservation.models import ReservationBarbecue, ReservationFoyer, ReservationSynthe, ReservationBibli, BlockedSlotBibli
 from cla_reservation.models.barbecue import BlockedSlotBarbecue
 from cla_reservation.models.foyer import BlockedSlotFoyer
 from cla_reservation.models.synthe import BlockedSlotSynthe
@@ -39,6 +39,18 @@ class IndexView(ClaMemberModuleMixin, TemplateView):
                         'manage': resolve_url("cla_reservation:manage:barbecue"),
                         'planning': resolve_url("cla_reservation:public:barbecue-planning"),
                         'reservation': resolve_url("cla_reservation:public:barbecue-reservation"),
+                    }
+                },
+                {
+                    'name': "Bibli",
+                    'icon': "books",
+                    'color': "blue",
+                    'to_review_count': ReservationBibli.objects.to_validate().count(),
+                    'manage_permission': self.request.user.has_perm("cla_reservation.change_reservationbibli"),
+                    'href': {
+                        'manage': resolve_url("cla_reservation:manage:bibli"),
+                        'planning': resolve_url("cla_reservation:public:bibli-planning"),
+                        'reservation': resolve_url("cla_reservation:public:bibli-reservation"),
                     }
                 },
                 {
@@ -93,6 +105,25 @@ class PlanningBarbecueView(AbstractPlanningView):
 
 class ReservationBarbecueView(ClaMemberModuleMixin, TemplateView):
     template_name = "cla_reservation/public/reservation/barbecue/index.html"
+    cla_member_active_section = "reservations"
+
+
+class PlanningBibliView(AbstractPlanningView):
+    planning_name = 'bibli'
+    model = ReservationBibli
+    blocked_slot_model = BlockedSlotBibli
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'manage_permission': self.request.user.has_perm("cla_reservation.change_reservationbibli"),
+            'manage_href': resolve_url("cla_reservation:manage:bibli")
+        })
+        return context
+
+
+class ReservationBibliView(ClaMemberModuleMixin, TemplateView):
+    template_name = "cla_reservation/public/reservation/bibli/index.html"
     cla_member_active_section = "reservations"
 
 

@@ -138,6 +138,11 @@ class Event(models.Model):
             return self.reservation_barbecue
         return None
 
+    def get_reservation_bibli(self):
+        if (hasattr(self, 'reservation_bibli')):
+            return self.reservation_bibli
+        return None
+
     def get_reservation_foyer(self):
         if (hasattr(self, 'reservation_foyer')):
             return self.reservation_foyer
@@ -152,6 +157,7 @@ class Event(models.Model):
     def reservations(self):
         return {
             'barbecue': self.get_reservation_barbecue(),
+            'bibli': self.get_reservation_bibli(),
             'foyer': self.get_reservation_foyer(),
             'synthe': self.get_reservation_synthe()
         }

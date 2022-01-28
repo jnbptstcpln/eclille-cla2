@@ -20,15 +20,20 @@ class AbstractBlockedSlotManager(models.Manager):
         events = self.filter(starts_on__lte=start, recurring=True).filter(Q(end_recurring__gte=end) | Q(end_recurring__isnull=True))
         for event in events:
             for d in event.recurring_days:
-                if start.weekday() == d and end.weekday() == d:
-                    if event.start_time <= end.time() and event.end_time >= start.time():
+                _d = (int(d) - 1) % 7
+                print(start.weekday(), _d, end.weekday())
+
+                if start.weekday() == _d and end.weekday() == _d:
+                    print(event.start_time, event.end_time)
+                    print(start.time(), end.time())
+                    if event.start_time < end.time() and event.end_time > start.time():
                         return False
-                elif start.weekday() < d < end.weekday():
+                elif start.weekday() < _d < end.weekday():
                     return False
-                elif start.weekday() < d <= end.weekday():
+                elif start.weekday() < _d == end.weekday():
                     if end.time() > event.start_time:
                         return False
-                elif start.weekday() >= d and end.weekday() > d:
+                elif start.weekday() == _d and end.weekday() > _d:
                     if start.time() < event.end_time:
                         return False
 

@@ -114,7 +114,7 @@ class FoyerRejectView(ReservationFoyerManageMixin, UpdateView):
 
     def form_valid(self, form):
         response = super().form_valid(form)
-        form.instance.event.reject("Votre réservation du foyer a été rejeté")
+        form.instance.event.reject("Votre réservation du foyer a été rejetée")
         messages.success(self.request, "La réservation a bien été rejetée")
         return response
 

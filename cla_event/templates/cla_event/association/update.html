@@ -164,6 +164,31 @@
                         </div>
                     {% endwith %}
 
+                    {% with reservation=event.get_reservation_bibli %}
+                        <div class="border border-1-grey rounded p-4 d-flex align-items-center justify-content-between mt-3">
+                            <div>
+                                <h4 class="mb-2">Réservation de la bibli {% if reservation %}{{ reservation.get_status_display }}{% endif %}</h4>
+                                {% if reservation %}
+                                    <dl>
+                                        <dt>Ouverture pour installation</dt>
+                                        <dd>{{ reservation.starts_on|date:'d/m/Y - H\hi' }}</dd>
+                                        <dt>Fin du rangement</dt>
+                                        <dd>{{ reservation.ends_on|date:'d/m/Y - H\hi' }}</dd>
+                                    </dl>
+                                {% else %}
+                                    <p class="text-muted mb-0">Pas de réservation associée à votre événement</p>
+                                {% endif %}
+                            </div>
+                            <div>
+                                {% if reservation %}
+                                    <a href="{% url "cla_reservation:association:bibli" association.slug event.pk %}" class="btn btn-outline-primary">Détails</a>
+                                {% elif not event.sent and not event.validated %}
+                                    <a href="{% url "cla_reservation:association:bibli" association.slug event.pk %}" class="btn btn-outline-primary">Ajouter</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endwith %}
+
                     {% with reservation=event.get_reservation_barbecue %}
                         <div class="border border-1-grey rounded p-4 d-flex align-items-center justify-content-between mt-3">
                             <div>

@@ -120,7 +120,7 @@ class BarbecueRejectView(ReservationBarbecueManageMixin, UpdateView):
     def form_valid(self, form):
         response = super().form_valid(form)
         if form.instance.event:
-            form.instance.event.reject("Votre réservation du barbecue a été rejeté")
+            form.instance.event.reject("Votre réservation du barbecue a été rejetée")
         messages.success(self.request, "La réservation a bien été rejetée")
         return response
 

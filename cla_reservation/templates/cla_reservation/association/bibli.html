@@ -1,6 +1,6 @@
 {% extends "cla_event/association/_layout.html" %}
 
-{% block page_title %}Réserver le barbecue | {{ event.name }} | CLA{% endblock %}
+{% block page_title %}Réserver la bibli | {{ event.name }} | CLA{% endblock %}
 
 {% block section_top %}
     <a href="{% url "cla_event:association:update" association.slug event.pk %}"><i class="far fa-angle-left"></i> Revenir à la fiche de l'événement</a>
@@ -9,7 +9,7 @@
 {% block section_title %}{{ event.name }}{% endblock %}
 
 {% block section_content %}
-    <h3 style="font-size: 1.25rem" class="mt-3">Réserver le barbecue</h3>
+    <h3 style="font-size: 1.25rem" class="mt-3">Réserver la bibli</h3>
 
     {% if not reservation.sent and reservation.rejected_for %}
         <div class="alert alert-warning align-items-center d-flex mt-4 mb-5">
@@ -53,11 +53,11 @@
                     </div>
                     <div class="flex-fill">
                         <p class="mb-2">
-                            Toute réservation du barbecue est soumise à l'acceptation de la charte d'utilisation du barbecue :
+                            Toute réservation du bibli est soumise à l'acceptation de la charte d'utilisation du bibli :
                         </p>
                         <div class="px-4">
                             <p class="text-center mb-0">
-                                <a class="alert-link link-warning" href="{{ rules.file.url }}" target="_blank"><i class="far fa-file-pdf"></i> Charte d'utilisation du barbecue</a>
+                                <a class="alert-link link-warning" href="{{ rules.file.url }}" target="_blank"><i class="far fa-file-pdf"></i> Charte d'utilisation de la bibli</a>
                             </p>
                         </div>
                     </div>
@@ -69,7 +69,7 @@
             <div class="mt-2 p-4">
                 <div class="row">
                     <dl class="col-12 col-md-6">
-                        <dt>Ouverture du barbecue</dt>
+                        <dt>Ouverture du bibli</dt>
                         <dd>{{ reservation.starts_on|date:'d/m/Y - H\hi' }}</dd>
                     </dl>
                     <dl class="col-12 col-md-6">
@@ -86,7 +86,7 @@
             </div>
         {% else %}
             <p class="text-justify">
-                Le formulaire ci-dessous vous permet de préciser les modalités de votre réservation du barbecue avec notamment la prise
+                Le formulaire ci-dessous vous permet de préciser les modalités de votre réservation de la bibli avec notamment la prise
                 en compte des <b>créneaux d'installation et de rangement</b> de votre événement, <b>la réservation d'équipements supplémentaires</b> et
                 surtout <b>le descriptif de votre événement qui doit être <u>le plus complet possible</u></b> pour faciliter l'organisation de votre
                 événement.
@@ -124,7 +124,7 @@
             </div>
 
             {% if reservation.pk %}
-                <form method="post" action="{% url "cla_reservation:association:barbecue-delete" association.slug event.pk %}" class="mt-4">
+                <form method="post" action="{% url "cla_reservation:association:bibli-delete" association.slug event.pk %}" class="mt-4">
                     <hr>
                     {% csrf_token %}
                     <div class="row mt-4 mx-auto" style="max-width: 600px">

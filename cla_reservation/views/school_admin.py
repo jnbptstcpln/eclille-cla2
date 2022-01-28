@@ -1,7 +1,7 @@
 from django.views.generic import TemplateView
 
 from cla_reservation.mixins import PlanningSchoolAdminMixin
-from cla_reservation.models import ReservationSynthe, ReservationFoyer, ReservationBarbecue
+from cla_reservation.models import ReservationSynthe, ReservationFoyer, ReservationBarbecue, ReservationBibli, BlockedSlotBibli
 from cla_reservation.models.barbecue import BlockedSlotBarbecue
 from cla_reservation.models.foyer import BlockedSlotFoyer
 from cla_reservation.models.synthe import BlockedSlotSynthe
@@ -16,6 +16,19 @@ class BarbecueView(PlanningSchoolAdminMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         context.update({
             'infrastructure_name': 'Barbecue'
+        })
+        return context
+
+
+class BibliView(PlanningSchoolAdminMixin, TemplateView):
+    template_name = "cla_reservation/school_admin/planning.html"
+    model = ReservationBibli
+    blocked_slot_model = BlockedSlotBibli
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'infrastructure_name': 'Bibli'
         })
         return context
 

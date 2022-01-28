@@ -13,6 +13,7 @@ from cla_event.models import Event
 from cla_member.mixins import ClaMemberModuleMixin
 from cla_reservation.models import ReservationFoyer, ReservationBarbecue, ReservationSynthe
 from cla_reservation.models.barbecue import BlockedSlotBarbecue
+from cla_reservation.models.bibli import ReservationBibli, BlockedSlotBibli
 from cla_reservation.models.foyer import BlockedSlotFoyer
 from cla_reservation.models.synthe import BlockedSlotSynthe
 
@@ -42,10 +43,15 @@ class ReservationAssociationMixin(EventAssociationMixin):
         return None
 
     def get_reservation_kwargs(self):
+        start_time = self.event.start_time
+        end_time = self.event.end_time
+        if self.event.public:
+            start_time = (datetime.combine(date.today(), self.event.start_time) - timedelta(hours=1, minutes=30)).time()
+            end_time = (datetime.combine(date.today(), self.event.end_time) + timedelta(hours=1)).time()
         return {
             'start_date': self.event.start_date,
-            'start_time': (datetime.combine(date.today(), self.event.start_time) - timedelta(hours=1, minutes=30)).time(),
-            'end_time': (datetime.combine(date.today(), self.event.end_time) + timedelta(hours=1)).time(),
+            'start_time': start_time,
+            'end_time': end_time,
             'multiple_days': self.event.multiple_days
         }
 
@@ -117,8 +123,10 @@ class AbstractReservationItemManageMixin(ClaMemberModuleMixin):
 
     def is_range_free(self):
         if hasattr(self, 'object'):
+            _starts_on = self.object.starts_on.astimezone(timezone.get_current_timezone())
+            _ends_on = self.object.ends_on.astimezone(timezone.get_current_timezone())
             return self.model.objects.is_range_free(self.object.starts_on, self.object.ends_on) \
-                   and self.blocked_slot_model.objects.is_range_free(self.object.starts_on, self.object.ends_on)
+                   and self.blocked_slot_model.objects.is_range_free(_starts_on, _ends_on)  # Need to perform the operation with naive timezone datetime
         return None
 
     def is_event_range_free(self):
@@ -151,6 +159,20 @@ class ReservationBarbecueManageMixin(AbstractReservationItemManageMixin):
             'name': "Barbecue",
             'icon': "fire",
             'color': "red",
+        }
+
+
+class ReservationBibliManageMixin(AbstractReservationItemManageMixin):
+    model = ReservationBibli
+    blocked_slot_model = BlockedSlotBibli
+    permission_name = "cla_reservation.change_reservationbibli"
+    namespace = "bibli"
+
+    def get_reservation_item(self):
+        return {
+            'name': "Bibli",
+            'icon': "books",
+            'color': "blue",
         }
 
 
@@ -350,6 +372,7 @@ class PlanningAdminMixin(PlanningMixin):
 class PlanningSchoolAdminMixin(PlanningMixin):
 
     TOKEN_BARBECUE = "S3qyQLouijRL13xGN2eF"
+    TOKEN_BIBLI = "wZcEFvqN3NxE5QVCPnP9"
     TOKEN_FOYER = "2zlSMSyL35I6dfjQ8P0u"
     TOKEN_SYNTHE = "FSh8ssZ3deZ4Nr3bfRlK"
 

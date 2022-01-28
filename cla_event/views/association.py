@@ -74,6 +74,7 @@ class EventSendView(LoginRequiredMixin, EventAssociationMixin, View):
 
         reservations = [
             self.event.get_reservation_barbecue(),
+            self.event.get_reservation_bibli(),
             self.event.get_reservation_foyer(),
             self.event.get_reservation_synthe()
         ]

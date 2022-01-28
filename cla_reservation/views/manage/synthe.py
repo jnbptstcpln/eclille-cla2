@@ -120,7 +120,7 @@ class SyntheRejectView(ReservationSyntheManageMixin, UpdateView):
     def form_valid(self, form):
         response = super().form_valid(form)
         if form.instance.event:
-            form.instance.event.reject("Votre réservation du synthé a été rejeté")
+            form.instance.event.reject("Votre réservation du synthé a été rejetée")
         messages.success(self.request, "La réservation a bien été rejetée")
         return response
 
@@ -137,7 +137,7 @@ class BlockSlotBarbecueListView(ReservationSyntheManageMixin, UpdateView):
     def form_valid(self, form):
         response = super().form_valid(form)
         if form.instance.event:
-            form.instance.event.reject("Votre réservation du synthé a été rejeté")
+            form.instance.event.reject("Votre réservation du synthé a été rejetée")
         messages.success(self.request, "La réservation a bien été rejetée")
         return response
 

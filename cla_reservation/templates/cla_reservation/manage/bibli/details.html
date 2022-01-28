@@ -1,0 +1,218 @@
+{% extends "cla_reservation/manage/_layout.html" %}
+
+{% block page_title %}{{ object.event.name }} | Réservations de la bibli | CLA{% endblock %}
+
+{% block section_top %}
+    <a href="{% url "cla_reservation:manage:bibli" %}"><i class="far fa-angle-left"></i> Revenir à la liste des réservations</a>
+{% endblock %}
+
+{% block section_title %}{{ object.event.name }} | {{ object.event.get_datetime_display }}{% endblock %}
+
+{% block section_buttons %}
+    <a href="{% url "cla_reservation:manage:bibli-update" object.pk %}" class="btn btn-outline-primary btn-lg">Modifier</a>
+{% endblock %}
+
+{% block section_content %}
+    <div class="mt-4">
+        {% if object.validated %}
+            <div class="alert alert-success align-items-center d-flex mb-5">
+                <div class="mr-4">
+                    <i class="far fa-check-circle" style="font-size: 1.25rem"></i>
+                </div>
+                <div class="flex-fill">
+                    Cette réservation a été validée par {{ object.validated_by.first_name }} {{ object.validated_by.last_name }} le {{ object.validated_on|date:'d/m/Y à H:i' }}.
+                </div>
+            </div>
+        {% else %}
+            <div class="alert alert-info align-items-center d-flex mb-5">
+                <div class="mr-4">
+                    <i class="far fa-info-circle" style="font-size: 1.25rem"></i>
+                </div>
+                <div class="flex-fill">
+                    Cette réservation n'a pas encore été validée
+                </div>
+            </div>
+        {% endif %}
+
+        {% if object.user %}
+            <h3 style="font-size: 1.25rem">Informations sur le cotisant</h3>
+            <div class="mt-2 px-4">
+                <div class="row">
+                    <dl class="col-12 col-md-6">
+                        <dt>Nom</dt>
+                        <dd>{{ object.user.first_name }}</dd>
+                    </dl>
+                    <dl class="col-12 col-md-6">
+                        <dt>Cursus</dt>
+                        <dd>{{ object.user.infos.cursus }}</dd>
+                    </dl>
+                    <dl class="col-12 col-md-6">
+                        <dt>Adresse mail</dt>
+                        <dd>{{ object.user.email }}</dd>
+                    </dl>
+                    <dl class="col-12 col-md-6">
+                        <dt>Téléphone</dt>
+                        <dd>{{ object.user.infos.phone }}</dd>
+                    </dl>
+                </div>
+            </div>
+        {% else %}
+            <h3 style="font-size: 1.25rem">Informations sur l'association</h3>
+            <div class="mt-2 px-4">
+                <div class="row">
+                    <dl class="col-12 col-md-6">
+                        <dt>Nom</dt>
+                        <dd>{{ object.event.association.name }}</dd>
+                    </dl>
+                    <dl class="col-12 col-md-6">
+                        <dt>Type</dt>
+                        <dd>{{ object.event.association.get_type_display }}</dd>
+                    </dl>
+                </div>
+            </div>
+            <div class="px-4">
+                <h4 style="font-size: 1rem">Responsables</h4>
+                <table class="table table-condensed">
+                    <tbody>
+                    {% for member in object.event.association.members.all %}
+                        <tr>
+                            <td>{{ member.role }}</td>
+                            <td>{{ member.user.first_name }} {{ member.user.last_name }}</td>
+                            <td>{{ member.user.cursus }}</td>
+                            <td>{{ member.user.email }}</td>
+                            <td>{{ member.user.infos.phone }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+
+        <h3 style="font-size: 1.25rem">Informations sur {% if object.user %}la réservation{% else %}l'événement{% endif %}</h3>
+        <div class="mt-2 p-4">
+            {% if object.event %}
+                <div class="row">
+                    <dl class="col-12 col-md-6">
+                        <dt>Nom</dt>
+                        <dd>{{ object.event.name }}</dd>
+                    </dl>
+                    <dl class="col-12 col-md-6">
+                        <dt>Nom "admin compatible"</dt>
+                        <dd>{{ object.event.name_school }}</dd>
+                    </dl>
+                    <dl class="col-12 col-md-6">
+                        <dt>Type d'événement</dt>
+                        <dd>{{ object.event.type }}</dd>
+                    </dl>
+                    <dl class="col-12 col-md-6">
+                        <dt>Lieu</dt>
+                        <dd>{{ object.event.place }}</dd>
+                    </dl>
+                    <dl class="col-12 col-md-6">
+                        <dt>Début de l'événement</dt>
+                        <dd>{{ object.event.starts_on|date:'d/m/Y H\hi' }}</dd>
+                    </dl>
+                    <dl class="col-12 col-md-6">
+                        <dt>Fin de l'événement</dt>
+                        <dd>{{ object.event.ends_on|date:'d/m/Y H\hi' }}</dd>
+                    </dl>
+                </div>
+            {% endif %}
+            <div class="row">
+                <dl class="col-12 col-md-6">
+                    <dt>Ouverture du bibli pour débuter l'installation</dt>
+                    <dd>{{ object.starts_on|date:'d/m/Y - H\hi' }}</dd>
+                </dl>
+                <dl class="col-12 col-md-6">
+                    <dt>Fin du rangement</dt>
+                    <dd>{{ object.ends_on|date:'d/m/Y - H\hi' }}</dd>
+                </dl>
+            </div>
+            <div style="max-width: 700px">
+                {% if not object.validated %}
+                    {% if is_range_free %}
+                        <div class="alert alert-success align-items-center d-flex">
+                            <div class="mr-4">
+                                <i class="far fa-check-circle" style="font-size: 1.25rem"></i>
+                            </div>
+                            <div class="flex-fill">
+                                La bibli n'est pas occupée sur le créneau demandé ({{ object.get_datetime_display }})
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-danger align-items-center d-flex">
+                            <div class="mr-4">
+                                <i class="far fa-times-circle" style="font-size: 1.25rem"></i>
+                            </div>
+                            <div class="flex-fill">
+                                La bibli est occupée sur le créneau demandé ({{ object.get_datetime_display }})
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endif %}
+            </div>
+            <div class="border-1-grey rounded-10 p-1">
+                <div id="calendar"></div>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function () {
+                        var calendarEl = document.getElementById('calendar');
+                        var calendar = new FullCalendar.Calendar(calendarEl, {
+                            timeZone: 'Europe/Paris',
+                            locale: 'fr',
+                            headerToolbar: {
+                                left: 'prev,next',
+                                center: 'title',
+                                right: 'timeGridWeek'
+                            },
+                            initialView: 'timeGridWeek',
+                            slotDuration: '02:00:00',
+                            nextDayThreshold: '08:00:00',
+                            allDaySlot: false,
+                            height: 400,
+                            initialDate: '{{ object.starts_on|date:'Y-m-d' }}',
+                            events: {
+                                url: window.location.href,
+                                method: 'GET',
+                                extraParams: {
+                                    format: 'json'
+                                }
+                            },
+                            eventDidMount: function (e) {
+                                console.log(e)
+                                if (e.event.extendedProps.popover) {
+                                    $(e.el).popover({
+                                        trigger: 'hover',
+                                        html: true,
+                                        content: e.event._def.extendedProps.popover_content
+                                    })
+                                }
+
+                            }
+                        });
+                        calendar.render();
+                    });
+                </script>
+            </div>
+            <div class="mt-4">
+                {% if object.user %}
+                    <h4>Détail de la réservations</h4>
+                    <div class="rounded border-1-grey p-3">
+                        {{ object.description_user|safe }}
+                    </div>
+                {% else %}
+                    <h4>Description de l'événement</h4>
+                    <div class="rounded border-1-grey p-3">
+                        {{ object.description_event|safe }}
+                    </div>
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+    {% if not object.validated %}
+        <div class="row mt-4 mx-auto" style="max-width: 750px">
+            <a href="{% url "cla_reservation:manage:bibli-reject" object.pk %}" class="btn btn-outline-danger btn-block btn-lg my-2">Rejeter la réservation...</a>
+            <a href="{% url "cla_reservation:manage:bibli-validate" object.pk %}" class="btn btn-outline-success btn-block btn-lg my-2">Valider la réservation...</a>
+        </div>
+    {% endif %}
+{% endblock %}

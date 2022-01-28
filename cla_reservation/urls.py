@@ -10,9 +10,11 @@ urlpatterns = [
         (
             [
                 path("planning/barbecue/", public.PlanningBarbecueView.as_view(), name="barbecue-planning"),
+                path("planning/bibli/", public.PlanningBibliView.as_view(), name="bibli-planning"),
                 path("planning/foyer/", public.PlanningFoyerView.as_view(), name="foyer-planning"),
                 path("planning/synthe/", public.PlanningSyntheView.as_view(), name="synthe-planning"),
                 path("reserver/barbecue/", public.ReservationBarbecueView.as_view(), name="barbecue-reservation"),
+                path("reserver/bibli/", public.ReservationBibliView.as_view(), name="bibli-reservation"),
                 path("reserver/foyer/", public.ReservationFoyerView.as_view(), name="foyer-reservation"),
                 path("reserver/synthe/", public.ReservationSyntheView.as_view(), name="synthe-reservation"),
             ], 'public'
@@ -32,6 +34,17 @@ urlpatterns = [
                 path("barbecue/<int:pk>/modifier/", manage.barbecue.BarbecueUpdateView.as_view(), name="barbecue-update"),
                 path("barbecue/<int:pk>/valider/", manage.barbecue.BarbecueValidateView.as_view(), name="barbecue-validate"),
                 path("barbecue/<int:pk>/rejeter/", manage.barbecue.BarbecueRejectView.as_view(), name="barbecue-reject"),
+                path("bibli/", manage.bibli.BibliListView.as_view(), name="bibli"),
+                path("bibli/planning/", manage.bibli.BibliPlanningView.as_view(), name="bibli-planning"),
+                path("bibli/planning/export/ical", manage.bibli.BibliIcsFileView.as_view(), name="bibli-export"),
+                path("bibli/creneaux-bloques/", manage.bibli.BibliBlockedSlotListView.as_view(), name="bibli-blockedslot-list"),
+                path("bibli/creneaux-bloques/nouveau", manage.bibli.BibliBlockedSlotCreateView.as_view(), name="bibli-blockedslot-create"),
+                path("bibli/creneaux-bloques/<int:pk>", manage.bibli.BibliBlockedSlotUpdateView.as_view(), name="bibli-blockedslot-update"),
+                path("bibli/creneaux-bloques/<int:pk>/supprimer", manage.bibli.BibliBlockedSlotDeleteView.as_view(), name="bibli-blockedslot-delete"),
+                path("bibli/<int:pk>/", manage.bibli.BibliDetailView.as_view(), name="bibli-detail"),
+                path("bibli/<int:pk>/modifier/", manage.bibli.BibliUpdateView.as_view(), name="bibli-update"),
+                path("bibli/<int:pk>/valider/", manage.bibli.BibliValidateView.as_view(), name="bibli-validate"),
+                path("bibli/<int:pk>/rejeter/", manage.bibli.BibliRejectView.as_view(), name="bibli-reject"),
                 path("foyer/", manage.foyer.FoyerListView.as_view(), name="foyer"),
                 path("foyer/planning/", manage.foyer.FoyerPlanningView.as_view(), name="foyer-planning"),
                 path("foyer/planning/export/ical", manage.foyer.FoyerIcsFileView.as_view(), name="foyer-export"),
@@ -62,6 +75,8 @@ urlpatterns = [
             [
                 path("associations/<str:slug>/<int:pk>/barbecue", association.ReservationBarbecueView.as_view(), name="barbecue"),
                 path("associations/<str:slug>/<int:pk>/barbecue/supprimer/", association.ReservationBarbecueDeleteView.as_view(), name="barbecue-delete"),
+                path("associations/<str:slug>/<int:pk>/bibli", association.ReservationBibliView.as_view(), name="bibli"),
+                path("associations/<str:slug>/<int:pk>/bibli/supprimer/", association.ReservationBibliDeleteView.as_view(), name="bibli-delete"),
                 path("associations/<str:slug>/<int:pk>/foyer", association.ReservationFoyerView.as_view(), name="foyer"),
                 path("associations/<str:slug>/<int:pk>/foyer/supprimer/", association.ReservationFoyerDeleteView.as_view(), name="foyer-delete"),
                 path("associations/<str:slug>/<int:pk>/synthe", association.ReservationSyntheView.as_view(), name="synthe"),
@@ -73,8 +88,9 @@ urlpatterns = [
         (
             [
                 path(f"barbecue/ec/{PlanningSchoolAdminMixin.TOKEN_BARBECUE}", school_admin.BarbecueView.as_view(), name="barbecue"),
-                path(f"barbecue/ec/{PlanningSchoolAdminMixin.TOKEN_FOYER}", school_admin.FoyerView.as_view(), name="foyer"),
-                path(f"barbecue/ec/{PlanningSchoolAdminMixin.TOKEN_SYNTHE}", school_admin.SyntheView.as_view(), name="synthe")
+                path(f"bibli/ec/{PlanningSchoolAdminMixin.TOKEN_BIBLI}", school_admin.BibliView.as_view(), name="bibli"),
+                path(f"foyer/ec/{PlanningSchoolAdminMixin.TOKEN_FOYER}", school_admin.FoyerView.as_view(), name="foyer"),
+                path(f"synthe/ec/{PlanningSchoolAdminMixin.TOKEN_SYNTHE}", school_admin.SyntheView.as_view(), name="synthe")
             ], 'school_admin'
         )
     )),
