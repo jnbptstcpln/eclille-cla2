@@ -12,11 +12,11 @@ from django.views.decorators.csrf import csrf_protect
 from cla_web.middlewares import StayLoggedInMiddleware
 from cla_auth.models import PasswordResetRequest
 from cla_auth.forms.session import LoginForm, ForgotForm
+from cla_web.notification import send_generic_email
 
 
 @csrf_protect
 def login(req):
-
     if req.user.is_authenticated:
         return redirect(req.GET.get('next', 'cla_member:lobby'))
 
@@ -67,7 +67,6 @@ def login(req):
 
 
 def forgot(req):
-
     if req.user.is_authenticated:
         return redirect('cla_member:lobby')
 
@@ -78,19 +77,24 @@ def forgot(req):
 
 
 def forgot_username(req):
-
     if req.user.is_authenticated:
         return redirect('cla_member:lobby')
 
     username = None
+    server_error = False
     if req.method == "POST":
         form = ForgotForm(req.POST)
         if form.is_valid():
             email = form.cleaned_data['email']
-            try:
+            users = User.objects.filter(email=email)
+            if users.count() == 1:
                 username = User.objects.get(email=email).username
-            except User.DoesNotExist:
-                pass
+            elif users.count() > 1:
+                server_error = True
+                send_generic_email(
+                    f"Plusieurs utilisateurs pour {email}",
+                    f"Lors de l'exécution de la fonction \"J'ai oublié mon identifiant\", l'adresse email {email} a retourné plusieurs comptes utilisateur. La personne concernée a été invitée à contacter cla@centralelille.fr et des actions doivent être prises pour préserver l'unicité utilisateur/email."
+                )
     else:
         form = ForgotForm()
 
@@ -99,26 +103,29 @@ def forgot_username(req):
         'cla_auth/session/forgot_username.html',
         {
             'username': username,
-            'form': form
+            'form': form,
+            'server_error': server_error
         }
     )
 
 
 def forgot_password(req):
-
     if req.user.is_authenticated:
         return redirect('cla_member:lobby')
 
     error = None
     warning = None
     success = None
+    server_error = False
 
     if req.method == "POST":
         form = ForgotForm(req.POST)
         if form.is_valid():
             email = form.cleaned_data['email']
-            try:
-                user = User.objects.get(email=email)
+            user = User.objects.get(email=email)
+
+            users = User.objects.filter(email=email)
+            if users.count() == 1:
                 reset_req: PasswordResetRequest = PasswordResetRequest.objects.get_or_create_reset_request(user=user)
                 if reset_req.attempt < 3:  # Send reset email if less than 3 attempts were made
                     send_mail(
@@ -137,9 +144,13 @@ def forgot_password(req):
                     success = True
                 else:
                     warning = True
+            elif users.count() > 1:
+                server_error = True
+                send_generic_email(
+                    f"Plusieurs utilisateurs pour {email}",
+                    f"Lors de l'exécution de la fonction \"J'ai oublié mon mot de passe\", l'adresse email {email} a retourné plusieurs comptes utilisateur. La personne concernée a été invitée à contacter cla@centralelille.fr et des actions doivent être prises pour préserver l'unicité utilisateur/email."
+                )
 
-            except User.DoesNotExist:
-                pass
     else:
         form = ForgotForm()
 
@@ -150,7 +161,8 @@ def forgot_password(req):
             'form': form,
             'error': error,
             'warning': warning,
-            'success': success
+            'success': success,
+            'server_error': server_error
         }
     )
 

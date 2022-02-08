@@ -40,6 +40,7 @@ class AbstractRegistrationView(CreateView):
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
+        created = True
         self.registration = form.save(False)
         if self.current_registration_session.registrations.filter(email_school=self.registration.email_school).count() == 0:
             self.registration.session = self.current_registration_session
@@ -51,11 +52,12 @@ class AbstractRegistrationView(CreateView):
                 self.registration.original_school = form.cleaned_data.get('original_school')
             self.registration.save()
         else:
+            created = False
             self.registration = self.current_registration_session.registrations.filter(email_school=self.registration.email_school).first()
 
         self.registration.save()
 
-        if self.send_email_notification:
+        if created and self.send_email_notification:
             try:
                 send_mail(
                     subject=f"[Nouvelle Adhésion] {self.registration.get_school_display()} {self.registration.first_name.upper()} {self.registration.last_name}",

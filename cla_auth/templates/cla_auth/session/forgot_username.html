@@ -31,6 +31,13 @@
                     </p>
                 {% else %}
                     <h1 class="text-center" style="font-size: 1.75rem">J'ai oublié mon identifiant</h1>
+                    {% if server_error %}
+                        <div class="alert alert-warning">
+                            <b>Oups !</b> Nous avons rencontrer un problème lors de la récupération de votre compte...
+                            Mais pas de panique : contactez nous à <a href="mailto:cla@centralelille.fr">cla@centralelille.fr</a>
+                            pour que nous puissions résoudre le problème ensemble !
+                        </div>
+                    {% endif %}
                     <form method="post" action="{% url "cla_auth:forgot_username" %}" class="mt-3 mx-auto" style="max-width: 500px">
                         {% csrf_token %}
                         <p class="mb-1 text-justify">
