@@ -14,7 +14,7 @@ class AssociationManageMixin:
         self.association = get_object_or_404(Association, slug=self.kwargs.pop("slug"))
 
     def dispatch(self, request, *args, **kwargs):
-        if not self.association.active and self.association.members.filter(user=self.request.user).count() == 0:
+        if not self.association.active or self.association.members.filter(user=self.request.user).count() == 0:
             raise PermissionDenied()
         return super().dispatch(request, *args, **kwargs)
 
