@@ -16,6 +16,10 @@ class EventListView(LoginRequiredMixin, AssociationManageMixin, ListView):
     model = Event
     paginate_by = 20
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        queryset.filter(association=self.association)
+
 
 class EventCreateView(LoginRequiredMixin, AssociationManageMixin, CreateView):
     association_manage_active_section = "events"
