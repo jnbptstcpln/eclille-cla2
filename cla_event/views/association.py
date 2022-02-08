@@ -18,7 +18,7 @@ class EventListView(LoginRequiredMixin, AssociationManageMixin, ListView):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        queryset.filter(association=self.association)
+        return queryset.filter(association=self.association)
 
 
 class EventCreateView(LoginRequiredMixin, AssociationManageMixin, CreateView):
