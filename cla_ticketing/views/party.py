@@ -271,7 +271,7 @@ class ValidateRegistrationView(UserPassesTestMixin, LoginRequiredMixin, FormView
         self.party = get_object_or_404(DancingParty, slug=kwargs.pop("party_slug"))
 
     def get_next_registration(self, exclude_self=False):
-        registrations = self.party.registrations.filter(Q(validated=False) | Q(paid=False), is_staff=False)
+        registrations = self.party.registrations.filter(Q(validated=False) | Q(paid=False), is_staff=False, debug=False)
         if self.registration:
             registrations = registrations.filter(created_on__gte=self.registration.created_on)
             if exclude_self:

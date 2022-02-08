@@ -39,7 +39,7 @@ class UserAdmin(UserAdmin):
             'original_school',
             'image_right_agreement'
         )
-        readonly_fields = 'activated_on', 'valid_until', 'original_school', 'image_right_agreement'
+        readonly_fields = 'activated_on', 'original_school', 'image_right_agreement'
         extra = 1
         min_num = 1
         can_delete = False

@@ -158,7 +158,7 @@ class DancingPartyExportView(UserPassesTestMixin, generic.View):
 
         writer = csv.writer(response)
         writer.writerow([field for field in fields.keys()])
-        for registration in self.party.registrations.order_by("last_name"):
+        for registration in self.party.registrations.filter(debug=False).order_by("last_name"):
             writer.writerow([field_processing(registration) for field_processing in fields.values()])
 
         return response

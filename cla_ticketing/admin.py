@@ -334,6 +334,7 @@ class EventRegistrationTypeAdmin(admin.ModelAdmin):
 @admin.register(EventRegistration)
 class EventRegistrationAdmin(admin.ModelAdmin):
     autocomplete_fields = ('user',)
+    readonly_fields = ('created_on', )
     change_form_template = "cla_ticketing/admin/eventregistration_view.html"
     event = None
 
@@ -594,8 +595,15 @@ class DancingPartyAdmin(admin.ModelAdmin):
 
         def get_queryset(self, request):
             queryset = super().get_queryset(request)
-            if request.GET.get('registration_search') is not None:
+
+            if not request.user.has_perm('cla_ticketing.dancingparty_secretsauce'):
+                queryset = queryset.filter(debug=False)
+
+            if request.GET.get('registration_search') == "debug" and request.user.has_perm('cla_ticketing.dancingparty_secretsauce'):
+                queryset = queryset.filter(debug=True)
+            elif request.GET.get('registration_search') is not None:
                 queryset = queryset.filter(Q(last_name__icontains=request.GET.get('registration_search')) | Q(first_name__icontains=request.GET.get('registration_search')))
+
             return queryset
 
     list_display = ("name", "event_starts_on", "organizer", "places")
@@ -620,13 +628,13 @@ class DancingPartyAdmin(admin.ModelAdmin):
 
     link_ticketing.short_description = ''
 
-    def remaining_places(self, obj: Event):
+    def remaining_places(self, obj: DancingParty):
         if obj.pk:  # Check if the object was created
-            return obj.places_remaining
+            return obj.places_remaining_admin
         else:
             return "L'événement n'a pas encore été créé"
 
-    remaining_places.short_description = 'Nombre de places restant'
+    remaining_places.short_description = 'Nombre de places restantes'
 
     def response_add(self, request, obj, post_url_continue=None):
         self.update_managers(request, obj)
@@ -769,6 +777,9 @@ class DancingPartyRegistrationAdmin(admin.ModelAdmin):
         elif registration_type == "staff":
             fields += ['ticket_label', 'user', 'staff_description', 'paid']
 
+        if request.user.has_perm('cla_ticketing.dancingparty_secretsauce'):
+            fields += [('debug', 'debugged_on')]
+
         party = self.get_party(request, obj)
         for custom_field in party.custom_fields.all():
             # First add custom field to list
@@ -791,7 +802,7 @@ class DancingPartyRegistrationAdmin(admin.ModelAdmin):
 
         # Set field requirements
         form = context.get('adminform').form
-        non_required_set = {'paid', 'validated', 'mean_of_paiement'}.union(set([cf.field_id for cf in party.custom_fields.all()]))
+        non_required_set = {'paid', 'validated', 'mean_of_paiement', 'debug', 'debugged_on'}.union(set([cf.field_id for cf in party.custom_fields.all()]))
         for name, field in form.fields.items():
             field.required = True if name not in non_required_set else False
 
@@ -838,6 +849,10 @@ class DancingPartyRegistrationAdmin(admin.ModelAdmin):
             obj.birthdate = obj.user.infos.birthdate
         obj.is_staff = registration_type == "staff"
         obj.dancing_party = party
+
+        # Replace creation date by a fake one
+        if not obj.debug and obj.debugged_on is not None:
+            obj.created_on = obj.debugged_on
 
         super().save_model(request, obj, form, change)
 

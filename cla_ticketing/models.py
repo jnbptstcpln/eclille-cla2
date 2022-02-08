@@ -95,7 +95,7 @@ class AbstractRegistration(models.Model):
     email = models.EmailField(verbose_name="Adresse mail personnelle")
     phone = models.CharField(max_length=20, verbose_name="Numéro de téléphone")
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="+", verbose_name="Créateur de cette inscription", editable=False, null=True)
-    created_on = models.DateTimeField(auto_now_add=True, editable=False, verbose_name="Inscrit le")
+    created_on = models.DateTimeField(auto_now_add=True, verbose_name="Inscrit le")
     paid = models.BooleanField(default=False, verbose_name="A payé")
     mean_of_paiement = models.CharField(max_length=100, verbose_name="Moyen de paiement", choices=MeansOfPaiement.choices, null=True, blank=True)
 
@@ -307,6 +307,7 @@ class DancingParty(AbstractEvent):
         verbose_name_plural = "Billetteries de soirée dansante"
         permissions = (
             ('dancingparty_manager', "Accès à l'interface de gestion des soirées dansantes pour lesquelles l'utilisateur est administrateur"),
+            ('dancingparty_secretsauce', "Droit particulier sur les soirées dansantes"),
         )
 
     allow_non_contributor_registration = models.BooleanField(default=True, verbose_name="Autoriser l'inscription des non cotisants par les cotisants")
@@ -317,12 +318,20 @@ class DancingParty(AbstractEvent):
         return self.get_counted_registrations().count()
 
     @property
+    def counted_registrations_admin(self):
+        return self.get_counted_registrations().filter(debug=False).count()
+
+    @property
     def checked_registrations(self):
         return self.get_counted_registrations().filter(checkin_datetime__isnull=False).count()
 
     @property
     def places_remaining(self):
         return max(self.places-self.get_counted_registrations().count(), 0)
+
+    @property
+    def places_remaining_admin(self):
+        return max(self.places - self.get_counted_registrations().filter(debug=False).count(), 0)
 
     def get_counted_registrations(self):
         return self.registrations.filter(is_staff=False)
@@ -366,6 +375,8 @@ class DancingPartyRegistration(AbstractRegistration):
     birthdate = models.DateField(verbose_name="Date de naissance")
     guarantor = models.ForeignKey(User, on_delete=models.DO_NOTHING, to_field="username", related_name="+", verbose_name="Garant", null=True)
     checkin_datetime = models.DateTimeField(null=True, verbose_name="Date et heure d'entrée")
+    debug = models.BooleanField(default=False, blank=True, verbose_name="Debug")  # Special field to hide places, required `cla_ticketing.dancingparty_secretsauce` to use
+    debugged_on = models.DateTimeField(null=True, default=None, blank=True, verbose_name="Date of debugging")  # Specify the datetime of registration creation when no longer hiding
 
     @property
     def price(self):
