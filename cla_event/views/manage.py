@@ -92,7 +92,7 @@ class EventRejectView(EventManageMixin, UpdateView):
     model = Event
 
     def get_success_url(self):
-        return resolve_url("cla_event:manage:event")
+        return resolve_url("cla_event:manage:index")
 
     def form_valid(self, form):
         response = super().form_valid(form)
