@@ -386,6 +386,14 @@ class PlanningSchoolAdminMixin(PlanningMixin):
     def get_blocked_slot_base_queryset(self):
         return self.blocked_slot_model.objects.for_admin()
 
+    def build_reservation(self, instance):
+        reservation = super().build_reservation(instance)
+        reservation.update({
+            'start': instance.event.starts_on.astimezone(timezone.get_current_timezone()),
+            'end': instance.event.ends_on.astimezone(timezone.get_current_timezone())
+        })
+        return reservation
+
     def get_reservation_title(self, instance):
         if instance.event:
             return instance.event.association.name

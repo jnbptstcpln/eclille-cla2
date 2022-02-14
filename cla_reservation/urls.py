@@ -88,9 +88,13 @@ urlpatterns = [
         (
             [
                 path(f"barbecue/ec/{PlanningSchoolAdminMixin.TOKEN_BARBECUE}", school_admin.BarbecueView.as_view(), name="barbecue"),
+                path(f"barbecue/ec/{PlanningSchoolAdminMixin.TOKEN_BARBECUE}/ics", school_admin.BarbecueIcsView.as_view(), name="barbecue_ics"),
                 path(f"bibli/ec/{PlanningSchoolAdminMixin.TOKEN_BIBLI}", school_admin.BibliView.as_view(), name="bibli"),
+                path(f"bibli/ec/{PlanningSchoolAdminMixin.TOKEN_BIBLI}/ics", school_admin.BibliIcsView.as_view(), name="bibli_ics"),
                 path(f"foyer/ec/{PlanningSchoolAdminMixin.TOKEN_FOYER}", school_admin.FoyerView.as_view(), name="foyer"),
-                path(f"synthe/ec/{PlanningSchoolAdminMixin.TOKEN_SYNTHE}", school_admin.SyntheView.as_view(), name="synthe")
+                path(f"foyer/ec/{PlanningSchoolAdminMixin.TOKEN_FOYER}/ics", school_admin.FoyerIcsView.as_view(), name="foyer_ics"),
+                path(f"synthe/ec/{PlanningSchoolAdminMixin.TOKEN_SYNTHE}", school_admin.SyntheView.as_view(), name="synthe"),
+                path(f"synthe/ec/{PlanningSchoolAdminMixin.TOKEN_SYNTHE}/ics", school_admin.SyntheIcsView.as_view(), name="synthe_ics")
             ], 'school_admin'
         )
     )),
