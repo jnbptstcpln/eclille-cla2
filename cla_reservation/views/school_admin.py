@@ -31,7 +31,6 @@ class BarbecueIcsView(PlanningSchoolAdminMixin, View):
     blocked_slot_model = BlockedSlotBarbecue
 
     def get(self, request, *args, **kwargs):
-        response = super().get(request, *args, **kwargs)
         cal = Calendar()
         for e in self.get_planning_items(timezone.now() - timedelta(days=15), timezone.now() + timedelta(days=60)):
             event = Event()
@@ -63,7 +62,6 @@ class BibliIcsView(PlanningSchoolAdminMixin, View):
     blocked_slot_model = BlockedSlotBibli
 
     def get(self, request, *args, **kwargs):
-        response = super().get(request, *args, **kwargs)
         cal = Calendar()
         for e in self.get_planning_items(timezone.now() - timedelta(days=15), timezone.now() + timedelta(days=60)):
             event = Event()
@@ -95,7 +93,6 @@ class FoyerIcsView(PlanningSchoolAdminMixin, View):
     blocked_slot_model = BlockedSlotFoyer
 
     def get(self, request, *args, **kwargs):
-        response = super().get(request, *args, **kwargs)
         cal = Calendar()
         for e in self.get_planning_items(timezone.now() - timedelta(days=15), timezone.now() + timedelta(days=60)):
             event = Event()
@@ -127,7 +124,6 @@ class SyntheIcsView(PlanningSchoolAdminMixin, View):
     blocked_slot_model = BlockedSlotSynthe
 
     def get(self, request, *args, **kwargs):
-        response = super().get(request, *args, **kwargs)
         cal = Calendar()
         for e in self.get_planning_items(timezone.now() - timedelta(days=15), timezone.now() + timedelta(days=60)):
             event = Event()
