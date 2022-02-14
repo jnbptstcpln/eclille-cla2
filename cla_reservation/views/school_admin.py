@@ -2,7 +2,7 @@ from datetime import timedelta
 
 from django.http import HttpResponse
 from django.utils import timezone
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, View
 from icalendar import Event, Calendar
 
 from cla_association.views.public import DetailView
@@ -26,7 +26,7 @@ class BarbecueView(PlanningSchoolAdminMixin, TemplateView):
         return context
 
 
-class BarbecueIcsView(PlanningSchoolAdminMixin, TemplateView):
+class BarbecueIcsView(PlanningSchoolAdminMixin, View):
     model = ReservationBarbecue
     blocked_slot_model = BlockedSlotBarbecue
 
@@ -58,7 +58,7 @@ class BibliView(PlanningSchoolAdminMixin, TemplateView):
         return context
 
 
-class BibliIcsView(PlanningSchoolAdminMixin, TemplateView):
+class BibliIcsView(PlanningSchoolAdminMixin, View):
     model = ReservationBibli
     blocked_slot_model = BlockedSlotBibli
 
@@ -90,7 +90,7 @@ class FoyerView(PlanningSchoolAdminMixin, TemplateView):
         return context
 
 
-class FoyerIcsView(PlanningSchoolAdminMixin, TemplateView):
+class FoyerIcsView(PlanningSchoolAdminMixin, View):
     model = ReservationFoyer
     blocked_slot_model = BlockedSlotFoyer
 
@@ -122,7 +122,7 @@ class SyntheView(PlanningSchoolAdminMixin, TemplateView):
         return context
 
 
-class SyntheIcsView(PlanningSchoolAdminMixin, TemplateView):
+class SyntheIcsView(PlanningSchoolAdminMixin, View):
     model = ReservationSynthe
     blocked_slot_model = BlockedSlotSynthe
 
