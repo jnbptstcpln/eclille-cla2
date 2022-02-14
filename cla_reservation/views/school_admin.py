@@ -26,7 +26,7 @@ class BarbecueView(PlanningSchoolAdminMixin, TemplateView):
         return context
 
 
-class BarbecueIcsView(PlanningSchoolAdminMixin, DetailView):
+class BarbecueIcsView(PlanningSchoolAdminMixin, TemplateView):
     model = ReservationBarbecue
     blocked_slot_model = BlockedSlotBarbecue
 
@@ -58,7 +58,7 @@ class BibliView(PlanningSchoolAdminMixin, TemplateView):
         return context
 
 
-class BibliIcsView(PlanningSchoolAdminMixin, DetailView):
+class BibliIcsView(PlanningSchoolAdminMixin, TemplateView):
     model = ReservationBibli
     blocked_slot_model = BlockedSlotBibli
 
@@ -90,7 +90,7 @@ class FoyerView(PlanningSchoolAdminMixin, TemplateView):
         return context
 
 
-class FoyerIcsView(PlanningSchoolAdminMixin, DetailView):
+class FoyerIcsView(PlanningSchoolAdminMixin, TemplateView):
     model = ReservationFoyer
     blocked_slot_model = BlockedSlotFoyer
 
@@ -122,7 +122,7 @@ class SyntheView(PlanningSchoolAdminMixin, TemplateView):
         return context
 
 
-class SyntheIcsView(PlanningSchoolAdminMixin, DetailView):
+class SyntheIcsView(PlanningSchoolAdminMixin, TemplateView):
     model = ReservationSynthe
     blocked_slot_model = BlockedSlotSynthe
 
