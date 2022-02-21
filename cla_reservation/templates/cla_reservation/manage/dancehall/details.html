@@ -1,6 +1,6 @@
 {% extends "cla_reservation/manage/_layout.html" %}
 
-{% block page_title %}{{ object.event.name }} | Réservations de la salle de dance | CLA{% endblock %}
+{% block page_title %}{{ object.event.name }} | Réservations de la salle de danse | CLA{% endblock %}
 
 {% block section_top %}
     <a href="{%  url "cla_reservation:manage:dancehall" %}"><i class="far fa-angle-left"></i> Revenir à la liste des réservations</a>
@@ -120,7 +120,7 @@
             {% endif %}
             <div class="row">
                 <dl class="col-12 col-md-6">
-                    <dt>Ouverture de la salle de dance pour débuter l'installation</dt>
+                    <dt>Ouverture de la salle de danse pour débuter l'installation</dt>
                     <dd>{{ object.starts_on|date:'d/m/Y - H\hi' }}</dd>
                 </dl>
                 <dl class="col-12 col-md-6">
@@ -136,7 +136,7 @@
                                 <i class="far fa-check-circle" style="font-size: 1.25rem"></i>
                             </div>
                             <div class="flex-fill">
-                                La salle de dance n'est pas occupé sur le créneau demandé ({{ object.get_datetime_display }})
+                                La salle de danse n'est pas occupé sur le créneau demandé ({{ object.get_datetime_display }})
                             </div>
                         </div>
                     {% else %}
@@ -145,7 +145,7 @@
                                 <i class="far fa-times-circle" style="font-size: 1.25rem"></i>
                             </div>
                             <div class="flex-fill">
-                                La salle de dance est occupé sur le créneau demandé ({{ object.get_datetime_display }})
+                                La salle de danse est occupé sur le créneau demandé ({{ object.get_datetime_display }})
                             </div>
                         </div>
                     {% endif %}

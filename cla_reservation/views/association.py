@@ -212,6 +212,6 @@ class ReservationDanceHallDeleteView(LoginRequiredMixin, ReservationAssociationM
             return redirect("cla_reservation:association:dancehall", self.association.slug, self.event.pk)
 
         self.reservation.delete()
-        messages.info(self.request, "Votre réservation de la salle de dance a bien été supprimée")
+        messages.info(self.request, "Votre réservation de la salle de danse a bien été supprimée")
 
         return redirect("cla_event:association:update", self.association.slug, self.event.pk)
