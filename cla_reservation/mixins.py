@@ -11,9 +11,10 @@ from django.utils import timezone
 from cla_event.mixins import EventAssociationMixin
 from cla_event.models import Event
 from cla_member.mixins import ClaMemberModuleMixin
-from cla_reservation.models import ReservationFoyer, ReservationBarbecue, ReservationSynthe
+from cla_reservation.models import ReservationFoyer, ReservationBarbecue, ReservationSynthe, ReservationDanceHall
 from cla_reservation.models.barbecue import BlockedSlotBarbecue
 from cla_reservation.models.bibli import ReservationBibli, BlockedSlotBibli
+from cla_reservation.models.dancehall import BlockedSlotDanceHall
 from cla_reservation.models.foyer import BlockedSlotFoyer
 from cla_reservation.models.synthe import BlockedSlotSynthe
 
@@ -204,6 +205,20 @@ class ReservationSyntheManageMixin(AbstractReservationItemManageMixin):
         }
 
 
+class ReservationDanceHallManageMixin(AbstractReservationItemManageMixin):
+    model = ReservationDanceHall
+    blocked_slot_model = BlockedSlotDanceHall
+    permission_name = "cla_reservation.change_reservationdancehall"
+    namespace = "dancehall"
+
+    def get_reservation_item(self):
+        return {
+            'name': "Salle de danse",
+            'icon': "house",
+            'color': "pink",
+        }
+
+
 class PlanningMixin:
     planning_name = '__PLANNING_NAME__'
     model = None
@@ -375,6 +390,7 @@ class PlanningSchoolAdminMixin(PlanningMixin):
     TOKEN_BIBLI = "wZcEFvqN3NxE5QVCPnP9"
     TOKEN_FOYER = "2zlSMSyL35I6dfjQ8P0u"
     TOKEN_SYNTHE = "FSh8ssZ3deZ4Nr3bfRlK"
+    TOKEN_DANCEHALL = "Wu1GCPjkmLqMoJvTi7YY"
 
     config__reservation_clickable = False
     config__slot_clickable = False

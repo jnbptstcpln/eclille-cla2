@@ -153,13 +153,19 @@ class Event(models.Model):
             return self.reservation_synthe
         return None
 
+    def get_reservation_dancehall(self):
+        if (hasattr(self, 'reservation_dancehall')):
+            return self.reservation_dancehall
+        return None
+
     @property
     def reservations(self):
         return {
             'barbecue': self.get_reservation_barbecue(),
             'bibli': self.get_reservation_bibli(),
             'foyer': self.get_reservation_foyer(),
-            'synthe': self.get_reservation_synthe()
+            'synthe': self.get_reservation_synthe(),
+            'dancehall': self.get_reservation_dancehall(),
         }
 
     def reject(self, rejected_for):

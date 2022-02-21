@@ -13,10 +13,12 @@ urlpatterns = [
                 path("planning/bibli/", public.PlanningBibliView.as_view(), name="bibli-planning"),
                 path("planning/foyer/", public.PlanningFoyerView.as_view(), name="foyer-planning"),
                 path("planning/synthe/", public.PlanningSyntheView.as_view(), name="synthe-planning"),
+                path("planning/salle_de_danse/", public.PlanningDanceHallView.as_view(), name="dancehall-planning"),
                 path("reserver/barbecue/", public.ReservationBarbecueView.as_view(), name="barbecue-reservation"),
                 path("reserver/bibli/", public.ReservationBibliView.as_view(), name="bibli-reservation"),
                 path("reserver/foyer/", public.ReservationFoyerView.as_view(), name="foyer-reservation"),
                 path("reserver/synthe/", public.ReservationSyntheView.as_view(), name="synthe-reservation"),
+                path("reserver/salle_de_danse/", public.ReservationDanceHallView.as_view(), name="dancehall-reservation"),
             ], 'public'
         )
     )),
@@ -67,6 +69,17 @@ urlpatterns = [
                 path("synthe/<int:pk>/modifier/", manage.synthe.SyntheUpdateView.as_view(), name="synthe-update"),
                 path("synthe/<int:pk>/valider/", manage.synthe.SyntheValidateView.as_view(), name="synthe-validate"),
                 path("synthe/<int:pk>/rejeter/", manage.synthe.SyntheRejectView.as_view(), name="synthe-reject"),
+                path("salle_de_danse/", manage.dancehall.DanceHallListView.as_view(), name="dancehall"),
+                path("salle_de_danse/planning/", manage.dancehall.DanceHallPlanningView.as_view(), name="dancehall-planning"),
+                path("salle_de_danse/planning/export/ical", manage.dancehall.DanceHallIcsFileView.as_view(), name="dancehall-export"),
+                path("salle_de_danse/creneaux-bloques/", manage.dancehall.DanceHallBlockedSlotListView.as_view(), name="dancehall-blockedslot-list"),
+                path("salle_de_danse/creneaux-bloques/nouveau", manage.dancehall.DanceHallBlockedSlotCreateView.as_view(), name="dancehall-blockedslot-create"),
+                path("salle_de_danse/creneaux-bloques/<int:pk>", manage.dancehall.DanceHallBlockedSlotUpdateView.as_view(), name="dancehall-blockedslot-update"),
+                path("salle_de_danse/creneaux-bloques/<int:pk>/supprimer", manage.dancehall.DanceHallBlockedSlotDeleteView.as_view(), name="dancehall-blockedslot-delete"),
+                path("salle_de_danse/<int:pk>/", manage.dancehall.DanceHallDetailView.as_view(), name="dancehall-detail"),
+                path("salle_de_danse/<int:pk>/modifier/", manage.dancehall.DanceHallUpdateView.as_view(), name="dancehall-update"),
+                path("salle_de_danse/<int:pk>/valider/", manage.dancehall.DanceHallValidateView.as_view(), name="dancehall-validate"),
+                path("salle_de_danse/<int:pk>/rejeter/", manage.dancehall.DanceHallRejectView.as_view(), name="dancehall-reject"),
             ], 'manage'
         )
     )),
@@ -81,6 +94,8 @@ urlpatterns = [
                 path("associations/<str:slug>/<int:pk>/foyer/supprimer/", association.ReservationFoyerDeleteView.as_view(), name="foyer-delete"),
                 path("associations/<str:slug>/<int:pk>/synthe", association.ReservationSyntheView.as_view(), name="synthe"),
                 path("associations/<str:slug>/<int:pk>/synthe/supprimer/", association.ReservationSyntheDeleteView.as_view(), name="synthe-delete"),
+                path("associations/<str:slug>/<int:pk>/salle_de_danse", association.ReservationDanceHallView.as_view(), name="dancehall"),
+                path("associations/<str:slug>/<int:pk>/salle_de_danse/supprimer/", association.ReservationDanceHallDeleteView.as_view(), name="dancehall-delete"),
             ], 'association'
         )
     )),
@@ -94,7 +109,9 @@ urlpatterns = [
                 path(f"foyer/ec/{PlanningSchoolAdminMixin.TOKEN_FOYER}", school_admin.FoyerView.as_view(), name="foyer"),
                 path(f"foyer/ec/{PlanningSchoolAdminMixin.TOKEN_FOYER}/ics", school_admin.FoyerIcsView.as_view(), name="foyer_ics"),
                 path(f"synthe/ec/{PlanningSchoolAdminMixin.TOKEN_SYNTHE}", school_admin.SyntheView.as_view(), name="synthe"),
-                path(f"synthe/ec/{PlanningSchoolAdminMixin.TOKEN_SYNTHE}/ics", school_admin.SyntheIcsView.as_view(), name="synthe_ics")
+                path(f"synthe/ec/{PlanningSchoolAdminMixin.TOKEN_SYNTHE}/ics", school_admin.SyntheIcsView.as_view(), name="synthe_ics"),
+                path(f"salle_de_danse/ec/{PlanningSchoolAdminMixin.TOKEN_DANCEHALL}", school_admin.DanceHallView.as_view(), name="dancehall"),
+                path(f"salle_de_danse/ec/{PlanningSchoolAdminMixin.TOKEN_DANCEHALL}/ics", school_admin.DanceHallIcsView.as_view(), name="dancehall_ics")
             ], 'school_admin'
         )
     )),

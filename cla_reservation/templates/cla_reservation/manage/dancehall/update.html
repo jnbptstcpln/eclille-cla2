@@ -1,0 +1,38 @@
+{% extends "cla_reservation/manage/_layout.html" %}
+
+{% block page_title %}{{ object.event.name }} | Réservations de la salle de dance | CLA{% endblock %}
+
+{% block section_top %}
+    <a href="{%  url "cla_reservation:manage:dancehall-detail" object.pk %}"><i class="far fa-angle-left"></i> Revenir aux détails de la réservation</a>
+{% endblock %}
+
+{% block section_title %}{{ object.event.name }} | {{ object.event.get_datetime_display }}{% endblock %}
+
+{% block section_buttons %}{% endblock %}
+
+{% block section_content %}
+    <form method="post" enctype="multipart/form-data" class="mt-2 p-4" style="max-width: 500px;">
+        {% if object.validated %}
+            <div class="d-flex align-items-center alert alert-warning mb-4">
+                <div class="mr-3">
+                    <i class="far fa-exclamation-triangle text-x2"></i>
+                </div>
+                <div class="flex-fill">
+                    <b>Attention !</b> La réservation a été validé, soyez donc très prudent dans vos modifications, en particulier au niveau des dates.
+                </div>
+            </div>
+        {% endif %}
+        {% csrf_token %}
+        {% include "components/messages.html" %}
+        {% include "components/form-errors.html" with form=form %}
+
+        {% for field in form %}
+            {% include "components/form-group.html" with field=field %}
+        {% endfor %}
+
+        <div class="row mt-4 mx-auto" style="max-width: 600px">
+            <a href="{% url "cla_reservation:manage:dancehall-detail" object.pk %}" class="btn btn-grey btn-block btn-lg">Retour</a>
+            <input class="btn btn-blue-dark btn-block btn-lg" type="submit" value="Sauvegarder les changements">
+        </div>
+    </form>
+{% endblock %}

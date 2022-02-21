@@ -7,7 +7,7 @@ from icalendar import Event, Calendar
 
 from cla_association.views.public import DetailView
 from cla_reservation.mixins import PlanningSchoolAdminMixin
-from cla_reservation.models import ReservationSynthe, ReservationFoyer, ReservationBarbecue, ReservationBibli, BlockedSlotBibli
+from cla_reservation.models import ReservationSynthe, ReservationFoyer, ReservationBarbecue, ReservationBibli, BlockedSlotBibli, ReservationDanceHall, BlockedSlotDanceHall
 from cla_reservation.models.barbecue import BlockedSlotBarbecue
 from cla_reservation.models.foyer import BlockedSlotFoyer
 from cla_reservation.models.synthe import BlockedSlotSynthe
@@ -122,6 +122,39 @@ class SyntheView(PlanningSchoolAdminMixin, TemplateView):
 class SyntheIcsView(PlanningSchoolAdminMixin, View):
     model = ReservationSynthe
     blocked_slot_model = BlockedSlotSynthe
+
+    def get(self, request, *args, **kwargs):
+        cal = Calendar()
+        for e in self.get_planning_items(timezone.now() - timedelta(days=15), timezone.now() + timedelta(days=60)):
+            event = Event()
+            event.add('summary', e['name'])
+            event.add('dtstart', e['start'])
+            event.add('dtend', e['end'])
+            event.add('description', e['name'])
+            event.add('location', e['place'])
+            cal.add_component(event)
+
+        return HttpResponse(content=cal.to_ical(), content_type='text/calendar')
+
+
+
+
+class DanceHallView(PlanningSchoolAdminMixin, TemplateView):
+    template_name = "cla_reservation/school_admin/planning.html"
+    model = ReservationDanceHall
+    blocked_slot_model = BlockedSlotDanceHall
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'infrastructure_name': 'Salle de danse'
+        })
+        return context
+
+
+class DanceHallIcsView(PlanningSchoolAdminMixin, View):
+    model = ReservationDanceHall
+    blocked_slot_model = BlockedSlotDanceHall
 
     def get(self, request, *args, **kwargs):
         cal = Calendar()

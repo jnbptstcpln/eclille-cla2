@@ -1,18 +1,26 @@
 from cla_reservation.admin.barbecue import (
     BarbecueRuleAdmin,
-    ReservationBarbecueAdmin
+    ReservationBarbecueAdmin,
+    BlockedSlotBarbecueAdmin
 )
 from cla_reservation.admin.bibli import (
     BibliRuleAdmin,
-    ReservationBibliAdmin
+    ReservationBibliAdmin,
+    BlockedSlotBibliAdmin
 )
 from cla_reservation.admin.foyer import (
     FoyerItemAdmin,
     FoyerRulesAdmin,
     BeerMenuAdmin,
-    ReservationFoyerAdmin
+    ReservationFoyerAdmin,
+    BlockedSlotFoyerAdmin
 )
 from cla_reservation.admin.synthe import (
     SportActivityAdmin,
-    ReservationSyntheAdmin
+    ReservationSyntheAdmin,
+    BlockedSlotSyntheAdmin
+)
+from cla_reservation.admin.dancehall import (
+    ReservationDanceHallAdmin,
+    BlockedSlotDanceHallAdmin
 )

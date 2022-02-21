@@ -6,10 +6,11 @@ from django.views.generic import FormView, DeleteView
 
 from cla_reservation.forms.barbecue import ReservationBarbecueAssociationForm
 from cla_reservation.forms.bibli import ReservationBibliAssociationForm
+from cla_reservation.forms.dancehall import ReservationDanceHallAssociationForm
 from cla_reservation.forms.foyer import ReservationFoyerAssociationForm
 from cla_reservation.forms.synthe import ReservationSyntheAssociationForm
 from cla_reservation.mixins import ReservationAssociationMixin
-from cla_reservation.models import BarbecueRules, ReservationBarbecue, ReservationBibli, BibliRules
+from cla_reservation.models import BarbecueRules, ReservationBarbecue, ReservationBibli, BibliRules, ReservationDanceHall
 from cla_reservation.models.foyer import ReservationFoyer, FoyerRules, BeerMenu
 from cla_reservation.models.synthe import ReservationSynthe
 
@@ -176,5 +177,41 @@ class ReservationSyntheDeleteView(LoginRequiredMixin, ReservationAssociationMixi
 
         self.reservation.delete()
         messages.info(self.request, "Votre réservation du synthé a bien été supprimée")
+
+        return redirect("cla_event:association:update", self.association.slug, self.event.pk)
+
+
+class ReservationDanceHallView(LoginRequiredMixin, ReservationAssociationMixin, FormView):
+    template_name = "cla_reservation/association/dancehall.html"
+    model = ReservationDanceHall
+    form_class = ReservationDanceHallAssociationForm
+    creating = False
+    reservation: model = None
+
+    def get_reservation(self):
+        return self.event.get_reservation_dancehall()
+
+    def get_success_url(self):
+        return resolve_url("cla_reservation:association:dancehall", self.association.slug, self.event.pk)
+
+
+class ReservationDanceHallDeleteView(LoginRequiredMixin, ReservationAssociationMixin, View):
+    model = ReservationDanceHall
+    creating = False
+    reservation: model = None
+
+    def get_reservation(self):
+        return self.event.get_reservation_dancehall()
+
+    def get(self, request, *args, **kwargs):
+        return redirect("cla_reservation:association:dancehall", self.association.slug, self.event.pk)
+
+    def post(self, request, *args, **kwargs):
+
+        if self.reservation.sent or self.reservation.validated:
+            return redirect("cla_reservation:association:dancehall", self.association.slug, self.event.pk)
+
+        self.reservation.delete()
+        messages.info(self.request, "Votre réservation de la salle de dance a bien été supprimée")
 
         return redirect("cla_event:association:update", self.association.slug, self.event.pk)

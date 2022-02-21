@@ -15,7 +15,7 @@ from cla_association.models import Association
 
 from cla_member.mixins import ClaMemberModuleMixin
 from cla_reservation.mixins import PlanningMixin
-from cla_reservation.models import ReservationBarbecue, ReservationFoyer, ReservationSynthe, ReservationBibli, BlockedSlotBibli
+from cla_reservation.models import ReservationBarbecue, ReservationFoyer, ReservationSynthe, ReservationBibli, BlockedSlotBibli, ReservationDanceHall, BlockedSlotDanceHall
 from cla_reservation.models.barbecue import BlockedSlotBarbecue
 from cla_reservation.models.foyer import BlockedSlotFoyer
 from cla_reservation.models.synthe import BlockedSlotSynthe
@@ -75,7 +75,17 @@ class IndexView(ClaMemberModuleMixin, TemplateView):
                         'planning': resolve_url("cla_reservation:public:synthe-planning"),
                         'reservation': resolve_url("cla_reservation:public:synthe-reservation"),
                     }
-
+                }, {
+                    'name': "Salle de danse",
+                    'icon': "home",
+                    'color': "pink",
+                    'to_review_count': ReservationDanceHall.objects.to_validate().count(),
+                    'manage_permission': self.request.user.has_perm("cla_reservation.change_reservationdancehall"),
+                    'href': {
+                        'manage': resolve_url("cla_reservation:manage:dancehall"),
+                        'planning': resolve_url("cla_reservation:public:dancehall-planning"),
+                        'reservation': resolve_url("cla_reservation:public:dancehall-reservation"),
+                    }
                 }
             ]
         })
@@ -162,4 +172,23 @@ class PlanningSyntheView(AbstractPlanningView):
 
 class ReservationSyntheView(ClaMemberModuleMixin, TemplateView):
     template_name = "cla_reservation/public/reservation/synthe/index.html"
+    cla_member_active_section = "reservations"
+
+
+class PlanningDanceHallView(AbstractPlanningView):
+    planning_name = 'salle de danse'
+    model = ReservationDanceHall
+    blocked_slot_model = BlockedSlotDanceHall
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'manage_permission': self.request.user.has_perm("cla_reservation.change_reservationdancehall"),
+            'manage_href': resolve_url("cla_reservation:manage:dancehall")
+        })
+        return context
+
+
+class ReservationDanceHallView(ClaMemberModuleMixin, TemplateView):
+    template_name = "cla_reservation/public/reservation/dancehall/index.html"
     cla_member_active_section = "reservations"

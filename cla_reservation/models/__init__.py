@@ -20,3 +20,7 @@ from cla_reservation.models.synthe import (
     ReservationSynthe,
     BlockedSlotSynthe
 )
+from cla_reservation.models.dancehall import (
+    ReservationDanceHall,
+    BlockedSlotDanceHall
+)

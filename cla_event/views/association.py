@@ -80,7 +80,8 @@ class EventSendView(LoginRequiredMixin, EventAssociationMixin, View):
             self.event.get_reservation_barbecue(),
             self.event.get_reservation_bibli(),
             self.event.get_reservation_foyer(),
-            self.event.get_reservation_synthe()
+            self.event.get_reservation_synthe(),
+            self.event.get_reservation_dancehall()
         ]
         for r in reservations:
             if r:
