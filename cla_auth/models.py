@@ -66,11 +66,11 @@ class UserInfos(models.Model):
         IE4 = 'ie4', 'IE4'
         IE5 = 'ie5', 'IE5'
         ALUMNI_ITEEM = 'alumni-iteem', 'Diplomé de l\'ITEEM'
-        CPI1 = 'cpi1', "CPI1"
-        CPI2 = 'cpi2', "CPI2"
-        CH1 = 'ch1', "ch1"
-        CH2 = 'ch2', "ch2"
-        CH3 = 'ch3', "ch3"
+        CPI1 = 'cpi1', "ENSCL-CPI1"
+        CPI2 = 'cpi2', "ENSCL-CPI2"
+        CH1 = 'ch1', "ENSCL-1A"
+        CH2 = 'ch2', "ENSCL-2A"
+        CH3 = 'ch3', "ENSCL-3A"
         ALUMNI_ENSCL = 'alumni-enscl', 'Diplomé de l\'ENSCL'
         PHD = 'phd', 'Doctorant'
         OTHER = 'other', "Autre"
