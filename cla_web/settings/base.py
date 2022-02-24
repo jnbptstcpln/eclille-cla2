@@ -1,4 +1,3 @@
-
 """
 Django settings for cla_web project.
 
@@ -30,12 +29,10 @@ ALLOWED_HOSTS = config("ALLOWED_HOSTS").split(",")
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
-
 # Admins
 
 ADMINS = [(x, x) for x in config("ADMINS", "").split(',')]
 SERVER_EMAIL = config("EMAIL_FROM")
-
 
 # Application definition
 
@@ -98,13 +95,11 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'cla_web.wsgi.application'
 
-
 # Site
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
 SITE_ID = 1
 X_FRAME_OPTIONS = 'SAMEORIGIN'
-
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
@@ -175,7 +170,6 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 SESSION_COOKIE_AGE = 3600
 SESSION_SAVE_EVERY_REQUEST = True
 
-
 # Bleach default config
 BLEACH_ALLOWED_TAGS = [
     "a",
@@ -190,6 +184,13 @@ BLEACH_ALLOWED_TAGS = [
     "u",
     "li",
     "ol",
+    "h1",
+    "h2",
+    "h3",
+    "h4",
+    "h5",
+    "h6",
+    "img",
     "strong",
     "span",
     "ul",
@@ -201,10 +202,16 @@ BLEACH_ALLOWED_TAGS = [
     "div"
 ]
 BLEACH_ALLOWED_ATTRIBUTES = {
-    "a": ["href", "title"],
-    "abbr": ["title"],
-    "acronym": ["title"],
-    "img": ["src"],
+    "a": ["href", "title", "style"],
+    "abbr": ["title", "style"],
+    "h1": ["style"],
+    "h2": ["style"],
+    "h3": ["style"],
+    "h4": ["style"],
+    "h5": ["style"],
+    "h6": ["style"],
+    "acronym": ["title", "style"],
+    "img": ["style", "src"],
     "div": ["style"],
     "p": ["style"],
     "span": ["style"]
