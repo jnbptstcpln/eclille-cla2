@@ -4,6 +4,7 @@ import uuid
 
 import jwt
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db import models
 from django import forms
 from django.db.models import F
@@ -403,6 +404,12 @@ class DancingPartyRegistration(AbstractRegistration):
             key=settings.SECRET_KEY,
             algorithm="HS256"
         )
+
+    def clean(self):
+        queryset = self.objects.filter(dancing_party=self.dancing_party, user=self.user)
+        if queryset.count() > 0:
+            registration = queryset.first()
+            raise ValidationError(f"L'utilisateur est déjà inscrit à l'événement en tant que {registration.get_type_display()}")
 
 
 class DancingPartyRegistrationCustomFieldValue(AbstractRegistrationCustomFieldValue):
