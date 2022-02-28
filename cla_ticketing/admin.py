@@ -752,7 +752,7 @@ class DancingPartyAdmin(admin.ModelAdmin):
 class DancingPartyRegistrationAdmin(admin.ModelAdmin):
     autocomplete_fields = ('user', 'guarantor')
     change_form_template = "cla_ticketing/admin/partyregistration_view.html"
-    readonly_fields = ['ticket_label']
+    readonly_fields = ['dancing_party', 'ticket_label']
 
     def get_registration_type(self, request: HttpRequest, obj: DancingPartyRegistration):
         if obj is not None and obj.pk is not None:
@@ -837,7 +837,6 @@ class DancingPartyRegistrationAdmin(admin.ModelAdmin):
     def get_form(self, request, obj=None, **kwargs):
         form = super(DancingPartyRegistrationAdmin, self).get_form(request, obj, **kwargs)
         form.base_fields['dancing_party'].initial = self.get_party(request, obj)
-        form.base_fields['dancing_party'].read_only = True
         return form
 
     def save_model(self, request, obj: DancingPartyRegistration, form, change):
