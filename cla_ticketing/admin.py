@@ -769,7 +769,7 @@ class DancingPartyRegistrationAdmin(admin.ModelAdmin):
 
     def get_fields(self, request, obj=None):
         registration_type = self.get_registration_type(request, obj)
-        fields = ['dancing_party']
+        fields = []
         if registration_type == "contributor":
             fields += ['ticket_label', 'user', 'type', 'home', 'mean_of_paiement', ('paid', 'validated')]
         elif registration_type == "non_contributor":
