@@ -769,7 +769,7 @@ class DancingPartyRegistrationAdmin(admin.ModelAdmin):
 
     def get_fields(self, request, obj=None):
         registration_type = self.get_registration_type(request, obj)
-        fields = []
+        fields = ['dancing_party']
         if registration_type == "contributor":
             fields += ['ticket_label', 'user', 'type', 'home', 'mean_of_paiement', ('paid', 'validated')]
         elif registration_type == "non_contributor":
@@ -810,9 +810,6 @@ class DancingPartyRegistrationAdmin(admin.ModelAdmin):
         if 'user' in form.fields.keys():
             form.fields['user'].label = "Étudiant"
             form.fields['user'].help_text = ""
-
-        # Set dancing_party instance
-        form.instance.dancing_party = self.get_party(request, obj)
 
         # Set custom fields initial values
         if obj is not None:

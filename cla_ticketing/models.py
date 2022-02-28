@@ -350,9 +350,6 @@ class DancingPartyRegistration(AbstractRegistration):
         abstract = False
         verbose_name = "Inscription"
         verbose_name_plural = "Inscriptions"
-        unique_together = [
-            ['user', 'dancing_party', ],  # User can only be registered one time for an event
-        ]
 
     class Types(models.TextChoices):
         HARD = "hard", "Avec alcool"
@@ -404,12 +401,6 @@ class DancingPartyRegistration(AbstractRegistration):
             key=settings.SECRET_KEY,
             algorithm="HS256"
         )
-
-    def clean(self):
-        queryset = DancingPartyRegistration.objects.filter(dancing_party=self.dancing_party, user=self.user)
-        if queryset.count() > 0:
-            registration = queryset.first()
-            raise ValidationError(f"L'utilisateur est déjà inscrit à l'événement en tant que {registration.get_type_display()}")
 
 
 class DancingPartyRegistrationCustomFieldValue(AbstractRegistrationCustomFieldValue):
