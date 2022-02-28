@@ -842,6 +842,10 @@ class DancingPartyRegistrationAdmin(admin.ModelAdmin):
             obj.created_by = request.user
         obj.student_status = DancingPartyRegistration.StudentStatus.CONTRIBUTOR if obj.user else DancingPartyRegistration.StudentStatus.NON_CONTRIBUTOR
         if obj.student_status == DancingPartyRegistration.StudentStatus.CONTRIBUTOR:
+            queryset = DancingPartyRegistration.objects.filter(dancing_party=party, user=obj.user)
+            if queryset.count() > 0:
+                registration = queryset.first()
+                raise ValidationError(f"L'utilisateur est déjà inscrit à l'événement en tant que {registration.get_type_display()}")
             obj.first_name = obj.user.first_name
             obj.last_name = obj.user.last_name
             obj.email = obj.user.email
@@ -849,6 +853,8 @@ class DancingPartyRegistrationAdmin(admin.ModelAdmin):
             obj.birthdate = obj.user.infos.birthdate
         obj.is_staff = registration_type == "staff"
         obj.dancing_party = party
+
+
 
         # Replace creation date by a fake one
         if not obj.debug and obj.debugged_on is not None:

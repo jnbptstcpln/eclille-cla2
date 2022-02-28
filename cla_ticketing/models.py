@@ -405,12 +405,6 @@ class DancingPartyRegistration(AbstractRegistration):
             algorithm="HS256"
         )
 
-    def clean(self):
-        queryset = DancingPartyRegistration.objects.filter(dancing_party=self.dancing_party, user=self.user)
-        if queryset.count() > 0:
-            registration = queryset.first()
-            raise ValidationError(f"L'utilisateur est déjà inscrit à l'événement en tant que {registration.get_type_display()}")
-
 
 class DancingPartyRegistrationCustomFieldValue(AbstractRegistrationCustomFieldValue):
     registration = models.ForeignKey(DancingPartyRegistration, on_delete=models.CASCADE, related_name="custom_fields", editable=False)
