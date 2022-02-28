@@ -811,6 +811,9 @@ class DancingPartyRegistrationAdmin(admin.ModelAdmin):
             form.fields['user'].label = "Étudiant"
             form.fields['user'].help_text = ""
 
+        # Set dancing_party instance
+        form.fields['dancing_party'].initial = self.get_party(request, obj)
+
         # Set custom fields initial values
         if obj is not None:
             for custom_field in party.custom_fields.all():
@@ -833,11 +836,6 @@ class DancingPartyRegistrationAdmin(admin.ModelAdmin):
         if not request.user.has_perm('cla_ticketing.add_dancingparty') and party.managers.filter(pk=request.user.pk).count() == 0:
             raise PermissionDenied()
         return party
-
-    def get_form(self, request, obj=None, **kwargs):
-        form = super(DancingPartyRegistrationAdmin, self).get_form(request, obj, **kwargs)
-        form.base_fields['dancing_party'].initial = self.get_party(request, obj)
-        return form
 
     def save_model(self, request, obj: DancingPartyRegistration, form, change):
         registration_type = self.get_registration_type(request, obj)
