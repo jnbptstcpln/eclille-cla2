@@ -406,7 +406,7 @@ class DancingPartyRegistration(AbstractRegistration):
         )
 
     def clean(self):
-        queryset = self.objects.filter(dancing_party=self.dancing_party, user=self.user)
+        queryset = DancingPartyRegistration.objects.filter(dancing_party=self.dancing_party, user=self.user)
         if queryset.count() > 0:
             registration = queryset.first()
             raise ValidationError(f"L'utilisateur est déjà inscrit à l'événement en tant que {registration.get_type_display()}")
