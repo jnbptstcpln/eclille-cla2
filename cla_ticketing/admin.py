@@ -769,7 +769,7 @@ class DancingPartyRegistrationAdmin(admin.ModelAdmin):
 
     def get_fields(self, request, obj=None):
         registration_type = self.get_registration_type(request, obj)
-        fields = []
+        fields = ['dancing_party']
         if registration_type == "contributor":
             fields += ['ticket_label', 'user', 'type', 'home', 'mean_of_paiement', ('paid', 'validated')]
         elif registration_type == "non_contributor":
@@ -834,6 +834,12 @@ class DancingPartyRegistrationAdmin(admin.ModelAdmin):
             raise PermissionDenied()
         return party
 
+    def get_form(self, request, obj=None, **kwargs):
+        form = super(DancingPartyRegistrationAdmin, self).get_form(request, obj, **kwargs)
+        form.base_fields['dancing_party'].initial = self.get_party(request, obj)
+        form.base_fields['dancing_party'].read_only = True
+        return form
+
     def save_model(self, request, obj: DancingPartyRegistration, form, change):
         registration_type = self.get_registration_type(request, obj)
         party = self.get_party(request, obj)
@@ -842,10 +848,6 @@ class DancingPartyRegistrationAdmin(admin.ModelAdmin):
             obj.created_by = request.user
         obj.student_status = DancingPartyRegistration.StudentStatus.CONTRIBUTOR if obj.user else DancingPartyRegistration.StudentStatus.NON_CONTRIBUTOR
         if obj.student_status == DancingPartyRegistration.StudentStatus.CONTRIBUTOR:
-            queryset = DancingPartyRegistration.objects.filter(dancing_party=party, user=obj.user)
-            if queryset.count() > 0:
-                registration = queryset.first()
-                raise ValidationError(f"L'utilisateur est déjà inscrit à l'événement en tant que {registration.get_type_display()}")
             obj.first_name = obj.user.first_name
             obj.last_name = obj.user.last_name
             obj.email = obj.user.email
@@ -853,8 +855,6 @@ class DancingPartyRegistrationAdmin(admin.ModelAdmin):
             obj.birthdate = obj.user.infos.birthdate
         obj.is_staff = registration_type == "staff"
         obj.dancing_party = party
-
-
 
         # Replace creation date by a fake one
         if not obj.debug and obj.debugged_on is not None:
