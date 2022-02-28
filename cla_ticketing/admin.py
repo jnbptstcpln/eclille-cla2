@@ -752,7 +752,7 @@ class DancingPartyAdmin(admin.ModelAdmin):
 class DancingPartyRegistrationAdmin(admin.ModelAdmin):
     autocomplete_fields = ('user', 'guarantor')
     change_form_template = "cla_ticketing/admin/partyregistration_view.html"
-    readonly_fields = ['dancing_party', 'ticket_label']
+    readonly_fields = ['ticket_label']
 
     def get_registration_type(self, request: HttpRequest, obj: DancingPartyRegistration):
         if obj is not None and obj.pk is not None:
@@ -769,7 +769,7 @@ class DancingPartyRegistrationAdmin(admin.ModelAdmin):
 
     def get_fields(self, request, obj=None):
         registration_type = self.get_registration_type(request, obj)
-        fields = ['dancing_party']
+        fields = []
         if registration_type == "contributor":
             fields += ['ticket_label', 'user', 'type', 'home', 'mean_of_paiement', ('paid', 'validated')]
         elif registration_type == "non_contributor":
@@ -812,7 +812,7 @@ class DancingPartyRegistrationAdmin(admin.ModelAdmin):
             form.fields['user'].help_text = ""
 
         # Set dancing_party instance
-        form.fields['dancing_party'].initial = self.get_party(request, obj)
+        form.instance.dancing_party = self.get_party(request, obj)
 
         # Set custom fields initial values
         if obj is not None:
