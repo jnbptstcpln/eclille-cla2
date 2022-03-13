@@ -49,7 +49,7 @@
             </tr>
             </thead>
             <tbody>
-            {% for reservation in object_list %}
+            {% for reservation in page_obj %}
                 <tr>
                     <td>
                         {{ reservation.event.get_datetime_display }}
@@ -82,7 +82,7 @@
 
                 {% if page_obj.has_next %}
                     <li class="page-item">
-                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Next"> <span aria-hidden="true">»</span> <span class="sr-only">Next</span> </a>
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next"> <span aria-hidden="true">»</span> <span class="sr-only">Next</span> </a>
                     </li>
                 {% endif %}
 
