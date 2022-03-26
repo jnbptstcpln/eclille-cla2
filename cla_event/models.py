@@ -23,7 +23,7 @@ class FilePath:
     @classmethod
     def _path(cls, instance, pathlist, filename):
         ext = filename.split('.')[-1]
-        filename = "%s-%s.%s" % (uuid.uuid4(), instance.slug, ext)
+        filename = "%s-%s.%s" % (uuid.uuid4(), instance.id, ext)
         pathlist.append(filename)
         return os.path.join(*pathlist)
 
