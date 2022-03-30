@@ -165,6 +165,14 @@ class DancingPartyExportView(UserPassesTestMixin, generic.View):
 
 
 class DancingPartyExportPumpkinView(UserPassesTestMixin, generic.TemplateView):
+
+    def test_func(self):
+        if self.request.user.has_perm("cla_ticketing.add_dancingparty"):
+            return True
+        elif self.request.user.has_perm("cla_ticketing.dancingparty_manager"):
+            return self.party.managers.filter(pk=self.request.user.pk).count() > 0
+        return False
+
     template_name = 'cla_ticketing/party/download_csv.html'
 
 
