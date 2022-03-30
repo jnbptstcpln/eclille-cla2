@@ -744,12 +744,12 @@ class DancingPartyAdmin(admin.ModelAdmin):
                 name='%s_%s_export' % info
             ),
             path(
-                '<int:event_pk>/registrations/export2',
+                '<int:party_pk>/registrations/export2',
                 self.admin_site.admin_view(DancingPartyExportPumpkinView.as_view()),
                 name='%s_%s_export_type' % info
             ),
             path(
-                '<int:event_pk>/registrations/export2/<str:type>',
+                '<int:party_pk>/registrations/export2/<str:type>',
                 self.admin_site.admin_view(DancingPartyExportPumpkinProcessView.as_view()),
                 name='%s_%s_export_type_process' % info
             )
