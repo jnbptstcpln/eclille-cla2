@@ -162,3 +162,65 @@ class DancingPartyExportView(UserPassesTestMixin, generic.View):
             writer.writerow([field_processing(registration) for field_processing in fields.values()])
 
         return response
+
+
+class DancingPartyExportPumpkinView(UserPassesTestMixin, generic.TemplateView):
+    template_name = 'cla_ticketing/party/download_csv.html'
+
+
+class DancingPartyExportPumpkinProcessView(UserPassesTestMixin, generic.View):
+
+    party: DancingParty = None
+
+    def dispatch(self, request, *args, **kwargs):
+        self.party = get_object_or_404(DancingParty, pk=kwargs.pop("party_pk", None))
+        return super().dispatch(request, *args, **kwargs)
+
+    def test_func(self):
+        if self.request.user.has_perm("cla_ticketing.add_dancingparty"):
+            return True
+        elif self.request.user.has_perm("cla_ticketing.dancingparty_manager"):
+            return self.party.managers.filter(pk=self.request.user.pk).count() > 0
+        return False
+
+    def get(self, req: HttpRequest, *args, **kwargs):
+
+        types = {
+            'ca': DancingPartyRegistration.objects.filter(dancing_party=self.party, type=DancingPartyRegistration.Types.HARD, student_status=DancingPartyRegistration.StudentStatus.CONTRIBUTOR, is_staff=False),
+            'cs': DancingPartyRegistration.objects.filter(dancing_party=self.party, type=DancingPartyRegistration.Types.SOFT, student_status=DancingPartyRegistration.StudentStatus.CONTRIBUTOR, is_staff=False),
+            'na': DancingPartyRegistration.objects.filter(dancing_party=self.party, type=DancingPartyRegistration.Types.HARD, student_status=DancingPartyRegistration.StudentStatus.NON_CONTRIBUTOR, is_staff=False),
+            'ns': DancingPartyRegistration.objects.filter(dancing_party=self.party, type=DancingPartyRegistration.Types.SOFT, student_status=DancingPartyRegistration.StudentStatus.NON_CONTRIBUTOR, is_staff=False),
+            's': DancingPartyRegistration.objects.filter(dancing_party=self.party, is_staff=True)
+        }
+
+        type = kwargs.pop('type')
+        queryset = types.get(type)
+
+        if queryset is None:
+            return HttpResponse(status=400)
+
+        response = HttpResponse(
+            content_type='text/csv',
+            headers={'Content-Disposition': 'attachment; filename="' + str(self.party.name) + '-' + type + '.csv"'},
+        )
+
+        def get_email(x: DancingPartyRegistration):
+            if x.user and hasattr(x.user, 'infos'):
+                return x.user.infos.email_school
+            elif x.guarantor and hasattr(x.guarantor, 'infos'):
+                return x.email
+            return ""
+
+        fields = {
+            "firstname": lambda x: x.last_name,
+            "lastname": lambda x: x.first_name,
+            "email": get_email,
+            "phone": lambda x: x.phone,
+        }
+
+        writer = csv.writer(response)
+        writer.writerow([field for field in fields.keys()])
+        for registration in queryset.order_by("last_name"):
+            writer.writerow([field_processing(registration) for field_processing in fields.values()])
+
+        return response

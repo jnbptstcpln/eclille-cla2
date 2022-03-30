@@ -1,0 +1,134 @@
+{% extends "layout/standalone.html" %}
+{% load static %}
+
+{% block css %}
+    {{ block.super }}
+    <style>
+
+        @media (min-width: 1200px) {
+            h1 {
+                font-size: 2rem
+            }
+
+            h3 {
+                font-size: 1.5rem;
+            }
+        }
+
+        h1 {
+            font-size: 1.5rem
+        }
+
+        h2 {
+            text-transform: uppercase;
+            letter-spacing: .05rem;
+            font-size: 1rem;
+            color: #3a3a3a;
+        }
+
+        h3 {
+            font-size: 1.25rem;
+        }
+
+        p {
+            font-size: .85rem;
+        }
+
+        .alert {
+            font-size: .8rem;
+            padding: .33rem;
+        }
+
+        .search-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-width: 3px;
+            border-style: solid;
+            height: 75px;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: .66rem;
+        }
+
+        .search-item .status {
+            width: 30px;
+            text-align: center;
+        }
+
+        .search-item h4 {
+            margin: 0;
+            text-transform: uppercase;
+            font-size: 1rem;
+        }
+
+        .search-item h5 {
+            text-transform: uppercase;
+            font-size: .75rem;
+            margin: .45rem 0 0;
+        }
+
+        .search-item:hover {
+            text-decoration: none;
+            opacity: .95;
+            transition: opacity 200ms;
+            color: #ffffff !important;
+        }
+
+        .search-item {
+            background-color: #34495e;
+            color: #ffffff;
+            transition: opacity 150ms;
+        }
+
+        .search-item.noncontributor {
+            background-color: #a10f2b;
+            color: #ffffff;
+            transition: opacity 150ms;
+        }
+
+        .search-item.loading {
+            border: 0;
+            height: 150px;
+            text-align: center;
+            font-size: 1.5rem;
+        }
+
+        .search-item.empty {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #qrcode-container {
+            display: none;
+            position: relative;
+            background-color: #34495e;
+        }
+
+    </style>
+{% endblock %}
+
+{% block page_title %}Télécharger les CSV | {{ party.name }} | CLA{% endblock %}
+
+{% block background_image_url %}{% static "cla_ticketing/img/sd1_blur.jpg" %}{% endblock %}
+
+{% block content %}
+    <div id="main" class="card" style="max-width: 525px">
+        <div id="main-container" class="card-body w-100">
+            <div class="d-flex flex-column justify-content-between h-100">
+                <div class="text-center">
+                    <h2>Billetterie</h2>
+                    <h1>{{ party.name }}</h1>
+                    <div class="mx-auto mt-4 w-100" style="max-width: 500px;">
+                        <a href="{% url "admin:cla_ticketing_dancingpartyregistration_export_type_process" party.pk 'ca' %}"><i class="far fa-file-download"></i> CSV des Cotisants avec Alcool</a>
+                        <a href="{% url "admin:cla_ticketing_dancingpartyregistration_export_type_process" party.pk 'na' %}"><i class="far fa-file-download"></i> CSV des Non-Cotisants avec Alcool</a>
+                        <a href="{% url "admin:cla_ticketing_dancingpartyregistration_export_type_process" party.pk 'cs' %}"><i class="far fa-file-download"></i> CSV des Cotisants sans Alcool</a>
+                        <a href="{% url "admin:cla_ticketing_dancingpartyregistration_export_type_process" party.pk 'ns' %}"><i class="far fa-file-download"></i> CSV des Non-Cotisants sans Alcool</a>
+                        <a href="{% url "admin:cla_ticketing_dancingpartyregistration_export_type_process" party.pk 's' %}"><i class="far fa-file-download"></i> CSV des Staffeurs</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

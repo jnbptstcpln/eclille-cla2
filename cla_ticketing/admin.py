@@ -14,7 +14,7 @@ from cla_ticketing.views.admin import (
     EventRegistrationTogglePaidView,
     EventRegistrationExportView,
     DancingPartyRegistrationTogglePaidView,
-    DancingPartyExportView
+    DancingPartyExportView, DancingPartyExportPumpkinView, DancingPartyExportPumpkinProcessView
 )
 
 
@@ -287,6 +287,16 @@ class EventAdmin(admin.ModelAdmin):
                 '<int:event_pk>/registrations/export',
                 self.admin_site.admin_view(EventRegistrationExportView.as_view()),
                 name='%s_%s_export' % info
+            ),
+            path(
+                '<int:event_pk>/registrations/export2',
+                self.admin_site.admin_view(DancingPartyExportPumpkinView.as_view()),
+                name='%s_%s_export_type' % info
+            ),
+            path(
+                '<int:event_pk>/registrations/export2/<str:type>',
+                self.admin_site.admin_view(DancingPartyExportPumpkinProcessView.as_view()),
+                name='%s_%s_export_type_process' % info
             )
         ]
         urls = my_urls + urls
