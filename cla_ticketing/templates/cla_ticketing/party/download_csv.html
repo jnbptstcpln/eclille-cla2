@@ -121,11 +121,11 @@
                     <h2>Billetterie</h2>
                     <h1>{{ party.name }}</h1>
                     <div class="mx-auto mt-4 w-100" style="max-width: 500px;">
-                        <a href="{% url "admin:cla_ticketing_dancingpartyregistration_export_type_process" party.pk 'ca' %}"><i class="far fa-file-download"></i> CSV des Cotisants avec Alcool</a>
-                        <a href="{% url "admin:cla_ticketing_dancingpartyregistration_export_type_process" party.pk 'na' %}"><i class="far fa-file-download"></i> CSV des Non-Cotisants avec Alcool</a>
-                        <a href="{% url "admin:cla_ticketing_dancingpartyregistration_export_type_process" party.pk 'cs' %}"><i class="far fa-file-download"></i> CSV des Cotisants sans Alcool</a>
-                        <a href="{% url "admin:cla_ticketing_dancingpartyregistration_export_type_process" party.pk 'ns' %}"><i class="far fa-file-download"></i> CSV des Non-Cotisants sans Alcool</a>
-                        <a href="{% url "admin:cla_ticketing_dancingpartyregistration_export_type_process" party.pk 's' %}"><i class="far fa-file-download"></i> CSV des Staffeurs</a>
+                        <a href="{% url "admin:cla_ticketing_dancingparty_export_type_process" party.pk 'ca' %}"><i class="far fa-file-download"></i> CSV des Cotisants avec Alcool</a>
+                        <a href="{% url "admin:cla_ticketing_dancingparty_export_type_process" party.pk 'na' %}"><i class="far fa-file-download"></i> CSV des Non-Cotisants avec Alcool</a>
+                        <a href="{% url "admin:cla_ticketing_dancingparty_export_type_process" party.pk 'cs' %}"><i class="far fa-file-download"></i> CSV des Cotisants sans Alcool</a>
+                        <a href="{% url "admin:cla_ticketing_dancingparty_export_type_process" party.pk 'ns' %}"><i class="far fa-file-download"></i> CSV des Non-Cotisants sans Alcool</a>
+                        <a href="{% url "admin:cla_ticketing_dancingparty_export_type_process" party.pk 's' %}"><i class="far fa-file-download"></i> CSV des Staffeurs</a>
                     </div>
                 </div>
             </div>
