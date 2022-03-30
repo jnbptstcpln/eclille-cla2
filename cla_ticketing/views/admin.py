@@ -166,6 +166,13 @@ class DancingPartyExportView(UserPassesTestMixin, generic.View):
 
 class DancingPartyExportPumpkinView(UserPassesTestMixin, generic.TemplateView):
 
+    template_name = 'cla_ticketing/party/download_csv.html'
+    party: DancingParty = None
+
+    def dispatch(self, request, *args, **kwargs):
+        self.party = get_object_or_404(DancingParty, pk=kwargs.pop("party_pk", None))
+        return super().dispatch(request, *args, **kwargs)
+
     def test_func(self):
         if self.request.user.has_perm("cla_ticketing.add_dancingparty"):
             return True
@@ -173,7 +180,10 @@ class DancingPartyExportPumpkinView(UserPassesTestMixin, generic.TemplateView):
             return self.party.managers.filter(pk=self.request.user.pk).count() > 0
         return False
 
-    template_name = 'cla_ticketing/party/download_csv.html'
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({'party': self.party})
+        return context
 
 
 class DancingPartyExportPumpkinProcessView(UserPassesTestMixin, generic.View):
