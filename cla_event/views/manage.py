@@ -13,6 +13,9 @@ class IndexView(PlanningMixin, EventManageMixin, TemplateView):
 
     config__event_popover = True
 
+    def can_access_complete_view(self):
+        return True
+
     def get_event_base_queryset(self):
         return Event.objects.filter(sent=True)
 
@@ -33,6 +36,9 @@ class EventDetailView(PlanningMixin, EventManageMixin, DetailView):
 
     config__event_clickable = False
     config__event_popover = True
+
+    def can_access_complete_view(self):
+        return True
 
     def get_event_base_queryset(self):
         return Event.objects.filter(public=True, sent=True)

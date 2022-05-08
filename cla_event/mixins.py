@@ -99,7 +99,37 @@ class PlanningMixin:
     def get_event_title(self, instance: Event):
         return instance.association.name
 
+    def can_access_complete_view(self):
+        # Complete viw has displays information like organizer phone number
+        return False
+
     def get_event_popover(self, instance: Event):
+
+        if self.can_access_complete_view():
+            # The rich view include more information like organizer phone number
+            try:
+                phone = instance.created_by.infos.phone
+            except:
+                phone = "Non spécifié"
+
+            return {
+                'popover': True,
+                'popover_content': bleach.clean(
+                    f"""
+                    <div class='text-center min-width-100'>
+                        <div class='font-weight-bold text-sm text-muted'>{instance.association.name}</div>
+                        <div class='font-weight-bold text-lg'>{instance.name}</div>
+                        <div class='text-muted text-sm'>{instance.place.name}</span>
+                        <hr>
+                        <div>{instance.created_by.first_name} {instance.created_by.last_name}</div>
+                        <div class='text-sm'>Tel : {phone}</div>
+                    </div>
+                    """,
+                    tags=['span', 'br', 'div'],
+                    attributes={'span': ['class'], 'div': ['class']}
+                ),
+            }
+
         return {
             'popover': True,
             'popover_content': bleach.clean(
