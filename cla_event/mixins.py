@@ -169,6 +169,12 @@ class PlanningSchoolAdminMixin(PlanningMixin):
         return Event.objects.for_admin()
 
     def get_event_popover(self, instance: Event):
+
+        try:
+            phone = instance.created_by.infos.phone
+        except:
+            phone = "Non spécifié"
+
         return {
             'popover': True,
             'popover_content': bleach.clean(
@@ -178,6 +184,9 @@ class PlanningSchoolAdminMixin(PlanningMixin):
                     <div class='font-weight-bold text-lg'>{instance.name_school}</div>
                     <div class='text-grey-dark text-sm'>{instance.type}</div>
                     <div class='text-muted text-sm'>{instance.place.name}</span>
+                    <hr>
+                    <div>{instance.created_by.first_name} {instance.created_by.last_name}</div>
+                    <div class='text-sm'>Tel : {phone}</div>
                 </div>
                 """,
                 tags=['span', 'br', 'div'],
