@@ -125,7 +125,7 @@ class PlanningMixin:
                         <div class='text-sm'>Tel : {phone}</div>
                     </div>
                     """,
-                    tags=['span', 'br', 'div'],
+                    tags=['span', 'br', 'div', 'hr'],
                     attributes={'span': ['class'], 'div': ['class']}
                 ),
             }
