@@ -99,6 +99,9 @@ class PlanningMixin:
     def get_event_title(self, instance: Event):
         return instance.association.name
 
+    def get_event_name(self, instance: Event):
+        return instance.name
+
     def can_access_complete_view(self):
         # Complete viw has displays information like organizer phone number
         return False
@@ -152,7 +155,7 @@ class PlanningMixin:
             'start': instance.starts_on.astimezone(timezone.get_current_timezone()),
             'end': instance.ends_on.astimezone(timezone.get_current_timezone()),
             'place': instance.place.name,
-            'name': instance.name,
+            'name': f"[{instance.association.name}] {self.get_event_name(instance)}",
         }
         if self.config__event_clickable:
             e['url'] = self.get_event_url(instance)
@@ -195,6 +198,9 @@ class PlanningSchoolAdminMixin(PlanningMixin):
     config__event_clickable = False
     config__event_popover = True
 
+    def get_event_name(self, instance: Event):
+        return instance.name_school
+
     def get_event_base_queryset(self):
         return Event.objects.for_admin()
 
@@ -219,7 +225,7 @@ class PlanningSchoolAdminMixin(PlanningMixin):
                     <div class='text-sm'>Tel : {phone}</div>
                 </div>
                 """,
-                tags=['span', 'br', 'div'],
+                tags=['span', 'br', 'div', 'hr'],
                 attributes={'span': ['class'], 'div': ['class']}
             ),
         }

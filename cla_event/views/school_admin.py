@@ -14,6 +14,9 @@ class IndexView(PlanningSchoolAdminMixin, TemplateView):
 
 class IndexIcsView(PlanningSchoolAdminMixin, View):
 
+    def build_event(self, instance: Event):
+        return super().build_event(instance)
+
     def get(self, request, *args, **kwargs):
         cal = Calendar()
         for e in self.get_planning_items(timezone.now() - timedelta(days=15), timezone.now() + timedelta(days=60)):
