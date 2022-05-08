@@ -38,7 +38,7 @@ urlpatterns = [
         (
             [
                 path(f"ec/{PlanningSchoolAdminMixin.TOKEN}", school_admin.IndexView.as_view(), name="index"),
-                path(f"ec/{PlanningSchoolAdminMixin.TOKEN}/ics", school_admin.IndexView.as_view(), name="index-ics")
+                path(f"ec/{PlanningSchoolAdminMixin.TOKEN}/ics", school_admin.IndexIcsView.as_view(), name="index-ics")
             ], 'school_admin'
         )
     )),
