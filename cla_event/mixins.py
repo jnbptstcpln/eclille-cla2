@@ -110,11 +110,6 @@ class PlanningMixin:
 
         if self.can_access_complete_view():
             # The rich view include more information like organizer phone number
-            try:
-                phone = instance.created_by.infos.phone
-            except:
-                phone = "Non spécifié"
-
             return {
                 'popover': True,
                 'popover_content': bleach.clean(
@@ -124,8 +119,8 @@ class PlanningMixin:
                         <div class='font-weight-bold text-lg'>{instance.name}</div>
                         <div class='text-muted text-sm'>{instance.place.name}</span>
                         <hr>
-                        <div>{instance.created_by.first_name} {instance.created_by.last_name}</div>
-                        <div class='text-sm'>Tel : {phone}</div>
+                        <div>{instance.organizer}</div>
+                        <div class='text-sm'>Tel : {instance.organizer_phone}</div>
                     </div>
                     """,
                     tags=['span', 'br', 'div', 'hr'],
@@ -205,12 +200,6 @@ class PlanningSchoolAdminMixin(PlanningMixin):
         return Event.objects.for_admin()
 
     def get_event_popover(self, instance: Event):
-
-        try:
-            phone = instance.created_by.infos.phone
-        except:
-            phone = "Non spécifié"
-
         return {
             'popover': True,
             'popover_content': bleach.clean(
@@ -221,8 +210,8 @@ class PlanningSchoolAdminMixin(PlanningMixin):
                     <div class='text-grey-dark text-sm'>{instance.type}</div>
                     <div class='text-muted text-sm'>{instance.place.name}</span>
                     <hr>
-                    <div>{instance.created_by.first_name} {instance.created_by.last_name}</div>
-                    <div class='text-sm'>Tel : {phone}</div>
+                    <div>{instance.organizer}</div>
+                    <div class='text-sm'>Tel : {instance.organizer_phone}</div>
                 </div>
                 """,
                 tags=['span', 'br', 'div', 'hr'],

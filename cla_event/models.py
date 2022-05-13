@@ -159,6 +159,23 @@ class Event(models.Model):
         return None
 
     @property
+    def organizer(self):
+        if self.created_by:
+            return f"{self.created_by.first_name} {self.created_by.last_name}"
+        return "Non spécifié"
+
+    @property
+    def organizer_phone(self):
+        if self.created_by:
+            try:
+                phone = self.created_by.infos.phone
+                if phone and len(phone) > 0:
+                    return phone
+            except:
+                pass
+        return "Non spécifié"
+
+    @property
     def reservations(self):
         return {
             'barbecue': self.get_reservation_barbecue(),
