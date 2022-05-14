@@ -62,6 +62,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'bugsnag.django.middleware.BugsnagMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -215,4 +216,12 @@ BLEACH_ALLOWED_ATTRIBUTES = {
     "div": ["style"],
     "p": ["style"],
     "span": ["style"]
+}
+
+
+BUGSNAG = {
+    'api_key': config('BUGSNAG_KEY', ''),
+    'project_root': str(BASE_DIR),
+    'release_stage': config('BUGSNAG_STAGE', 'development'),
+    'notify_release_stages': ('production',)
 }
