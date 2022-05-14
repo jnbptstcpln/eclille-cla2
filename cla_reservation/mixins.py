@@ -320,7 +320,6 @@ class PlanningMixin:
         title = instance.name
         if hasattr(instance, 'event') and instance.event and instance.event.is_cancelled:
             title = f"[ANNULE] {title}"
-        print(title)
 
         s = {
             'title': title,
