@@ -2,12 +2,12 @@ version: "3.6"
 
 services:
 
-  clery-sologne-db:
-    image: mysql:5.7.22
+  cla-web-db:
+    image: mysql:5.7.38
     container_name: cla-web-db
     hostname: cla-web-db
     volumes:
-      - cla-dbdata:/var/lib/postgresql/data
+      - cla-dbdata:/var/lib/mysql
     ports:
       - 3306:3306
     environment:
