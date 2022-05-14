@@ -29,16 +29,16 @@ class SportActivity(models.Model):
 class ReservationSyntheManager(models.Manager):
 
     def for_admin(self):
-        return self.filter(validated=True, admin_display=True)
+        return self.filter(validated=True, admin_display=True, event__cancelled_on__isnull=True)
 
     def for_member(self):
-        return self.filter(validated=True, member_display=True)
+        return self.filter(validated=True, member_display=True, event__cancelled_on__isnull=True)
 
     def to_validate(self):
-        return self.filter(validated=False, sent=True).order_by('sent_on')
+        return self.filter(validated=False, sent=True, event__cancelled_on__isnull=True).order_by('sent_on')
 
     def is_range_free(self, start, end):
-        return self.filter(starts_on__lte=end, ends_on__gte=start, validated=True).count() == 0
+        return self.filter(starts_on__lte=end, ends_on__gte=start, validated=True, event__cancelled_on__isnull=True).count() == 0
 
 
 class ReservationSynthe(models.Model):
@@ -93,7 +93,9 @@ class ReservationSynthe(models.Model):
             return f"{_starts_on.strftime('%d/%m/%Y')} - {start_time} / {_ends_on.strftime('%d/%m/%Y')} - {end_time}"
 
     def get_status_display(self):
-        if self.validated:
+        if self.event.is_cancelled:
+            return mark_safe("<span class='badge badge-danger'>Annulé</span>")
+        elif self.validated:
             return mark_safe("<span class='badge badge-success'>Validée</span>")
         elif self.sent:
             return mark_safe("<span class='badge badge-info'>Envoyée</span>")

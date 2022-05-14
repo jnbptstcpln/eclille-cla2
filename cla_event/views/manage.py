@@ -1,8 +1,9 @@
 from django.contrib import messages
 from django.shortcuts import resolve_url, redirect
+from django.utils import timezone
 from django.views.generic import TemplateView, UpdateView, DetailView
 
-from cla_event.forms import EventAdminForm, EventValidateForm, EventRejectForm
+from cla_event.forms import EventAdminForm, EventValidateForm, EventRejectForm, EventCancelForm
 from cla_event.mixins import EventManageMixin, PlanningMixin
 from cla_event.models import Event
 
@@ -106,3 +107,33 @@ class EventRejectView(EventManageMixin, UpdateView):
             form.instance.reject(form.instance.rejected_for)
         messages.success(self.request, "La réservation a bien été rejetée")
         return response
+
+
+class EventCancelView(EventManageMixin, UpdateView):
+    template_name = "cla_event/manage/event/cancel.html"
+    form_class = EventCancelForm
+    model = Event
+
+    def get_initial(self):
+        initials = super().get_initial()
+        initials.update({
+            'cancel_type': 'hide' if self.object.cancelled_hide else 'show'
+        })
+        return initials
+
+    def get_success_url(self):
+        return resolve_url("cla_event:manage:event-detail", self.object.pk)
+
+    def form_valid(self, form):
+        event: Event = self.object
+        if not event.is_cancelled:
+            event.cancelled_on = timezone.now()
+            event.cancelled_by = self.request.user
+            event.cancelled_hide = form.cleaned_data['cancel_type'] == 'hide'
+            event.save()
+            messages.info(self.request, "L'événement a bien été annulé" + (" et retiré du calendrier" if event.cancelled_hide else ""))
+        else:
+            event.cancelled_hide = form.cleaned_data['cancel_type'] == 'hide'
+            event.save()
+            messages.info(self.request, "L'événement a été retiré du calendrier" if event.cancelled_hide else "L'événement a été indiqué comme annulé dans le calendrier")
+        return redirect(self.get_success_url())

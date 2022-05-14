@@ -55,6 +55,30 @@ class EventAssociationSentForm(forms.ModelForm):
                 field.widget.attrs['class'] = field.widget.attrs.get('class', "") + "form-control"
 
 
+class EventCancelForm(forms.ModelForm):
+
+    CANCEL_TYPES = [
+        ('show', "Conserver l'événement dans le calendrier avec la mention [ANNULÉ]"),
+        ('hide', "Retirer l'événement du calendrier"),
+    ]
+
+    class Meta:
+        model = Event
+        fields = [
+            'cancel_type'
+        ]
+
+    cancel_type = forms.ChoiceField(choices=CANCEL_TYPES, label="Que souhaitez-vous faire ?")
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Customising all fields
+        for field_name, field in self.fields.items():
+            if hasattr(field.widget, 'input_type') and field.widget.input_type not in {'checkbox'}:
+                field.widget.attrs['class'] = field.widget.attrs.get('class', "") + "form-control"
+
+
 class EventAdminForm(forms.ModelForm):
 
     class Meta:

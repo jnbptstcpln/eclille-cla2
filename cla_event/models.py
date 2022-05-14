@@ -61,13 +61,13 @@ class EventPlace(models.Model):
 class EventManager(models.Manager):
 
     def is_range_free(self, start, end):
-        return self.filter(starts_on__lte=end, ends_on__gte=start, validated=True, public=True).count() == 0
+        return self.filter(starts_on__lte=end, ends_on__gte=start, validated=True, cancelled_on__isnull=True, public=True).count() == 0
 
     def for_admin(self):
-        return self.filter(validated=True, admin_display=True, public=True)
+        return self.filter(validated=True, cancelled_hide=False, admin_display=True, public=True)
 
     def for_member(self):
-        return self.filter(validated=True, member_display=True, public=True)
+        return self.filter(validated=True, cancelled_hide=False, member_display=True, public=True)
 
 
 class Event(models.Model):
@@ -109,6 +109,10 @@ class Event(models.Model):
     admin_display = models.BooleanField(default=False, verbose_name="L'événement apparait sur le planning de l'administration")
     member_display = models.BooleanField(default=True, verbose_name="L'événement apparait sur le planning des cotisants")
 
+    cancelled_on = models.DateTimeField(default=None, null=True, blank=True, verbose_name="Annulé le")
+    cancelled_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Annulé par")
+    cancelled_hide = models.BooleanField(default=False, blank=True)
+
     rejected_for = SummernoteTextField(verbose_name="Raison du refus", null=True, blank=True)
 
     def get_datetime_display(self):
@@ -124,7 +128,9 @@ class Event(models.Model):
             return f"{_starts_on.strftime('%d/%m/%Y')} - {start_time} / {_ends_on.strftime('%d/%m/%Y')} - {end_time}"
 
     def get_status_display(self):
-        if self.validated:
+        if self.is_cancelled:
+            return mark_safe("<span class='badge badge-danger'>Annulé</span>")
+        elif self.validated:
             return mark_safe("<span class='badge badge-success'>Validée</span>")
         elif self.sent:
             return mark_safe("<span class='badge badge-info'>Envoyée</span>")
@@ -174,6 +180,10 @@ class Event(models.Model):
             except:
                 pass
         return "Non spécifié"
+
+    @property
+    def is_cancelled(self):
+        return self.cancelled_on is not None
 
     @property
     def reservations(self):

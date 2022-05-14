@@ -14,7 +14,16 @@
 
 {% block section_content %}
     <div class="mt-4">
-        {% if object.validated %}
+        {% if object.event.is_cancelled %}
+            <div class="alert alert-warning align-items-center d-flex mb-3 mt-3">
+                <div class="mr-4">
+                    <i class="far fa-calendar-times" style="font-size: 1.25rem"></i>
+                </div>
+                <div class="flex-fill">
+                    L'événement associé à cette réservation a été annulé{% if object.event.cancelled_hide %} et retiré des calendriers des cotisants et de l'administration{% endif %} le {{ object.event.cancelled_on|date:'d/m/Y à H:i' }} par {{ object.event.cancelled_by.first_name }} {{ object.event.cancelled_by.last_name }}
+                </div>
+            </div>
+        {% elif object.validated %}
             <div class="alert alert-success align-items-center d-flex mb-5">
                 <div class="mr-4">
                     <i class="far fa-check-circle" style="font-size: 1.25rem"></i>

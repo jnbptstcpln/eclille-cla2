@@ -238,6 +238,11 @@ class PlanningMixin:
         'textColor': '#888',
         'borderColor': '#888',
     }
+    config__reservation_cancelled_attrs = {
+        'backgroundColor': '#fee',
+        'textColor': '#f88',
+        'borderColor': '#f88',
+    }
 
     def get_reservation_content(self, instance):
         return {
@@ -257,7 +262,9 @@ class PlanningMixin:
         return None
 
     def get_reservation_title(self, instance):
-        if instance.event and instance.event.public:
+        if hasattr(instance, 'event') and instance.event and instance.event.public:
+            if instance.event.is_cancelled:
+                return f"[ANNULÉ] {instance.event.association.name}"
             return instance.event.association.name
         else:
             return f"Réservé"
@@ -270,7 +277,7 @@ class PlanningMixin:
                     f"""
                     <div class='text-center min-width-100'>
                         <div class='font-weight-bold text-lg'>{instance.event.association.name}</div>
-                        <div>{instance.event.name}</div>
+                        <div>{"[ANNULÉ] " if instance.event.is_cancelled else ""}{instance.event.name}</div>
                     </div>
                     """
                 ) if instance.event else (
@@ -300,6 +307,8 @@ class PlanningMixin:
             r.update(self.config__reservation_non_public_attrs)
         if not instance.validated:
             r.update(self.config__reservation_non_validated_attrs)
+        if hasattr(instance, 'event') and instance.event and instance.event.is_cancelled:
+            r.update(self.config__reservation_cancelled_attrs)
         if self.config__reservation_content:
             r.update({'reservationContent': self.get_reservation_content(instance)})
         if self.config__reservation_popover:
@@ -308,11 +317,20 @@ class PlanningMixin:
 
     def build_slot(self, instance, recurring=False):
 
+        title = instance.name
+        if hasattr(instance, 'event') and instance.event and instance.event.is_cancelled:
+            title = f"[ANNULE] {title}"
+        print(title)
+
         s = {
-            'title': instance.name,
+            'title': title,
             'backgroundColor': '#eee',
             'textColor': '#555',
         }
+
+        if hasattr(instance, 'event') and instance.event and instance.event.is_cancelled:
+            s['backgroundColor'] = '#fee'
+            s['textColor'] = '#f55'
 
         if recurring:
             s.update({
@@ -378,7 +396,9 @@ class PlanningMixin:
 class PlanningAdminMixin(PlanningMixin):
 
     def get_reservation_title(self, instance):
-        if instance.event:
+        if hasattr(instance, 'event') and instance.event and instance.event.public:
+            if instance.event.is_cancelled:
+                return f"[ANNULÉ] {instance.event.association.name}"
             return instance.event.association.name
         else:
             return f"Cotisant"
@@ -411,7 +431,9 @@ class PlanningSchoolAdminMixin(PlanningMixin):
         return reservation
 
     def get_reservation_title(self, instance):
-        if instance.event:
+        if hasattr(instance, 'event') and instance.event:
+            if instance.event.is_cancelled:
+                return f"[ANNULÉ] {instance.event.association.name}"
             return instance.event.association.name
         else:
             return f"Cotisant"
@@ -431,7 +453,7 @@ class PlanningSchoolAdminMixin(PlanningMixin):
                     <div class='text-center min-width-100'>
                         <div class='font-weight-bold text-lg'>{instance.event.association.name}</div>
                         <div class='font-weight-bold text-lg'>{instance.event.type.name}</div>
-                        <div>{instance.event.name}</div>
+                        <div>{"[ANNULÉ] " if instance.event.is_cancelled else ""}{instance.event.name}</div>
                         <hr>
                         <div>{instance.created_by.first_name} {instance.created_by.last_name}</div>
                         <div class='text-sm'>Tel : {phone}</div>

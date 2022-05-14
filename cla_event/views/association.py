@@ -5,7 +5,7 @@ from django.utils import timezone
 from django.views.generic import UpdateView, CreateView, ListView, View
 
 from cla_association.mixins import AssociationManageMixin
-from cla_event.forms import EventAssociationDefaultForm, EventAssociationSentForm
+from cla_event.forms import EventAssociationDefaultForm, EventAssociationSentForm, EventCancelForm
 from cla_event.mixins import EventAssociationMixin
 from cla_event.models import Event
 
@@ -92,3 +92,31 @@ class EventSendView(LoginRequiredMixin, EventAssociationMixin, View):
 
         messages.success(request, "Votre événement a bien été envoyé !")
         return redirect("cla_event:association:list", self.association.slug)
+
+
+class EventCancelView(LoginRequiredMixin, EventAssociationMixin, UpdateView):
+    association_manage_active_section = "events"
+    template_name = "cla_event/association/cancel.html"
+    model = Event
+    form_class = EventCancelForm
+
+    def dispatch(self, request, *args, **kwargs):
+        # Prevent accessing the form if the event is already cancelled
+        if self.event.is_cancelled:
+            return redirect(self.get_success_url())
+
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_object(self, queryset=None):
+        return self.event
+
+    def form_valid(self, form):
+        self.event.cancelled_on = timezone.now()
+        self.event.cancelled_by = self.request.user
+        self.event.cancelled_hide = form.cleaned_data['cancel_type'] == 'hide'
+        self.event.save()
+        messages.info(self.request, "Votre événement a bien été annulé" + (" et retiré du calendrier" if self.event.cancelled_hide else ""))
+        return redirect(self.get_success_url())
+
+    def get_success_url(self):
+        return resolve_url("cla_event:association:update", self.association.slug, self.event.pk)

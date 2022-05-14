@@ -81,6 +81,11 @@ class PlanningMixin:
         'textColor': '#888',
         'borderColor': '#888',
     }
+    config__event_cancelled_attrs = {
+        'backgroundColor': '#fee',
+        'textColor': '#f88',
+        'borderColor': '#f88',
+    }
 
     def get_event_content(self, instance: Event):
         return {
@@ -97,9 +102,13 @@ class PlanningMixin:
         return None
 
     def get_event_title(self, instance: Event):
+        if instance.is_cancelled:
+            return f"[ANNULÉ] {instance.association.name}"
         return instance.association.name
 
     def get_event_name(self, instance: Event):
+        if instance.is_cancelled:
+            return f"[ANNULÉ] {instance.name}"
         return instance.name
 
     def can_access_complete_view(self):
@@ -107,7 +116,6 @@ class PlanningMixin:
         return False
 
     def get_event_popover(self, instance: Event):
-
         if self.can_access_complete_view():
             # The rich view include more information like organizer phone number
             return {
@@ -116,7 +124,7 @@ class PlanningMixin:
                     f"""
                     <div class='text-center min-width-100'>
                         <div class='font-weight-bold text-sm text-muted'>{instance.association.name}</div>
-                        <div class='font-weight-bold text-lg'>{instance.name}</div>
+                        <div class='font-weight-bold text-lg'>{"[ANNULÉ] " if instance.is_cancelled else ""}{instance.name}</div>
                         <div class='text-muted text-sm'>{instance.place.name}</span>
                         <hr>
                         <div>{instance.organizer}</div>
@@ -134,7 +142,7 @@ class PlanningMixin:
                 f"""
                 <div class='text-center min-width-100'>
                     <div class='font-weight-bold text-sm text-muted'>{instance.association.name}</div>
-                    <div class='font-weight-bold text-lg'>{instance.name}</div>
+                    <div class='font-weight-bold text-lg'>{"[ANNULÉ] " if instance.is_cancelled else ""}{instance.name}</div>
                     <div class='text-muted text-sm'>{instance.place.name}</span>
                 </div>
                 """,
@@ -158,6 +166,8 @@ class PlanningMixin:
             e.update(self.config__event_non_public_attrs)
         if not instance.validated:
             e.update(self.config__event_non_validated_attrs)
+        if instance.is_cancelled:
+            e.update(self.config__event_cancelled_attrs)
         if self.config__event_content:
             e.update({'eventContent': self.get_event_content(instance)})
         if self.config__event_popover:
@@ -194,6 +204,8 @@ class PlanningSchoolAdminMixin(PlanningMixin):
     config__event_popover = True
 
     def get_event_name(self, instance: Event):
+        if instance.is_cancelled:
+            return f"[ANNULÉ] {instance.name_school}"
         return instance.name_school
 
     def get_event_base_queryset(self):
@@ -205,8 +217,9 @@ class PlanningSchoolAdminMixin(PlanningMixin):
             'popover_content': bleach.clean(
                 f"""
                 <div class='text-center min-width-100'>
+                    {'<div>'}
                     <div class='font-weight-bold text-sm text-muted'>{instance.association.name}</div>
-                    <div class='font-weight-bold text-lg'>{instance.name_school}</div>
+                    <div class='font-weight-bold text-lg'>{"[ANNULÉ] " if instance.is_cancelled else ""}{instance.name_school}</div>
                     <div class='text-grey-dark text-sm'>{instance.type}</div>
                     <div class='text-muted text-sm'>{instance.place.name}</span>
                     <hr>

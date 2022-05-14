@@ -1,0 +1,40 @@
+{% extends "cla_association/manage/_layout.html" %}
+
+{% block page_title %}{{ object.name }} | Événements{% endblock %}
+
+{% block section_top %}
+    <a href="{% url "cla_event:association:update" association.slug object.pk %}"><i class="far fa-angle-left"></i> Revenir à l'événement'</a>
+{% endblock %}
+
+{% block section_title %}{{ object.name }} - {{ object.starts_on|date:'d/m' }}{% endblock %}
+
+{% block section_content %}
+    <div>
+
+        <p class="text-justify font-weight-bold">
+            L'annulation de votre événement est définitive, réfléchissez y donc bien !
+        </p>
+        <p class="text-justify">
+            Vous avez la possibilité de conserver votre événement dans le calendrier avec la mention [ANNULÉ] ou bien
+            de le retirer du calendrier pour laisser de la place à d'autres événements.
+        </p>
+
+        <div class="mt-4">
+
+            <form method="post" enctype="multipart/form-data" class="p-2" style="max-width: 600px;">
+                {% csrf_token %}
+                {% include "components/messages.html" %}
+                {% include "components/form-errors.html" with form=form %}
+
+                {% for field in form %}
+                    {% include "components/form-group.html" with field=field %}
+                {% endfor %}
+
+                <div class="mt-4 mx-auto" style="max-width: 600px">
+                    <input class="btn btn-outline-danger btn-block btn-lg" type="submit" value="Annuler l'événement">
+                </div>
+
+            </form>
+        </div>
+    </div>
+{% endblock %}

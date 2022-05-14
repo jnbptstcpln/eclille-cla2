@@ -21,6 +21,7 @@ urlpatterns = [
                 path("modifier/<int:pk>/modifier", manage.EventUpdateView.as_view(), name="event-update"),
                 path("modifier/<int:pk>/valider", manage.EventValidateView.as_view(), name="event-validate"),
                 path("modifier/<int:pk>/rejeter", manage.EventRejectView.as_view(), name="event-reject"),
+                path("modifier/<int:pk>/annuler", manage.EventCancelView.as_view(), name="event-cancel"),
             ], 'manage'
         )
     )),
@@ -31,6 +32,7 @@ urlpatterns = [
                 path("associations/<str:slug>/nouveau/", association.EventCreateView.as_view(), name="create"),
                 path("associations/<str:slug>/<int:pk>/", association.EventUpdateView.as_view(), name="update"),
                 path("associations/<str:slug>/<int:pk>/envoyer/", association.EventSendView.as_view(), name="send"),
+                path("associations/<str:slug>/<int:pk>/annuler/", association.EventCancelView.as_view(), name="cancel"),
             ], 'association'
         )
     )),

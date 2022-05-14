@@ -1,6 +1,6 @@
 {% extends "cla_association/manage/_layout.html" %}
 
-{% block page_title %}{{ object.name }} | {{ association.name }} | CLA{% endblock %}
+{% block page_title %}{{ object.name }} | Événements{% endblock %}
 
 {% block section_top %}
     <a href="{% url "cla_event:association:list" association.slug %}"><i class="far fa-angle-left"></i> Revenir à la liste des événements</a>
@@ -8,9 +8,24 @@
 
 {% block section_title %}{{ object.name }} - {{ object.starts_on|date:'d/m' }}{% endblock %}
 
+{% block section_buttons %}
+    {% if object.sent and not object.is_cancelled %}
+        <a class="btn btn-outline-danger" href="{% url "cla_event:association:cancel" association.slug event.pk %}"><i class="far fa-calendar-minus mr-1"></i> Annuler l'événement...</a>
+    {% endif %}
+{% endblock %}
+
 {% block section_content %}
     <div>
-        {% if object.validated %}
+        {% if object.is_cancelled %}
+            <div class="alert alert-warning align-items-center d-flex mb-3 mt-3">
+                <div class="mr-4">
+                    <i class="far fa-calendar-times" style="font-size: 1.25rem"></i>
+                </div>
+                <div class="flex-fill">
+                    Cet événement a été annulé{% if object.cancelled_hide %} et retiré du calendrier{% endif %} le {{ object.cancelled_on|date:'d/m/Y à H:i' }} par {{ object.cancelled_by.first_name }} {{ object.cancelled_by.last_name }}
+                </div>
+            </div>
+        {% elif object.validated %}
             <div class="alert alert-success align-items-center d-flex mb-3 mt-3">
                 <div class="mr-4">
                     <i class="far fa-check-circle" style="font-size: 1.25rem"></i>
