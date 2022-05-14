@@ -2,6 +2,7 @@ import os
 import uuid
 from datetime import datetime, timedelta
 
+import bugsnag
 from django.conf import settings
 from django.contrib.auth.models import User, Group, Permission
 from django.core.mail import send_mail
@@ -247,7 +248,9 @@ class Event(models.Model):
                         ),
                     )
                 except Exception as e:
-                    print("event", e)
+                    bugsnag.notify(e, metadata={
+                        "infos": {"message": f"An error occurred while sending new event notification"},
+                    })
         except Exception as e:
             print("event", e)
 
