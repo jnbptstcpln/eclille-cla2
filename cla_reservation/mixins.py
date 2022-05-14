@@ -92,7 +92,7 @@ class AbstractReservationItemManageMixin(ClaMemberModuleMixin):
 
     def dispatch(self, request, *args, **kwargs):
         if not self.request.user.has_perm(self.permission_name):
-            raise PermissionDenied()
+            self.handle_no_permission()
         return super().dispatch(request, *args, **kwargs)
 
     def get_reservation_item(self):

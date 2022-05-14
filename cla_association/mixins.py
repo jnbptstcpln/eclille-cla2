@@ -1,11 +1,11 @@
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import resolve_url, redirect, get_object_or_404
 
 from cla_association.models import Association
 
 
-class AssociationManageMixin:
+class AssociationManageMixin(AccessMixin):
     association: Association = None
     association_manage_active_section = None
 
@@ -15,7 +15,7 @@ class AssociationManageMixin:
 
     def dispatch(self, request, *args, **kwargs):
         if not self.association.active or self.association.members.filter(user=self.request.user).count() == 0:
-            raise PermissionDenied()
+            self.handle_no_permission()
         return super().dispatch(request, *args, **kwargs)
 
     def get_sections_navigation(self):
