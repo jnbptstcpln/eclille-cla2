@@ -1,5 +1,5 @@
 from django.views import generic
-from django.shortcuts import render, redirect, reverse, get_object_or_404
+from django.shortcuts import render, redirect, reverse, get_object_or_404, resolve_url
 from django.http import HttpRequest, HttpResponseNotAllowed
 
 from cla_ticketing.forms import EventRegistrationForm
@@ -17,7 +17,7 @@ class EventRegistrationView(generic.CreateView):
         self.event = get_object_or_404(Event, slug=kwargs.pop('event_slug'))
         if not request.user.is_authenticated:
             if not self.event.allow_non_contributor_registration:
-                return redirect(reverse("cla_auth:login")+f"?next={reverse('cla_ticketing:event_ticketing', self.event.slug)}")
+                return redirect(reverse("cla_auth:login")+f"?next={resolve_url('cla_ticketing:event_ticketing', self.event.slug)}")
             elif not request.session.get(EventRegistrationNonMemberView.event_non_member_registration_id(self.event), False):
                 return render(
                     request,
