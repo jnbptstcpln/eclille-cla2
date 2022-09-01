@@ -9,6 +9,7 @@ urlpatterns = [
     path("mon-compte/validation", lobby.AccountValidationView.as_view(), name="account_validation"),
     path("mon-compte/justificatif", lobby.MembershipProofView.as_view(), name="membership_proof"),
     path("mes-associations", lobby.AssociationView.as_view(), name="associations"),
+    path("email-test", lobby.TestEmailView.as_view(), name="test_email"),
 
     path("photos", picture.PictureUploadView.as_view(), name="upload_pictures"),
 ]

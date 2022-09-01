@@ -1,7 +1,8 @@
 import csv
 
+from django.conf import settings
 from django.db.models import Q
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, View
 from django.contrib import admin, messages
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.utils.text import slugify
@@ -9,6 +10,7 @@ from django.contrib.auth.models import User
 from django.shortcuts import render, redirect, reverse, get_object_or_404
 from django.http import HttpRequest, HttpResponseNotAllowed, Http404, HttpResponse
 from django.utils import timezone
+from django.core.mail import send_mail
 
 from cla_association.models import AssociationMember, Association
 from cla_auth.mixins import IsContributorMixin, HasMembershipMixin
@@ -141,3 +143,14 @@ class AssociationView(ClaMemberModuleMixin, TemplateView):
             'association_memberships': self.get_association_memberships()
         })
         return context
+
+
+class TestEmailView(ClaMemberModuleMixin, View):
+    
+    def get(self, request):
+        send_mail(
+            subject='[CLA] Test',
+            from_email=settings.EMAIL_HOST_FROM,
+            recipient_list=[request.user.email],
+            message="Ceci est un email de test"            
+        )
