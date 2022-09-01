@@ -47,7 +47,7 @@
             </div>
         {% else %}
 
-            {% if rules %}
+            {% if rules and rules.file %}
                 <div class="d-flex align-items-center alert alert-warning">
                     <div class="mr-3">
                         <i class="far fa-exclamation-triangle text-x2"></i>
@@ -66,7 +66,7 @@
                 </div>
             {% endif %}
 
-            {% if beer_menu %}
+            {% if beer_menu and beer_menu.file %}
                 <div class="d-flex align-items-center alert alert-info">
                     <div class="mr-3">
                         <i class="far fa-beer text-x2"></i>
