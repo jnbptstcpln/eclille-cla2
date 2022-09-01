@@ -1,4 +1,5 @@
 import csv
+import bugsnag
 
 from django.conf import settings
 from django.db.models import Q
@@ -148,9 +149,14 @@ class AssociationView(ClaMemberModuleMixin, TemplateView):
 class TestEmailView(ClaMemberModuleMixin, View):
     
     def get(self, request):
-        send_mail(
-            subject='[CLA] Test',
-            from_email=settings.EMAIL_HOST_FROM,
-            recipient_list=[request.user.email],
-            message="Ceci est un email de test"            
-        )
+        try:
+            send_mail(
+                subject='[CLA] Test',
+                from_email=settings.EMAIL_HOST_FROM,
+                recipient_list=[request.user.email],
+                message="Ceci est un email de test"
+            )
+            return HttpResponse("Email sent without error")
+        except Exception as e:
+            bugsnag.notify(e)
+            return HttpResponse(f"Email was not sent : {e}")
