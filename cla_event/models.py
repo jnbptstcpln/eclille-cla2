@@ -242,7 +242,7 @@ class Event(models.Model):
                             'cla_event/manage/mail.html',
                             {
                                 'site_href': f"https://{settings.ALLOWED_HOSTS[0]}",
-                                'detail_href': f"https://{settings.ALLOWED_HOSTS[0]}{resolve_url('cla_event:manage:detail', self.pk)}",
+                                'detail_href': f"https://{settings.ALLOWED_HOSTS[0]}{resolve_url('cla_event:manage:event-detail', self.pk)}",
                                 'event': self
                             }
                         ),
