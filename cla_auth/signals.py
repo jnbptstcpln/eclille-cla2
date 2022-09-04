@@ -33,5 +33,5 @@ def send_activation_email(sender, instance: UserInfos, created, **kwargs):
                     subject=f'[ACTIVATION] Erreur lors de l\'envoie à {instance.email_school}',
                     from_email=settings.EMAIL_HOST_FROM,
                     recipient_list=[settings.EMAIL_HOST_FROM],
-                    message=f"Une erreur s'est produite lors de l'envoie du mail d'activation à {instance.email_school} : {e}"
+                    message=f"Une erreur s'est produite lors de l'envoi du mail d'activation à {instance.email_school} : {e}"
                 )
