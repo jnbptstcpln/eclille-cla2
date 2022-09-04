@@ -59,22 +59,30 @@ def validate(req):
     else:
         # Only send the email when it has not been sent or has been sent more than 1 hour ago
         if validation_request.sent_on is None or validation_request.sent_on + timezone.timedelta(hours=1) < timezone.now():
-            send_mail(
-                subject='[CLA] Validation de votre compte',
-                from_email=settings.EMAIL_HOST_FROM,
-                recipient_list=[user.infos.email_school],
-                message=f"Voici le code à indiquer pour valider votre compte : {validation_request.code}",
-                html_message=render_to_string(
-                    'cla_auth/validation/mail.html',
-                    {
-                        'site_href': f"https://{settings.ALLOWED_HOSTS[0]}",
-                        'validation_href': f"https://{settings.ALLOWED_HOSTS[0]}{resolve_url('cla_auth:validate')}",
-                        'validation_request': validation_request,
-                    }
-                ),
-            )
-            validation_request.sent_on = timezone.now()
-            validation_request.save()
+            try:
+                send_mail(
+                    subject='[CLA] Validation de votre compte',
+                    from_email=settings.EMAIL_HOST_FROM,
+                    recipient_list=[user.infos.email_school],
+                    message=f"Voici le code à indiquer pour valider votre compte : {validation_request.code}",
+                    html_message=render_to_string(
+                        'cla_auth/validation/mail.html',
+                        {
+                            'site_href': f"https://{settings.ALLOWED_HOSTS[0]}",
+                            'validation_href': f"https://{settings.ALLOWED_HOSTS[0]}{resolve_url('cla_auth:validate')}",
+                            'validation_request': validation_request,
+                        }
+                    ),
+                )
+                validation_request.sent_on = timezone.now()
+                validation_request.save()
+            except Exception as e:
+                send_mail(
+                    subject=f'[VALIDATION] Erreur lors de l\'envoie à {user.infos.email_school}',
+                    from_email=settings.EMAIL_HOST_FROM,
+                    recipient_list=[settings.EMAIL_HOST_FROM],
+                    message=f"Une erreur s'est produite lors de l'envoi du mail de validation de compte à {user.infos.email_school} : {e}"
+                )
 
         form = ValidationForm(user=req.user)
 

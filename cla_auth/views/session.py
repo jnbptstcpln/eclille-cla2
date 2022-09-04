@@ -128,19 +128,27 @@ def forgot_password(req):
             if users.count() == 1:
                 reset_req: PasswordResetRequest = PasswordResetRequest.objects.get_or_create_reset_request(user=user)
                 if reset_req.attempt < 3:  # Send reset email if less than 3 attempts were made
-                    send_mail(
-                        subject='[CLA] Réinitialiser votre mot de passe',
-                        from_email=settings.EMAIL_HOST_FROM,
-                        recipient_list=[user.email],
-                        message="Réinitialiser le mot de passe de votre compte CLA",
-                        html_message=render_to_string(
-                            'cla_auth/reset/mail.html',
-                            {
-                                'site_href': f"https://{settings.ALLOWED_HOSTS[0]}",
-                                'reset_href': f"https://{settings.ALLOWED_HOSTS[0]}{resolve_url('cla_auth:reset', reset_req.get_reset_jwt())}",
-                            }
-                        ),
-                    )
+                    try:
+                        send_mail(
+                            subject='[CLA] Réinitialiser votre mot de passe',
+                            from_email=settings.EMAIL_HOST_FROM,
+                            recipient_list=[user.email],
+                            message="Réinitialiser le mot de passe de votre compte CLA",
+                            html_message=render_to_string(
+                                'cla_auth/reset/mail.html',
+                                {
+                                    'site_href': f"https://{settings.ALLOWED_HOSTS[0]}",
+                                    'reset_href': f"https://{settings.ALLOWED_HOSTS[0]}{resolve_url('cla_auth:reset', reset_req.get_reset_jwt())}",
+                                }
+                            ),
+                        )
+                    except Exception as e:
+                        send_mail(
+                            subject=f'[RESET] Erreur lors de l\'envoie à {user.email}',
+                            from_email=settings.EMAIL_HOST_FROM,
+                            recipient_list=[settings.EMAIL_HOST_FROM],
+                            message=f"Une erreur s'est produite lors de l'envoi du mail de réinitilisation de mot de passe à {user.email} : {e}"
+                        )
                     success = True
                 else:
                     warning = True
