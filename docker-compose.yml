@@ -2,8 +2,23 @@ version: "3.6"
 
 services:
 
+  cla-web-back:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    tty: true
+    command: python manage.py runserver 0.0.0.0:8000
+    ports:
+      - 8000:8000
+    volumes:
+      - ./:/usr/src/app/
+    environment:
+      DJANGO_SETTINGS_MODULE: cla_web.settings.development
+    depends_on:
+      - cla-web-db
+
   cla-web-db:
-    image: mysql
+    image: mysql:5.7
     container_name: cla-web-db
     hostname: cla-web-db
     volumes:
