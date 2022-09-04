@@ -3,7 +3,7 @@ version: "3.6"
 services:
 
   cla-web-db:
-    image: mysql:5.7.38
+    image: mysql
     container_name: cla-web-db
     hostname: cla-web-db
     volumes:
