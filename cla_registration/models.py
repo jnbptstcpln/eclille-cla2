@@ -41,27 +41,31 @@ class RegistrationSession(models.Model):
 
         @staticmethod
         def ticketing_href_centrale_pack():
-            return f"https://billetterie.pumpkin-app.com/cla-{next_back_to_school_year()}-centrale-pack"
+            return f"https://example.com/cla-{next_back_to_school_year()}-centrale-pack"
 
         @staticmethod
         def ticketing_href_centrale_cla():
-            return f"https://billetterie.pumpkin-app.com/cla-{next_back_to_school_year()}-centrale-cla"
+            return f"https://example.com/cla-{next_back_to_school_year()}-centrale-cla"
 
         @staticmethod
         def ticketing_href_centrale_dd_pack():
-            return f"https://billetterie.pumpkin-app.com/cla-{next_back_to_school_year()}-centrale-dd-pack"
+            return f"https://example.com/cla-{next_back_to_school_year()}-centrale-dd-pack"
 
         @staticmethod
         def ticketing_href_centrale_dd_cla():
-            return f"https://billetterie.pumpkin-app.com/cla-{next_back_to_school_year()}-centrale-dd-cla"
+            return f"https://example.com/cla-{next_back_to_school_year()}-centrale-dd-cla"
 
         @staticmethod
         def ticketing_href_iteem_pack():
-            return f"https://billetterie.pumpkin-app.com/cla-{next_back_to_school_year()}-iteem-pack"
+            return f"https://example.com/cla-{next_back_to_school_year()}-iteem-pack"
 
         @staticmethod
         def ticketing_href_iteem_cla():
-            return f"https://billetterie.pumpkin-app.com/cla-{next_back_to_school_year()}-iteem-cla"
+            return f"https://example.com/cla-{next_back_to_school_year()}-iteem-cla"
+        
+        @staticmethod
+        def ticketing_href_enscl_cla():
+            return f"https://example.com/cla-{next_back_to_school_year()}-enscl-cla"
 
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     school_year = models.PositiveIntegerField(verbose_name="Année de la rentrée scolaire", default=next_back_to_school_year)
@@ -104,6 +108,13 @@ class RegistrationSession(models.Model):
         verbose_name="Billetterie \"[ITEEM] Adhésion CLA\"",
         default=DefaultTicketingHref.ticketing_href_iteem_cla
     )
+    
+    ticketing_href_enscl_cla = models.URLField(
+        null=True,
+        blank=True,
+        verbose_name="Billetterie \"[ENSCL] Adhésion CLA\"",
+        default=DefaultTicketingHref.ticketing_href_enscl_cla
+    )
 
     sharing_uuid_alumni = models.UUIDField(default=uuid4, verbose_name="Identifiant de partage avec les Alumni", editable=False)
 
@@ -124,6 +135,7 @@ class RegistrationSession(models.Model):
 
                 self.school_centrale_nb = self.session.registrations.filter(school=Registration.SchoolDomains.CENTRALE).count()
                 self.school_iteem_nb = self.session.registrations.filter(school=Registration.SchoolDomains.ITEEM).count()
+                self.school_enscl_nb = self.session.registrations.filter(school=Registration.SchoolDomains.ENSCL).count()
 
         return Stats(self)
 
@@ -163,7 +175,10 @@ class Registration(models.Model):
     first_name = models.CharField(max_length=255, verbose_name="Prénom")
     last_name = models.CharField(max_length=255, verbose_name="Nom")
     email = models.EmailField(verbose_name="Adresse mail personnelle")
-    email_school = models.EmailField(verbose_name="Adresse mail scolaire")
+    email_school = models.EmailField(
+        verbose_name="Adresse mail scolaire",
+        help_text="Vérifier bien qu'elle correspond à celle indiquée sur la papier donné à l'étudiant par l'administration.<br><b>En cas d'erreur l'étudiant ne pourra pas accéder à son compte.</b>"
+    )
     phone = models.CharField(max_length=20, verbose_name="Numéro de téléphone")
     birthdate = models.DateField(verbose_name="Date de naissance")
     school = models.TextField(max_length=255, choices=SchoolDomains.choices, verbose_name="Ecole")
@@ -182,6 +197,7 @@ class Registration(models.Model):
             self.Types.CENTRALE_CLA: self.session.ticketing_href_centrale_cla,
             self.Types.CENTRALE_DD_CLA: self.session.ticketing_href_centrale_dd_cla,
             self.Types.ITEEM_CLA: self.session.ticketing_href_iteem_cla,
+            self.Types.ENSCL_CLA: self.session.ticketing_href_enscl_cla,
         }.get(self.type)
 
     def __str__(self):
