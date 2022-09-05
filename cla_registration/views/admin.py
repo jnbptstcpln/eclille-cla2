@@ -71,7 +71,7 @@ class RegistrationValidationView(UserPassesTestMixin, generic.FormView):
         self.registration.account = user
         self.registration.save()
 
-        messages.success(self.request, f"Un mail de bienvenue a été envoyé à {user.infos.email_school} avec un lien d'activation")
+        messages.success(self.request, f"L'utilisateur a été créé et un mail de bienvenue lui a été envoyé à {user.infos.email_school} avec un lien d'activation")
         return redirect("admin:auth_user_change", user.pk)
 
     def get_form_kwargs(self):

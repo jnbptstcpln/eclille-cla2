@@ -583,6 +583,8 @@ class UserMembership(models.Model):
         verbose_name = "Cotisation"
 
     class MeanOfPayment(models.TextChoices):
+        LYFPAY = 'lyfpay', 'Lyf pay'
+        LYDIA = 'lydia', 'Lydia'
         PUMPKIN = 'pumpkin', 'Pumpkin'
         CHECK = 'check', 'Chèque'
         CASH = 'cash', 'Liquide'

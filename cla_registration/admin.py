@@ -60,7 +60,7 @@ class RegistrationSessionAdmin(admin.ModelAdmin):
                 queryset = queryset.filter(Q(last_name__icontains=request.GET.get('registration_search')) | Q(first_name__icontains=request.GET.get('registration_search')))
             return queryset
 
-    readonly_fields = ['pumpkin_configuration', 'statistics', 'link_sharing_alumni']
+    readonly_fields = ['statistics', 'link_sharing_alumni']
     list_display = ("school_year", "date_start", "date_end", "number_of_registrations")
     change_form_template = "cla_registration/admin/change_registrationsession.html"
 
@@ -90,18 +90,19 @@ class RegistrationSessionAdmin(admin.ModelAdmin):
                         'fields': ('link_sharing_alumni',),
                         'classes': ('collapse',),
                     }
-                ],
-                [
-                    "Configuration de la plateforme de paiement",
-                    {
-                        'fields': ('pumpkin_configuration',),
-                        'classes': ('collapse',),
-                    }
-                ],
+                ],                
                 [
                     "Lien vers les billeteries",
                     {
-                        'fields': ('ticketing_href_centrale_pack', 'ticketing_href_centrale_cla', 'ticketing_href_centrale_dd_pack', 'ticketing_href_centrale_dd_cla', 'ticketing_href_iteem_pack', 'ticketing_href_iteem_cla'),
+                        'fields': (
+                            'ticketing_href_centrale_pack',
+                            'ticketing_href_centrale_cla',
+                            'ticketing_href_centrale_dd_pack',
+                            'ticketing_href_centrale_dd_cla',
+                            'ticketing_href_iteem_pack',
+                            'ticketing_href_iteem_cla',
+                            'ticketing_href_enscl_cla'
+                        ),
                         'classes': ('collapse',),
                     }
                 ]
@@ -119,20 +120,6 @@ class RegistrationSessionAdmin(admin.ModelAdmin):
             ]
 
         return fieldsets
-
-    def pumpkin_configuration(self, obj: RegistrationSession):
-        if obj.pk:  # Check if the object was created
-            return mark_safe(
-                render_to_string(
-                    "cla_registration/admin/pumpkin_configuration.html",
-                    {
-                        'session': obj
-                    }
-                )
-            )
-        else:
-            return ""
-    pumpkin_configuration.short_description = ''
 
     def number_of_registrations(self, obj: RegistrationSession):
         return obj.registrations.count()
