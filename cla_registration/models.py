@@ -157,15 +157,16 @@ class Registration(models.Model):
         CENTRALE = "centrale.centralelille.fr", "École Centrale de Lille"
         ITEEM = "iteem.centralelille.fr", "ITEEM"
         ENSCL = "enscl.centralelille.fr", "ENSCL"
-
-    class Types(models.TextChoices):
+                
+    class Types(models.TextChoices):  # value must end with `_pack` or `_cla`
         CENTRALE_PACK = "centrale_pack", "[Centrale Lille] Pack Alumni+CLA"
         CENTRALE_CLA = "centrale_cla", "[Centrale Lille] Adhésion CLA"
         CENTRALE_DD_PACK = "centrale_dd_pack", "[Centrale Lille][Double diplôme] Pack Alumni+CLA"
         CENTRALE_DD_CLA = "centrale_dd_cla", "[Centrale Lille][Double diplôme] Adhésion CLA"
         ITEEM_PACK = "iteem_pack", "[ITEEM] Pack Alumni+CLA"
         ITEEM_CLA = "iteem_cla", "[ITEEM] Adhésion CLA"
-        ENSCL_CLA = "enscl_cla", "[ENSCL] Ahésion CLA"
+        ENSCL_CLA = "enscl_cla", "[ENSCL] Ahésion CLA"    
+            
 
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     datetime_registration = models.DateTimeField(auto_now_add=True, editable=False, verbose_name="Date de l'inscription")
@@ -199,6 +200,16 @@ class Registration(models.Model):
             self.Types.ITEEM_CLA: self.session.ticketing_href_iteem_cla,
             self.Types.ENSCL_CLA: self.session.ticketing_href_enscl_cla,
         }.get(self.type)
+    
+    @property
+    def is_pack_available(self):
+        return self.school in {self.SchoolDomains.CENTRALE, self.SchoolDomains.ITEEM}
+    
+    @property
+    def type_prefix(self):
+        if self.type:            
+            return self.type.replace('_pack', '').replace('_cla', '')
+        return self.type
 
     def __str__(self):
         return f"{self.first_name} {self.last_name.upper()}"
