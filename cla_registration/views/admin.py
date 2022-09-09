@@ -1,4 +1,5 @@
 import csv
+import bugsnag
 
 from django.template.loader import render_to_string
 from django.views import generic
@@ -36,6 +37,24 @@ class RegistrationValidationView(UserPassesTestMixin, generic.FormView):
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
+        try:
+            # Update the registration
+            self.registration.first_name = form.cleaned_data['first_name']
+            self.registration.last_name = form.cleaned_data['last_name']
+            self.registration.email = form.cleaned_data['email']
+            self.registration.email_school = form.cleaned_data['email_school']
+            self.registration.birthdate = form.cleaned_data['birthdate']
+            self.registration.contribution = form.cleaned_data['amount']
+            self.registration.original_school = form.cleaned_data.get('original_school', None)
+            # If the student finally change his mind about taking the pack
+            if self.registration.is_pack_available:
+                self.registration.pack = int(form.cleaned_data['pack'])
+                self.registration.type = f'{self.registration.type_prefix}_{"pack" if self.registration.pack else "cla"}'
+                if self.registration.pack:
+                    self.registration.rgpd_sharing_alumni = True
+        except Exception as e:
+            bugsnag.notify(e, metadata={'form': form.cleaned_data})
+        
         # Creating user object
         user = User(
             username=create_username(form.cleaned_data['first_name'], form.cleaned_data['last_name']),
@@ -72,12 +91,14 @@ class RegistrationValidationView(UserPassesTestMixin, generic.FormView):
         self.registration.save()
 
         messages.success(self.request, f"L'utilisateur a été créé et un mail de bienvenue lui a été envoyé à {user.infos.email_school} avec un lien d'activation")
-        return redirect("admin:auth_user_change", user.pk)
+        return redirect("admin:cla_registration_registrationsession_change", self.registration.session.pk)
+        #return redirect("admin:auth_user_change", user.pk)
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs.update({
-            'is_from_another_school': self.registration.original_school is not None
+            'is_from_another_school': self.registration.original_school is not None,
+            'is_pack_available': self.registration.is_pack_available
         })
         return kwargs
 
@@ -96,8 +117,12 @@ class RegistrationValidationView(UserPassesTestMixin, generic.FormView):
         elif self.registration.school == Registration.SchoolDomains.ITEEM:
             cursus = UserInfos.CursusChoices.IE1
             promo = self.registration.session.school_year + 5
+        elif self.registration.school == Registration.SchoolDomains.ENSCL:
+            cursus = UserInfos.CursusChoices.CH1
+            promo = self.registration.session.school_year + 3
 
         return {
+            "pack": 1 if self.registration.pack else 0,
             "first_name": self.registration.first_name,
             "last_name": self.registration.last_name,
             "email": self.registration.email,
