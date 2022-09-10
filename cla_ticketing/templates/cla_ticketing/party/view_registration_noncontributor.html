@@ -77,29 +77,44 @@
                     <h3>{{ registration.first_name }} {{ registration.last_name }}</h3>
                     <h4>{{ registration.ticket_label }}</h4>
                 {% else %}
-                    {% if party.contributor_ticketing_href %}
-                        <p class="text-justify">
-                            <b>Vous pouvez maintenant régler la place de votre invité sur la billetterie de l'événement.</b>
-                            Une fois votre paiement effectué l'organisateur de l'événement validera l'inscription et sa place sera assurée.
+                    {% if party.use_integrated_payment %}
+
+                        <p class="text-center">
+                            <b>Vous pouvez maintenant procéder au paiement de cette place via Lyfpay.</b>
                         </p>
                         <p class="text-center">
-                            <b>Toute place non payée n'est pas réservée.</b>
+                            <b>Toute place non payée n'est pas définitivement réservée.</b>
                         </p>
                         <p class="text-center">
-                            <a class="btn btn-red-dark" href="{{ party.contributor_ticketing_href }}" target="_blank">Accéder à la billetterie</a>
+                            <a class="btn btn-blue-dark" href="{% url "cla_lyfpay:payment" registration.payment_jwt %}">Payer la place</a>
                         </p>
+
                     {% else %}
-                        <p class="text-justify">
-                            <b>Bravo ! Vous êtes bien inscrit pour l'événement.</b><br>
-                            <b>Un lien vers le moyen de paiement sera bientôt publié sur votre groupe de promo.</b>
-                        </p>
-                        <p class="text-center">
-                            <b>Toute place non payée n'est pas réservée.</b>
+
+                        {% if party.contributor_ticketing_href %}
+                            <p class="text-justify">
+                                <b>Vous pouvez maintenant régler la place de votre invité sur la billetterie de l'événement.</b>
+                                Une fois votre paiement effectué l'organisateur de l'événement validera l'inscription et sa place sera assurée.
+                            </p>
+                            <p class="text-center">
+                                <b>Toute place non payée n'est pas réservée.</b>
+                            </p>
+                            <p class="text-center">
+                                <a class="btn btn-red-dark" href="{{ party.contributor_ticketing_href }}" target="_blank">Accéder à la billetterie</a>
+                            </p>
+                        {% else %}
+                            <p class="text-justify">
+                                <b>Bravo ! Vous êtes bien inscrit pour l'événement.</b><br>
+                                <b>Un lien vers le moyen de paiement sera bientôt publié sur votre groupe de promo.</b>
+                            </p>
+                            <p class="text-center">
+                                <b>Toute place non payée n'est pas réservée.</b>
+                            </p>
+                        {% endif %}
+                        <p class="text-justify mx-auto" style="font-size: .75rem; max-width: 350px">
+                            Si vous avez bien payé votre place <b>pas de panique</b>, ce message s'affiche jusqu'à la validation du paiement par l'organisateur.
                         </p>
                     {% endif %}
-                    <p class="text-justify mx-auto" style="font-size: .75rem; max-width: 350px">
-                        Si vous avez bien payé votre place <b>pas de panique</b>, ce message s'affiche jusqu'à la validation du paiement par l'organisateur.
-                    </p>
                 {% endif %}
                 <div class="mt-4 mx-auto" style="max-width: 250px">
                     {% if not registration.validated and registration.dancing_party.has_editable_fields and not registration.dancing_party.has_started %}
