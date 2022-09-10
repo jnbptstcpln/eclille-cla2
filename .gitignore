@@ -2,3 +2,4 @@
 settings.ini
 /venv
 /static
+__pycache__
