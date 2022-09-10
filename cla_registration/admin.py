@@ -229,6 +229,19 @@ class RegistrationAdmin(admin.ModelAdmin):
                 return queryset.filter(session__pk=raw_val)
             return queryset
     
+    class SchoolFilter(SimpleListFilter):
+        title = 'école'
+        parameter_name = 'school'
+
+        def lookups(self, request, model_admin):
+            return Registration.SchoolDomains.choices
+
+        def queryset(self, request, queryset):
+            if self.value() is not None:
+                return queryset.filter(school=self.value())
+            else:
+                return queryset
+    
     class AccountFilter(SimpleListFilter):
         title = 'compte créé'
         parameter_name = 'account'
@@ -246,7 +259,7 @@ class RegistrationAdmin(admin.ModelAdmin):
                     return queryset.filter(account__isnull=True)
             return queryset
         
-    list_filter = (SessionFilter, AccountFilter)
+    list_filter = (SessionFilter, SchoolFilter, AccountFilter)
     list_display = ['__str__', 'has_pack', 'type', 'datetime_registration', 'is_linked_to_an_account']
     search_fields = ('first_name', 'last_name', 'email', 'email_school')
     
