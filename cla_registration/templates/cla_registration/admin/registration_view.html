@@ -64,6 +64,13 @@
                 <p>
                     À partir de cette page vous avez la possibilité de créer un compte utilisateur à partir des informations indiquées par <b>{{ original.first_name }}</b> dans le formulaire d'adhésion.<br>
                 </p>
+                <p>
+                    Prenez le temps de vérifier que les informations suivantes sont correctes et mettez les à jour si nécessaire.
+                    {% if original.is_pack_available %}
+                        <br>
+                        <b>En particulier, demandez-bien à l'étudiant si il souhaite ou non bénéficier du pack avec les Alumni.</b>
+                    {% endif %}
+                </p>
 
                 <fieldset class="module aligned">
 

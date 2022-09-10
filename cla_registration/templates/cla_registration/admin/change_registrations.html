@@ -112,7 +112,15 @@
                 {% endfor %}
                 </tbody>
             </table>
-            {% include 'admin/tabular_paginator.html' %}
+            <div style='display: flex; justify-content: space-between; align-items: center;'>
+                <div>
+                    {% include 'admin/tabular_paginator.html' %}
+                </div>
+                <div style="text-align: right; font-size: .75rem">
+                    <a href="{% url "admin:cla_registration_registration_changelist" %}?session={{ original.pk }}">Gestion avancée des formulaires d'adhésion</a>
+                </div>
+            </div>
+            
         </fieldset>
     </div>
 </div>

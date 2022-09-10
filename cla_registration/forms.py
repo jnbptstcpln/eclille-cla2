@@ -128,11 +128,22 @@ class RegistrationAdminForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         self.is_from_another_school = kwargs.pop("is_from_another_school", False)
+        self.is_pack_available = kwargs.pop("is_pack_available", False)
+        
         super().__init__(*args, **kwargs)
+        
         if self.is_from_another_school:
             self.fields['original_school'] = forms.CharField(
                 max_length=255,
                 label="École ou université d'origine"
+            )
+        
+        
+        if self.is_pack_available:
+            self.fields['pack'] = forms.ChoiceField(
+                choices=[(1, "L'étudiant veut cotiser au pack"), (0, "L'étudiant ne veut pas cotiser au pack"),],
+                label="Pack Alumni",
+                help_text="Pensez à mettre à jour ce champ et le montant de la cotisation si l'étudiant a changé d'avis"
             )
 
     cursus = forms.ChoiceField(choices=UserInfos.CursusChoices.choices, label="Cursus")

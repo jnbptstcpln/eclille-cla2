@@ -41,27 +41,31 @@ class RegistrationSession(models.Model):
 
         @staticmethod
         def ticketing_href_centrale_pack():
-            return f"https://billetterie.pumpkin-app.com/cla-{next_back_to_school_year()}-centrale-pack"
+            return f"https://example.com/cla-{next_back_to_school_year()}-centrale-pack"
 
         @staticmethod
         def ticketing_href_centrale_cla():
-            return f"https://billetterie.pumpkin-app.com/cla-{next_back_to_school_year()}-centrale-cla"
+            return f"https://example.com/cla-{next_back_to_school_year()}-centrale-cla"
 
         @staticmethod
         def ticketing_href_centrale_dd_pack():
-            return f"https://billetterie.pumpkin-app.com/cla-{next_back_to_school_year()}-centrale-dd-pack"
+            return f"https://example.com/cla-{next_back_to_school_year()}-centrale-dd-pack"
 
         @staticmethod
         def ticketing_href_centrale_dd_cla():
-            return f"https://billetterie.pumpkin-app.com/cla-{next_back_to_school_year()}-centrale-dd-cla"
+            return f"https://example.com/cla-{next_back_to_school_year()}-centrale-dd-cla"
 
         @staticmethod
         def ticketing_href_iteem_pack():
-            return f"https://billetterie.pumpkin-app.com/cla-{next_back_to_school_year()}-iteem-pack"
+            return f"https://example.com/cla-{next_back_to_school_year()}-iteem-pack"
 
         @staticmethod
         def ticketing_href_iteem_cla():
-            return f"https://billetterie.pumpkin-app.com/cla-{next_back_to_school_year()}-iteem-cla"
+            return f"https://example.com/cla-{next_back_to_school_year()}-iteem-cla"
+        
+        @staticmethod
+        def ticketing_href_enscl_cla():
+            return f"https://example.com/cla-{next_back_to_school_year()}-enscl-cla"
 
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     school_year = models.PositiveIntegerField(verbose_name="Année de la rentrée scolaire", default=next_back_to_school_year)
@@ -104,6 +108,13 @@ class RegistrationSession(models.Model):
         verbose_name="Billetterie \"[ITEEM] Adhésion CLA\"",
         default=DefaultTicketingHref.ticketing_href_iteem_cla
     )
+    
+    ticketing_href_enscl_cla = models.URLField(
+        null=True,
+        blank=True,
+        verbose_name="Billetterie \"[ENSCL] Adhésion CLA\"",
+        default=DefaultTicketingHref.ticketing_href_enscl_cla
+    )
 
     sharing_uuid_alumni = models.UUIDField(default=uuid4, verbose_name="Identifiant de partage avec les Alumni", editable=False)
 
@@ -124,6 +135,7 @@ class RegistrationSession(models.Model):
 
                 self.school_centrale_nb = self.session.registrations.filter(school=Registration.SchoolDomains.CENTRALE).count()
                 self.school_iteem_nb = self.session.registrations.filter(school=Registration.SchoolDomains.ITEEM).count()
+                self.school_enscl_nb = self.session.registrations.filter(school=Registration.SchoolDomains.ENSCL).count()
 
         return Stats(self)
 
@@ -145,15 +157,16 @@ class Registration(models.Model):
         CENTRALE = "centrale.centralelille.fr", "École Centrale de Lille"
         ITEEM = "iteem.centralelille.fr", "ITEEM"
         ENSCL = "enscl.centralelille.fr", "ENSCL"
-
-    class Types(models.TextChoices):
+                
+    class Types(models.TextChoices):  # value must end with `_pack` or `_cla`
         CENTRALE_PACK = "centrale_pack", "[Centrale Lille] Pack Alumni+CLA"
         CENTRALE_CLA = "centrale_cla", "[Centrale Lille] Adhésion CLA"
         CENTRALE_DD_PACK = "centrale_dd_pack", "[Centrale Lille][Double diplôme] Pack Alumni+CLA"
         CENTRALE_DD_CLA = "centrale_dd_cla", "[Centrale Lille][Double diplôme] Adhésion CLA"
         ITEEM_PACK = "iteem_pack", "[ITEEM] Pack Alumni+CLA"
         ITEEM_CLA = "iteem_cla", "[ITEEM] Adhésion CLA"
-        ENSCL_CLA = "enscl_cla", "[ENSCL] Ahésion CLA"
+        ENSCL_CLA = "enscl_cla", "[ENSCL] Ahésion CLA"    
+            
 
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     datetime_registration = models.DateTimeField(auto_now_add=True, editable=False, verbose_name="Date de l'inscription")
@@ -163,11 +176,14 @@ class Registration(models.Model):
     first_name = models.CharField(max_length=255, verbose_name="Prénom")
     last_name = models.CharField(max_length=255, verbose_name="Nom")
     email = models.EmailField(verbose_name="Adresse mail personnelle")
-    email_school = models.EmailField(verbose_name="Adresse mail scolaire")
+    email_school = models.EmailField(
+        verbose_name="Adresse mail scolaire",
+        help_text="Vérifier bien qu'elle correspond à celle indiquée sur la papier donné à l'étudiant par l'administration.<br><b>En cas d'erreur l'étudiant ne pourra pas accéder à son compte.</b>"
+    )
     phone = models.CharField(max_length=20, verbose_name="Numéro de téléphone")
     birthdate = models.DateField(verbose_name="Date de naissance")
     school = models.TextField(max_length=255, choices=SchoolDomains.choices, verbose_name="Ecole")
-    original_school = models.CharField(max_length=255, verbose_name="École/université d'origine", null=True)
+    original_school = models.CharField(max_length=255, verbose_name="École/université d'origine", null=True, blank=True)
     pack = models.BooleanField(verbose_name="L'étudiant a choisi de cotiser avec le pack")
     contribution = models.PositiveIntegerField(verbose_name="Montant de cotisation à régler")
     rgpd_agreement = models.BooleanField(verbose_name="L'étudiant a accepté que ses informations soient stockées et utilisées par Centrale Lille Associations")
@@ -182,7 +198,18 @@ class Registration(models.Model):
             self.Types.CENTRALE_CLA: self.session.ticketing_href_centrale_cla,
             self.Types.CENTRALE_DD_CLA: self.session.ticketing_href_centrale_dd_cla,
             self.Types.ITEEM_CLA: self.session.ticketing_href_iteem_cla,
+            self.Types.ENSCL_CLA: self.session.ticketing_href_enscl_cla,
         }.get(self.type)
+    
+    @property
+    def is_pack_available(self):
+        return self.school in {self.SchoolDomains.CENTRALE, self.SchoolDomains.ITEEM}
+    
+    @property
+    def type_prefix(self):
+        if self.type:            
+            return self.type.replace('_pack', '').replace('_cla', '')
+        return self.type
 
     def __str__(self):
         return f"{self.first_name} {self.last_name.upper()}"
