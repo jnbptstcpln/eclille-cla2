@@ -33,7 +33,7 @@ class Payment(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     updated_at = models.DateTimeField(auto_now=True, editable=False)
-    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="payments", editable=False)
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="payments", editable=False)
     
     wallet = models.ForeignKey(Wallet, on_delete=models.CASCADE, related_name='payments')
     
@@ -55,7 +55,7 @@ class Payment(models.Model):
         return f'{int(self.lyfpay_amount // 100)}.{str(self.lyfpay_amount % 100).zfill(2)} €'
 
     @property
-    def validated(self):
+    def is_validated(self):
         return self.lyfpay_status == self.LyfpayStatus.VALIDATED
     
     def __str__(self) -> str:

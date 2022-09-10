@@ -18,6 +18,7 @@ from cla_lyfpay.handlers import get_handler
 from urllib.parse import urlencode
 from base64 import b64encode
 
+
 def debug(req: HttpRequest):
     token = PaymentRequest.get_jwt(
         wallet='test',
@@ -25,18 +26,18 @@ def debug(req: HttpRequest):
         reference=12345,
         lyfpay_amount=1100
     )
-    
+
     url = resolve_url('cla_lyfpay:payment', token=token)
-    #return HttpResponse(url)
+    # return HttpResponse(url)
     return HttpResponseRedirect(url)
 
-@login_required
+
 def payment(req: HttpRequest, token):
 
     payment_request = PaymentRequest.parse_jwt(token)
 
     if not payment_request:
-        raise HttpResponseBadRequest()
+        return HttpResponseBadRequest()
 
     # Generate a unique identifier for this payment
     lyfpay_shop_reference = shortuuid.uuid()
@@ -66,7 +67,7 @@ def payment(req: HttpRequest, token):
         "timestamp": str(int(time.time())),
         "version": "v2.0"
     }
-    
+
     # Get or create the attached wallet
     wallet, created = Wallet.objects.get_or_create(name=payment_request.wallet)
 
@@ -101,11 +102,16 @@ def payment(req: HttpRequest, token):
     )
 
     # Redirect to Lyfpay website
-    #return HttpResponseRedirect(f'https://sandbox-webpos.lyf.eu/fr/plugin/Payment.aspx?{urlencode(lyfpay_params)}')
+    # return HttpResponseRedirect(f'https://sandbox-webpos.lyf.eu/fr/plugin/Payment.aspx?{urlencode(lyfpay_params)}')
     return HttpResponseRedirect(f'https://webpos.lyf.eu/fr/plugin/Payment.aspx?{urlencode(lyfpay_params)}')
 
 
 def validate(req: HttpRequest):
+    """
+    This view is called directly by Lyfpay's servers after either payment validation or paiement refusal
+    """
+    # Retrieve data from POST as described in documentation
+    #   --> https://merchant.lyf.eu/Assets/files/Lyf_Web_Plugin_into_an_ecommerce_platform.pdf
     data = {
         'posUuid': req.POST["posUuid"],
         'shopReference': req.POST["shopReference"],
@@ -121,6 +127,7 @@ def validate(req: HttpRequest):
     }
 
     try:
+        # Build the seal
         seal = LyfpayAPI.get_handle_seal(
             posUuid=data['posUuid'],
             shopReference=data['shopReference'],
@@ -133,69 +140,101 @@ def validate(req: HttpRequest):
             transactionUuid=data['transactionUuid'],
             additionalData=data['additionalData']
         )
+        # Authenticate the request by comparing seals
         assert data['mac'].upper() == seal, f"Seals don't match (`{seal}`)"
-        
+
+        # Fetch related payment
         payment: Payment = Payment.objects.filter(lyfpay_shop_reference=data['shopReference']).first()
-        assert payment, f'No payment found'
-        
+        assert payment, f'No payment found for shopReference `{data["shopReference"]}`'
+
+        # Update payment with Lyfpay infos
         payment.lyfpay_updated_at = timezone.now()
         payment.lyfpay_id = data['transactionUuid']
         payment.lyfpay_status = data['status']
         payment.save()
-        
-        if payment.validated:
-            handler = get_handler(payment.origin, 'validate')
-            if handler:
-                return handler(payment)
-            else:
-                bugsnag.notify(f'No payment handler found for origin `{payment.origin}` and event `validate`', metadata={'payment': payment.__dict__()})
-        
+
+        # Fetch the origin related handler
+        handler = get_handler(payment.origin, 'validate')
+        if handler:
+            return handler(req, payment)
+        else:
+            bugsnag.notify(f'No payment handler found for origin `{payment.origin}` and event `validate`', metadata={'payment': payment.__dict__()})
+
+        return HttpResponse("OK")
+
     except Exception as e:
         bugsnag.notify(e, metadata={'data': data})
         raise e
 
 
-def success(req: HttpRequest, token):    
-    payment: Payment = Payment.objects.filter(lyfpay_shop_reference=token).first()    
+def success(req: HttpRequest, token):
+    """
+    This user is redirected to this view after successful payment
+    """
+    # Fetch related payment
+    payment: Payment = Payment.objects.filter(lyfpay_shop_reference=token).first()
     if payment:
-        if payment.lyfpay_status != Payment.LyfpayStatus.VALIDATED:  # Check that the event have been validated
-            raise HttpResponseForbidden()
-        
+        # Check that the payment has been validated
+        if payment.lyfpay_status != Payment.LyfpayStatus.VALIDATED:
+            return HttpResponseForbidden()
+
+        # Fetch the origin related handler
         handler = get_handler(payment.origin, 'success')
         if handler:
-            return handler(payment)
+            return handler(req, payment)
         else:
             bugsnag.notify(f'No payment handler found for origin `{payment.origin}` and event `success`', metadata={'payment': payment.__dict__()})
     raise Http404()
 
 
-def cancel(req: HttpRequest, token):    
-    payment: Payment = Payment.objects.filter(lyfpay_shop_reference=token).first()    
+def cancel(req: HttpRequest, token):
+    """
+    This user is redirected to this view after payment cancellation
+    """
+    # Fetch related payment
+    payment: Payment = Payment.objects.filter(lyfpay_shop_reference=token).first()
     if payment:
-        if payment.lyfpay_status == Payment.LyfpayStatus.WAITING:
+        # Update payment if it was not already updated
+        if payment.lyfpay_updated_at is None:
             payment.lyfpay_updated_at = timezone.now()
             payment.lyfpay_status = Payment.LyfpayStatus.REFUSED
             payment.save()
         
+        # Check that the payment has been cancelled
+        if payment.lyfpay_status != Payment.LyfpayStatus.REFUSED:
+            return HttpResponseForbidden()
+
+        # Fetch the origin related handler
         handler = get_handler(payment.origin, 'cancel')
         if handler:
-            return handler(payment)
+            return handler(req, payment)
         else:
             bugsnag.notify(f'No payment handler found for origin `{payment.origin}` and event `cancel`', metadata={'payment': payment.__dict__()})
+    raise Http404()
 
 
-def error(req: HttpRequest, token):    
-    payment: Payment = Payment.objects.filter(lyfpay_shop_reference=token).first()    
+@login_required
+def error(req: HttpRequest, token):
+    """
+    This user is redirected to this view after payment error
+    """
+    # Fetch related payment
+    payment: Payment = Payment.objects.filter(lyfpay_shop_reference=token).first()
     if payment:
-        if payment.lyfpay_status == Payment.LyfpayStatus.WAITING:
+        # Update payment if it was not already updated
+        if payment.lyfpay_updated_at is None:
             payment.lyfpay_updated_at = timezone.now()
             payment.lyfpay_status = Payment.LyfpayStatus.FAILED
             payment.save()
-        
+            
+        # Check that the payment has failed
+        if payment.lyfpay_status != Payment.LyfpayStatus.FAILED:
+            return HttpResponseForbidden()
+
+        # Fetch the origin related handler
         handler = get_handler(payment.origin, 'error')
         if handler:
-            return handler(payment)
+            return handler(req, payment)
         else:
             bugsnag.notify(f'No payment handler found for origin `{payment.origin}` and event `error`', metadata={'payment': payment.__dict__()})
     raise Http404()
-

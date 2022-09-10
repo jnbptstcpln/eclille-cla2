@@ -20,7 +20,7 @@ class PaymentRequest:
                 'origin': origin,
                 'reference': reference,
                 'lyfpay_amount': lyfpay_amount,
-                'exp': datetime.utcnow() + timedelta(minutes=5)  # Token is valid for 5 minutes
+                'exp': datetime.utcnow() + timedelta(hours=24)  # Token is valid for 24 hours
             },
             key=settings.SECRET_KEY,
             algorithm="HS256"

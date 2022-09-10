@@ -17,6 +17,8 @@ from django.utils import timezone
 
 from cla_ticketing.utils import LockingManager
 
+from cla_lyfpay.models import Payment
+from cla_lyfpay.jwt import PaymentRequest
 
 class FilePath:
 
@@ -51,6 +53,7 @@ class AbstractEvent(models.Model):
     contributor_ticketing_href = models.URLField(blank=True, null=True, verbose_name="Lien vers la billeterie d'encaissement pour les cotisants", help_text="Laisser vide si aucune")
     non_contributor_ticketing_href = models.URLField(blank=True, null=True, verbose_name="Lien vers la billeterie d'encaissement pour les non cotisants", help_text="Laisser vide si aucune")
     managers = models.ManyToManyField(User, related_name="+", verbose_name="Administrateurs", help_text="Les administrateurs ont la possiblité de modifier les informations de l'événement ainsi que de gérer la liste des inscrits", blank=True)
+    use_integrated_payment = models.BooleanField(default=False, verbose_name="Utiliser le mode de paiement intégré plutôt que la billeterie")
 
     @property
     def are_registrations_opened(self):
@@ -99,6 +102,7 @@ class AbstractRegistration(models.Model):
     created_on = models.DateTimeField(auto_now_add=True, verbose_name="Inscrit le")
     paid = models.BooleanField(default=False, verbose_name="A payé")
     mean_of_paiement = models.CharField(max_length=100, verbose_name="Moyen de paiement", choices=MeansOfPaiement.choices, null=True, blank=True)
+    lyfpay_payment = models.ForeignKey(Payment, on_delete=models.SET_NULL, null=True, blank=True, editable=False)
 
     def __str__(self):
         return f"{self.last_name.upper()} {self.first_name}"
@@ -402,6 +406,14 @@ class DancingPartyRegistration(AbstractRegistration):
             algorithm="HS256"
         )
 
+    @property
+    def payment_jwt(self):
+        return PaymentRequest.get_jwt(
+            wallet=f'Soirée dansante #{self.dancing_party.pk}',
+            origin=Payment.Origin.DANCING_PARTY_REGISTRATION,
+            reference=self.pk,
+            lyfpay_amount=int(self.price*100)
+        )
 
 class DancingPartyRegistrationCustomFieldValue(AbstractRegistrationCustomFieldValue):
     registration = models.ForeignKey(DancingPartyRegistration, on_delete=models.CASCADE, related_name="custom_fields", editable=False)

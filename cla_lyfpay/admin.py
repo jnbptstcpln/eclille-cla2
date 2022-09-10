@@ -14,6 +14,7 @@ from cla_lyfpay.models import *
 
 @admin.register(Payment)
 class PaymentAdmin(admin.ModelAdmin):
+    ordering = ('-created_at',)
     list_display = ['__str__', 'get_amount_display', 'created_at', 'created_by', 'lyfpay_status', 'wallet']
     readonly_fields = [
         'wallet',
