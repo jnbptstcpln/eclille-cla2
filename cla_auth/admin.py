@@ -104,10 +104,10 @@ class UserAdmin(UserAdmin):
         UserInfosInline,
         MembershipInline,
     ]
-    list_display = ('username', 'first_name', 'last_name', 'cursus', 'promo', 'is_activated', 'is_validated')
+    list_display = ('username', 'first_name', 'last_name', 'cursus', 'promo', 'is_activated', 'is_validated', 'paiement_validated')
 
     class ValidatedFilter(SimpleListFilter):
-        title = 'statut'
+        title = 'statut du compte'
         parameter_name = 'validated'
 
         def lookups(self, request, model_admin):
@@ -121,21 +121,7 @@ class UserAdmin(UserAdmin):
                     return queryset.filter(infos__valid_until__gt=timezone.now())
                 elif val == 2:
                     return queryset.filter(infos__activated_on__isnull=False)
-            return queryset
-
-    class PromotionFilter(SimpleListFilter):
-        title = 'promotion'
-        parameter_name = 'promo'
-
-        def lookups(self, request, model_admin):
-            y = current_school_year()
-            return [(y + i, y + i) for i in range(6)]
-
-        def queryset(self, request, queryset):
-            if self.value() is not None:
-                return queryset.filter(infos__promo=self.value())
-            else:
-                return queryset
+            return queryset    
 
     class SchoolFilter(SimpleListFilter):
         title = 'école'
@@ -149,8 +135,39 @@ class UserAdmin(UserAdmin):
                 return queryset.filter(infos__email_school__endswith=f"@{self.value()}")
             else:
                 return queryset
+    
+    class PromotionFilter(SimpleListFilter):
+        title = 'promotion'
+        parameter_name = 'promo'
 
-    list_filter = (ValidatedFilter, PromotionFilter, SchoolFilter, 'is_staff')
+        def lookups(self, request, model_admin):
+            if request.GET.get(UserAdmin.SchoolFilter.parameter_name):
+                y = current_school_year()
+                return [(y + i, y + i) for i in range(6)]
+            return []
+
+        def queryset(self, request, queryset):
+            if self.value() is not None:
+                return queryset.filter(infos__promo=self.value())
+            else:
+                return queryset
+    
+    class PaiementFilter(SimpleListFilter):
+        title = 'cotisation'
+        parameter_name = 'paiement'
+
+        def lookups(self, request, model_admin):
+            return [(1, "Paiement non validé")]
+
+        def queryset(self, request, queryset):
+            raw_val = self.value()
+            if raw_val is not None:
+                val = int(raw_val)
+                if val == 1:
+                    return queryset.filter(membership__paid_validated=False)
+            return queryset
+    
+    list_filter = (SchoolFilter, PromotionFilter, PaiementFilter, ValidatedFilter, 'is_staff')
     search_fields = ('username', 'first_name', 'last_name', 'email')
     form = UserChangeForm
     add_form = UserCreationForm
@@ -173,13 +190,13 @@ class UserAdmin(UserAdmin):
     def is_activated(self, obj: User):
         return obj.infos.activated_on is not None
 
-    is_activated.short_description = 'Compté activé'
+    is_activated.short_description = 'Activé'
     is_activated.boolean = True
 
     def is_validated(self, obj: User):
         return obj.infos.valid_until is not None and obj.infos.valid_until > timezone.now()
 
-    is_validated.short_description = 'Compte validé'
+    is_validated.short_description = 'Validé'
     is_validated.boolean = True
 
     def account_status(self, obj: User):
@@ -224,6 +241,14 @@ class UserAdmin(UserAdmin):
         )
 
     link_activation.short_description = 'Activation du compte'
+    
+    def paiement_validated(self, obj: User):
+        if hasattr(obj, 'membership'):
+            return obj.membership.paid_validated
+        return False
+
+    paiement_validated.short_description = 'Cotisation'
+    paiement_validated.boolean = True
 
     def get_fieldsets(self, request, obj: User = None):
         fieldsets = copy.deepcopy(super().get_fieldsets(request, obj))
