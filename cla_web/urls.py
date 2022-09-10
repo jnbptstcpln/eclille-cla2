@@ -39,6 +39,7 @@ urlpatterns = [
     path('associations/', include("cla_association.urls")),
     path('evenements/', include("cla_event.urls")),
     path('reservations/', include("cla_reservation.urls")),
+    path('lyfpay/', include("cla_lyfpay.urls")),
 
     # Flat pages
     path('privacy/', views.flatpage, {'url': '/privacy/'}, name='privacy'),

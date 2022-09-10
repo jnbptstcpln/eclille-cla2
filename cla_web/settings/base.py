@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     'cla_association.apps.ClaAssociationConfig',
     'cla_event.apps.ClaEventConfig',
     'cla_reservation.apps.ClaReservationConfig',
+    'cla_lyfpay.apps.ClaLyfpayConfig'
 ]
 
 MIDDLEWARE = [
@@ -225,3 +226,7 @@ BUGSNAG = {
     'release_stage': config('BUGSNAG_STAGE', 'development'),
     'notify_release_stages': ('production',)
 }
+
+
+LYFPAY_POS = config('LYFPAY_POS')
+LYFPAY_KEY= config('LYFPAY_KEY')
