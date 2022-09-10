@@ -1,4 +1,5 @@
 import csv
+from datetime import timedelta
 from django.contrib import admin
 from django.contrib.admin import SimpleListFilter
 from django.contrib.auth.models import User
@@ -10,6 +11,7 @@ from django.template.loader import render_to_string
 from django.shortcuts import resolve_url, get_object_or_404
 from django.urls import path
 from django.utils.safestring import mark_safe
+from django.utils import timezone
 
 from cla_web.utils import current_school_year
 from .models import RegistrationSession, Registration, ImageRightAgreement
@@ -207,3 +209,62 @@ class ImageRightAgreementAdmin(admin.ModelAdmin):
         return "Aucun compte correspondant"
 
     account.short_description = "Compte lié"
+
+
+@admin.register(Registration)
+class RegistrationAdmin(admin.ModelAdmin):
+    
+    class SessionFilter(SimpleListFilter):
+        title = 'session'
+        parameter_name = 'session'
+
+        def lookups(self, request, model_admin):
+            return [
+                (r.pk, str(r))
+            for r in RegistrationSession.objects.filter(date_start__gte=timezone.now() - timedelta(days=365*5))]
+
+        def queryset(self, request, queryset):
+            raw_val = self.value()
+            if raw_val:
+                return queryset.filter(session__pk=raw_val)
+            return queryset
+    
+    class AccountFilter(SimpleListFilter):
+        title = 'compte créé'
+        parameter_name = 'account'
+
+        def lookups(self, request, model_admin):
+            return [(1, "Compte créé"), (2, "Compte non créé")]
+
+        def queryset(self, request, queryset):
+            raw_val = self.value()
+            if raw_val is not None:
+                val = int(raw_val)
+                if val == 1:
+                    return queryset.filter(account__isnull=False)
+                elif val == 2:
+                    return queryset.filter(account__isnull=True)
+            return queryset
+        
+    list_filter = (SessionFilter, AccountFilter)
+    list_display = ['__str__', 'has_pack', 'type', 'datetime_registration', 'is_linked_to_an_account']
+    search_fields = ('first_name', 'last_name', 'email', 'email_school')
+    
+    def is_linked_to_an_account(self, obj: Registration):
+            return obj.account is not None
+    is_linked_to_an_account.short_description = "Compte créé ?"
+    is_linked_to_an_account.boolean = True
+
+    def has_pack(self, obj: Registration):
+        return obj.pack
+    has_pack.short_description = "Pack ?"
+    has_pack.boolean = True
+
+    def has_module_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request: HttpRequest, obj = None) -> bool:
+        if obj:
+            if obj.account:
+                return False
+        return super().has_delete_permission(request, obj)

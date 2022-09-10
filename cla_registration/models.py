@@ -183,7 +183,7 @@ class Registration(models.Model):
     phone = models.CharField(max_length=20, verbose_name="Numéro de téléphone")
     birthdate = models.DateField(verbose_name="Date de naissance")
     school = models.TextField(max_length=255, choices=SchoolDomains.choices, verbose_name="Ecole")
-    original_school = models.CharField(max_length=255, verbose_name="École/université d'origine", null=True)
+    original_school = models.CharField(max_length=255, verbose_name="École/université d'origine", null=True, blank=True)
     pack = models.BooleanField(verbose_name="L'étudiant a choisi de cotiser avec le pack")
     contribution = models.PositiveIntegerField(verbose_name="Montant de cotisation à régler")
     rgpd_agreement = models.BooleanField(verbose_name="L'étudiant a accepté que ses informations soient stockées et utilisées par Centrale Lille Associations")
