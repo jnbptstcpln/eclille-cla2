@@ -2,7 +2,15 @@ import uuid
 
 from django.contrib.auth.models import User
 from django.db import models
-from dateutil import tz
+
+
+class Merchant(models.Model):
+    name = models.CharField(primary_key=True, max_length=100)
+    pos_uuid = models.CharField(max_length=100)
+    security_key = models.CharField(max_length=100)
+    
+    def __str__(self) -> str:
+        return self.name
 
 
 class Wallet(models.Model):
@@ -12,6 +20,7 @@ class Wallet(models.Model):
 
     def __str__(self) -> str:
         return self.name
+
 
 class Payment(models.Model):
     
@@ -36,6 +45,7 @@ class Payment(models.Model):
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="payments", editable=False)
     
     wallet = models.ForeignKey(Wallet, on_delete=models.CASCADE, related_name='payments')
+    merchant = models.ForeignKey(Merchant, on_delete=models.CASCADE, related_name='payments')
     
     origin = models.CharField(max_length=50, choices=Origin.choices, editable=False)
     reference = models.CharField(max_length=250, editable=False)
