@@ -226,7 +226,3 @@ BUGSNAG = {
     'release_stage': config('BUGSNAG_STAGE', 'development'),
     'notify_release_stages': ('production',)
 }
-
-
-LYFPAY_POS = config('LYFPAY_POS')
-LYFPAY_KEY= config('LYFPAY_KEY')
