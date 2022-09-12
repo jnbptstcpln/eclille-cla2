@@ -10,7 +10,7 @@ from django.utils import timezone
 from django.contrib.auth.decorators import login_required
 
 
-from cla_lyfpay.models import Wallet, Payment
+from cla_lyfpay.models import Merchant, Wallet, Payment
 from cla_lyfpay.jwt import PaymentRequest
 from cla_lyfpay.api import LyfpayAPI
 from cla_lyfpay.handlers import get_handler
@@ -38,6 +38,11 @@ def payment(req: HttpRequest, token):
 
     if not payment_request:
         return HttpResponseBadRequest()
+    
+    # Retrieve merchant
+    merchant: Merchant = Merchant.objects.filter(name=payment_request.merchant).first()
+    if not merchant:        
+        return HttpResponseBadRequest()
 
     # Generate a unique identifier for this payment
     lyfpay_shop_reference = shortuuid.uuid()
@@ -61,18 +66,19 @@ def payment(req: HttpRequest, token):
         "onCancel": f"https://{settings.ALLOWED_HOSTS[0]}{resolve_url('cla_lyfpay:cancel', lyfpay_shop_reference)}",
         "onError": f"https://{settings.ALLOWED_HOSTS[0]}{resolve_url('cla_lyfpay:error', lyfpay_shop_reference)}",
         "onSuccess": f"https://{settings.ALLOWED_HOSTS[0]}{resolve_url('cla_lyfpay:success', lyfpay_shop_reference)}",
-        "posUuid": settings.LYFPAY_POS,
+        "posUuid": merchant.pos_uuid,
         "shopOrderReference": f'{payment_request.origin}{payment_request.reference}',
         "shopReference": lyfpay_shop_reference,
         "timestamp": str(int(time.time())),
         "version": "v2.0"
     }
-
+    
     # Get or create the attached wallet
     wallet, created = Wallet.objects.get_or_create(name=payment_request.wallet)
 
     # Set the request's seal
     lyfpay_params['mac'] = LyfpayAPI.get_payment_seal(
+        security_key=merchant.security_key,
         lang=lyfpay_params['lang'],
         version=lyfpay_params['version'],
         timestamp=lyfpay_params['timestamp'],
@@ -92,6 +98,7 @@ def payment(req: HttpRequest, token):
 
     # Save this payment attempt
     Payment.objects.create(
+        merchant=merchant,
         wallet=wallet,
         origin=payment_request.origin,
         reference=payment_request.reference,
@@ -125,10 +132,15 @@ def validate(req: HttpRequest):
         'additionalData': req.POST["additionalData"],
         'mac': req.POST["mac"]
     }
+    
+    # Fetch related payment
+    payment: Payment = Payment.objects.filter(lyfpay_shop_reference=data['shopReference']).first()
+    assert payment, f'No payment found for shopReference `{data["shopReference"]}`'
 
     try:
         # Build the seal
         seal = LyfpayAPI.get_handle_seal(
+            security_key=payment.merchant.security_key,
             posUuid=data['posUuid'],
             shopReference=data['shopReference'],
             shopOrderReference=data['shopOrderReference'],
@@ -141,11 +153,7 @@ def validate(req: HttpRequest):
             additionalData=data['additionalData']
         )
         # Authenticate the request by comparing seals
-        assert data['mac'].upper() == seal, f"Seals don't match (`{seal}`)"
-
-        # Fetch related payment
-        payment: Payment = Payment.objects.filter(lyfpay_shop_reference=data['shopReference']).first()
-        assert payment, f'No payment found for shopReference `{data["shopReference"]}`'
+        assert data['mac'].upper() == seal, f"Seals don't match (`{seal}`)"        
 
         # Update payment with Lyfpay infos
         payment.lyfpay_updated_at = timezone.now()

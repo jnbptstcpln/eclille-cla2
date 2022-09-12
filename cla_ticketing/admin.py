@@ -681,7 +681,7 @@ class DancingPartyAdmin(admin.ModelAdmin):
                     'fields': (
                         ('event_starts_on', 'event_ends_on'),
                         ('registration_starts_on', 'registration_ends_on'),
-                        'use_integrated_payment', 'contributor_ticketing_href', 'colleges', 'allow_non_contributor_registration', 'description'
+                        'colleges', 'allow_non_contributor_registration', 'description'
                     ) if obj is not None and obj.pk is not None else (
                         'contributor_ticketing_href', 'colleges', 'description'
                     ),
@@ -695,6 +695,13 @@ class DancingPartyAdmin(admin.ModelAdmin):
                 "Administration de l'événement",
                 {
                     'fields': ('managers', 'scanners'),
+                    'classes': ('collapse',),
+                }
+            ])
+            fieldsets.append([
+                "Configuration du paiement",
+                {
+                    'fields': (('use_integrated_payment', 'lyfpay_merchant'), 'contributor_ticketing_href',),
                     'classes': ('collapse',),
                 }
             ])

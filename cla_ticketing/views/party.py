@@ -11,7 +11,7 @@ from django.http import HttpRequest, Http404, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, resolve_url, render
 from django.utils import timezone
 from django.utils.decorators import method_decorator
-from django.views.generic import View, CreateView, TemplateView, FormView
+from django.views.generic import View, CreateView, TemplateView, FormView, RedirectView
 
 from cla_auth.mixins import IsContributorMixin
 from cla_ticketing.mixins.party import DancingPartyRegistrationMixin, DancingPartyCollegeMixin
@@ -163,6 +163,57 @@ class ContributorRegistrationDetailView(AbstractRegistrationDetailView):
 
 class NonContributorRegistrationDetailView(AbstractRegistrationDetailView):
     template_name = "cla_ticketing/party/view_registration_noncontributor.html"
+
+    def get_registration(self):
+        return self.party.registrations.filter(guarantor=self.request.user).first()
+
+
+class AbstractRegistrationPayView(IsContributorMixin, DancingPartyRegistrationMixin, RedirectView):
+    registration: DancingPartyRegistration = None
+
+    def get_registration(self):
+        pass
+    
+    def get_redirect_url(self, *args, **kwargs):
+        if not self.registration.dancing_party.use_integrated_payment:
+            return resolve_url(f'cla_ticketing:party_detail_{"contributor" if self.registration.is_contributor else "noncontributor"}', self.registration.dancing_party.slug)
+        
+        # Fetch the payment JWT
+        payment_jwt = self.registration.payment_jwt
+        # Maybe the dancing party integrated payment was not properly configured
+        if not payment_jwt:
+            messages.error(self.request, "Une erreur s'est produite lors de l'initialisation du paiment, veuillez réessayer plus tard.")
+            return resolve_url(f'cla_ticketing:party_detail_{"contributor" if self.registration.is_contributor else "noncontributor"}', self.registration.dancing_party.slug)
+        
+        return resolve_url('cla_lyfpay:payment', payment_jwt)
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        if request.user.is_authenticated:
+            self.registration = self.get_registration()
+            if self.registration is None:
+                raise Http404()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'registration': self.registration,
+            'back_href': self.get_back_href()
+        })
+        return context
+
+    def get_back_href(self):
+        if self.request.GET.get('redirect') == "lobby":
+            return resolve_url("cla_member:ticketing")
+        return resolve_url("cla_ticketing:party_view", self.party.slug)
+
+class ContributorRegistrationPayView(AbstractRegistrationPayView):
+
+    def get_registration(self):
+        return self.party.registrations.filter(user=self.request.user).first()
+
+
+class NonContributorRegistrationPayView(AbstractRegistrationPayView):
 
     def get_registration(self):
         return self.party.registrations.filter(guarantor=self.request.user).first()

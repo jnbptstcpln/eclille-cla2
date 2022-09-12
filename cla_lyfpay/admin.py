@@ -32,3 +32,8 @@ class PaymentAdmin(admin.ModelAdmin):
     def get_amount_display(self, obj: Payment):
         return obj.amount_display
     get_amount_display.short_description = 'Montant'
+
+
+@admin.register(Merchant)
+class MerchantAdmin(admin.ModelAdmin):
+    pass

@@ -17,9 +17,11 @@ urlpatterns = [
     path("<str:party_slug>/inscription/non-cotisant", party.NonContributorRegistrationCreateView.as_view(), name="party_register_noncontributor"),
 
     path("<str:party_slug>/cotisant", party.ContributorRegistrationDetailView.as_view(), name="party_detail_contributor"),
+    path("<str:party_slug>/cotisant/pay", party.ContributorRegistrationPayView.as_view(), name="party_pay_contributor"),
     path("<str:party_slug>/cotisant/modifier", party.ContributorRegistrationChangeView.as_view(), name="party_detail_contributor_change"),
 
     path("<str:party_slug>/non-cotisant", party.NonContributorRegistrationDetailView.as_view(), name="party_detail_noncontributor"),
+    path("<str:party_slug>/non-cotisant/pay", party.NonContributorRegistrationPayView.as_view(), name="party_pay_noncontributor"),
     path("<str:party_slug>/non-cotisant/modifier", party.NonContributorRegistrationChangeView.as_view(), name="party_detail_noncontributor_change"),
 
     path("<str:party_slug>/validation", party.ValidateRegistrationView.as_view(), name="party_validate"),

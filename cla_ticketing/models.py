@@ -17,7 +17,7 @@ from django.utils import timezone
 
 from cla_ticketing.utils import LockingManager
 
-from cla_lyfpay.models import Payment
+from cla_lyfpay.models import Payment, Merchant
 from cla_lyfpay.jwt import PaymentRequest
 
 class FilePath:
@@ -54,6 +54,7 @@ class AbstractEvent(models.Model):
     non_contributor_ticketing_href = models.URLField(blank=True, null=True, verbose_name="Lien vers la billeterie d'encaissement pour les non cotisants", help_text="Laisser vide si aucune")
     managers = models.ManyToManyField(User, related_name="+", verbose_name="Administrateurs", help_text="Les administrateurs ont la possiblité de modifier les informations de l'événement ainsi que de gérer la liste des inscrits", blank=True)
     use_integrated_payment = models.BooleanField(default=False, verbose_name="Utiliser le mode de paiement intégré plutôt que la billeterie")
+    lyfpay_merchant = models.ForeignKey(Merchant, on_delete=models.SET_NULL, null=True, blank=True, related_name='+', verbose_name="Compte Lyfpay d'encaissement")
 
     @property
     def are_registrations_opened(self):
@@ -408,7 +409,11 @@ class DancingPartyRegistration(AbstractRegistration):
 
     @property
     def payment_jwt(self):
+        if not self.dancing_party.lyfpay_merchant:
+            return None
+        
         return PaymentRequest.get_jwt(
+            merchant=self.dancing_party.lyfpay_merchant.name,
             wallet=f'Soirée dansante #{self.dancing_party.pk}',
             origin=Payment.Origin.DANCING_PARTY_REGISTRATION,
             reference=self.pk,

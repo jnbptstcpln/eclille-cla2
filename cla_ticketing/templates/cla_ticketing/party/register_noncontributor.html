@@ -43,7 +43,13 @@
                     <p>La réservation de la place de votre invité s'effectue en 2 étapes :</p>
                     <ul>
                         <li><b>Premièrement</b> vous remplissez le formulaire suivant</li>
-                        <li><b>Puis</b> vous réglez votre place sur la billetterie qui vous sera indiquée</li>
+                        {% if party.use_integrated_payment %}
+                            <li><b>Puis</b> vous pourrez procéder au règlement de votre place</li>
+                        {% elif party.contributor_ticketing_href %}
+                            <li><b>Puis</b> vous réglez votre place sur la billetterie qui vous sera indiquée</li>
+                        {% else %}
+                            <li><b>Puis</b> vous réglez votre place selon les instructions qui vous seront communiqués plus tard</li>
+                        {% endif %}
                     </ul>
                     <div class="mt-3 mx-auto border-1-grey p-4">
                         {% csrf_token %}

@@ -7,20 +7,22 @@ from dataclasses import dataclass
 @dataclass
 class PaymentRequest:
 
+    merchant: str
     wallet: str
     origin: str
     reference: str
     lyfpay_amount: int
     
     @classmethod
-    def get_jwt(cls, wallet, origin, reference, lyfpay_amount):
+    def get_jwt(cls, merchant, wallet, origin, reference, lyfpay_amount):
         return jwt.encode(
             payload={
+                'merchant': merchant,
                 'wallet': wallet,
                 'origin': origin,
                 'reference': reference,
                 'lyfpay_amount': lyfpay_amount,
-                'exp': datetime.utcnow() + timedelta(hours=24)  # Token is valid for 24 hours
+                'exp': datetime.utcnow() + timedelta(seconds=10)  # Token is valid for 10 seconds
             },
             key=settings.SECRET_KEY,
             algorithm="HS256"
