@@ -178,7 +178,7 @@ def validate(req, identifier, ticket_jwt):
                 ticket.used = True
                 ticket.save()
 
-                if ticket.service.authorization_required and not ticket.user.infos.is_valid():
+                if ticket.service.validation_required and not ticket.user.infos.is_valid():
                     return _get_error_json_response(
                         "This user has not validated his account"
                     )
