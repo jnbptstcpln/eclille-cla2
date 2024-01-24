@@ -41,7 +41,9 @@ urlpatterns = [
     path("privacy/", views.flatpage, {"url": "/privacy/"}, name="privacy"),
     path("legal/", views.flatpage, {"url": "/legal/"}, name="legal"),
     path("faq/", views.flatpage, {"url": "/faq/"}, name="faq"),
-    # re_path(r'^(?P<url>.*/)$', views.flatpage)  # Catch all URLs and redirect them to flatpage module
+    re_path(
+        r"^(?P<url>.*/)$", views.flatpage
+    ),  # Catch all URLs and redirect them to flatpage module
 ]
 
 if settings.DEBUG:
