@@ -4,4 +4,4 @@ from cla_auth.models import *
 
 
 def cursus(req):
-    return JsonResponse({"cursus": UserInfos.Colleges.choices})
+    return JsonResponse(data={"cursus": UserInfos.Colleges.choices}, status=200)
