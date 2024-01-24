@@ -24,27 +24,24 @@ from cla_auth.views.session import login
 
 urlpatterns = [
     path("admin/login/", login),  # Override default login
-    path('admin/', admin.site.urls),
-
+    path("admin/", admin.site.urls),
     # Dependencies
-    path('summernote/', include('django_summernote.urls')),
-    path('qr_code/', include('qr_code.urls', namespace="qr_code")),
-
+    path("summernote/", include("django_summernote.urls")),
+    path("qr_code/", include("qr_code.urls", namespace="qr_code")),
     # Project's apps
-    path('', include("cla_auth.urls")),
-    path('', include("cla_public.urls")),
-    path('', include("cla_registration.urls")),
-    path('espace-adherent/', include("cla_member.urls")),
-    path('billetteries/', include("cla_ticketing.urls")),
-    path('associations/', include("cla_association.urls")),
-    path('evenements/', include("cla_event.urls")),
-    path('reservations/', include("cla_reservation.urls")),
-
+    path("", include("cla_auth.urls")),
+    path("", include("cla_public.urls")),
+    path("", include("cla_registration.urls")),
+    path("espace-adherent/", include("cla_member.urls")),
+    path("billetteries/", include("cla_ticketing.urls")),
+    path("associations/", include("cla_association.urls")),
+    path("evenements/", include("cla_event.urls")),
+    path("reservations/", include("cla_reservation.urls")),
     # Flat pages
-    path('privacy/', views.flatpage, {'url': '/privacy/'}, name='privacy'),
-    path('legal/', views.flatpage, {'url': '/legal/'}, name='legal'),
-    path('faq/', views.flatpage, {'url': '/faq/'}, name='faq'),
-    re_path(r'^(?P<url>.*/)$', views.flatpage)  # Catch all URLs and redirect them to flatpage module
+    path("privacy/", views.flatpage, {"url": "/privacy/"}, name="privacy"),
+    path("legal/", views.flatpage, {"url": "/legal/"}, name="legal"),
+    path("faq/", views.flatpage, {"url": "/faq/"}, name="faq"),
+    # re_path(r'^(?P<url>.*/)$', views.flatpage)  # Catch all URLs and redirect them to flatpage module
 ]
 
 if settings.DEBUG:
@@ -53,7 +50,7 @@ if settings.DEBUG:
 admin.site.site_header = "Centrale Lille Associations"
 admin.site.site_title = "Espace d'administration"
 
-handler400 = 'cla_web.error_views.error_400'
-handler403 = 'cla_web.error_views.error_403'
-handler404 = 'cla_web.error_views.error_404'
-handler500 = 'cla_web.error_views.error_500'
+handler400 = "cla_web.error_views.error_400"
+handler403 = "cla_web.error_views.error_403"
+handler404 = "cla_web.error_views.error_404"
+handler500 = "cla_web.error_views.error_500"
