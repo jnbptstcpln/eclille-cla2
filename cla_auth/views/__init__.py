@@ -4,5 +4,6 @@ from . import (
     validation,
     reset,
     service,
-    debug
+    debug,
+    docs,
 )
