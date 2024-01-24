@@ -39,7 +39,7 @@ urlpatterns = [
         name="service_validate",
     ),
     # Docs
-    path("docs/cursus", views.docs.cursus, name="docs_cursus"),
+    path("__docs/cursus/", views.docs.cursus, name="docs_cursus"),
     # Debugging
     path(
         "__cla_auth/debug/import_legacy_users",
