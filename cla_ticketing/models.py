@@ -358,10 +358,10 @@ class DancingPartyRegistration(AbstractRegistration):
         @classmethod
         def get_price(cls, student_status, type):
             return {
-                (AbstractRegistration.StudentStatus.CONTRIBUTOR, cls.SOFT): 4,
-                (AbstractRegistration.StudentStatus.CONTRIBUTOR, cls.HARD): 6,
-                (AbstractRegistration.StudentStatus.NON_CONTRIBUTOR, cls.SOFT): 8,
-                (AbstractRegistration.StudentStatus.NON_CONTRIBUTOR, cls.HARD): 10
+                (AbstractRegistration.StudentStatus.CONTRIBUTOR, cls.SOFT): 6,
+                (AbstractRegistration.StudentStatus.CONTRIBUTOR, cls.HARD): 8,
+                (AbstractRegistration.StudentStatus.NON_CONTRIBUTOR, cls.SOFT): 10,
+                (AbstractRegistration.StudentStatus.NON_CONTRIBUTOR, cls.HARD): 12
             }.get((student_status, type))
 
     dancing_party = models.ForeignKey(DancingParty, on_delete=models.CASCADE, related_name="registrations", verbose_name="Soirée dansante", editable=False)
