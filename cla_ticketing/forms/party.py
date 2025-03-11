@@ -34,8 +34,8 @@ class ContributorRegistrationForm(AbstractRegistrationForm):
         super().__init__(*args, **kwargs)
 
         self.fields['type'].choices = (
-            (DancingPartyRegistration.Types.HARD.value, f"{DancingPartyRegistration.Types.HARD.label} - 6€"),
-            (DancingPartyRegistration.Types.SOFT.value, f"{DancingPartyRegistration.Types.SOFT.label} - 4€")
+            (DancingPartyRegistration.Types.HARD.value, f"{DancingPartyRegistration.Types.HARD.label} - 8€"),
+            (DancingPartyRegistration.Types.SOFT.value, f"{DancingPartyRegistration.Types.SOFT.label} - 6€")
         )
 
 
@@ -48,8 +48,8 @@ class NonContributorRegistrationForm(AbstractRegistrationForm):
         super().__init__(*args, **kwargs)
 
         self.fields['type'].choices = (
-            (DancingPartyRegistration.Types.HARD.value, f"{DancingPartyRegistration.Types.HARD.label} - 10€"),
-            (DancingPartyRegistration.Types.SOFT.value, f"{DancingPartyRegistration.Types.SOFT.label} - 8€")
+            (DancingPartyRegistration.Types.HARD.value, f"{DancingPartyRegistration.Types.HARD.label} - 12€"),
+            (DancingPartyRegistration.Types.SOFT.value, f"{DancingPartyRegistration.Types.SOFT.label} - 10€")
         )
 
     def clean_first_name(self):
