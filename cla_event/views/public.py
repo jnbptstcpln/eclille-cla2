@@ -35,7 +35,7 @@ class IndexView(PlanningMixin, ClaMemberModuleMixin, TemplateView):
 
 class IcsFileView(PlanningMixin, JWTMixin, View):
 
-    jwt_payload_key = "cla_event:index:event"
+    jwt_payload_key = "cla_event:index:event:v2"
 
     def get(self, request, *args, **kwargs):
         cal = Calendar()
