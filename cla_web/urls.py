@@ -37,6 +37,8 @@ urlpatterns = [
     path("associations/", include("cla_association.urls")),
     path("evenements/", include("cla_event.urls")),
     path("reservations/", include("cla_reservation.urls")),
+    # Redirects
+    path("charte/", lambda _: redirect("https://drive.google.com/file/d/155HTvtLq4Q4GcmRjwiRHN4Y2ieHjRBUY/")),
     # Flat pages
     path("privacy/", views.flatpage, {"url": "/privacy/"}, name="privacy"),
     path("legal/", views.flatpage, {"url": "/legal/"}, name="legal"),
