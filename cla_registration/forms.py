@@ -108,6 +108,10 @@ class EnsclRegistrationForm(AbstractRegistrationForm):
 
 class RegistrationAdminForm(forms.ModelForm):
 
+    PAYMENT_INSTALLMENTS_CHOICES = [(1, "En 1 fois"), (2, "En 2 fois"), (3, "En 3 fois")]
+    PAYMENT_MONTHS_CHOICES = [(1, "Étalé sur 1 mois"), (2, "Étalé sur 2 mois"), (3, "Étalé sur 3 mois"),
+                              (4, "Étalé sur 4 mois"), (5, "Étalé sur 5 mois"), (6, "Étalé sur 6 mois")]
+
     class Meta:
         model = Registration
         fields = [
@@ -122,7 +126,8 @@ class RegistrationAdminForm(forms.ModelForm):
             'amount',
             'paid_on',
             'paid_by',
-            'paiement_method',
+            'payment_installments',
+            'payment_months',
             'paid_validated'
         ]
 
@@ -151,7 +156,16 @@ class RegistrationAdminForm(forms.ModelForm):
     amount = forms.IntegerField(label="Montant de la cotisation")
     paid_on = forms.DateField(label="Date du paiement")
     paid_by = forms.ChoiceField(label="Moyen de paiement", choices=UserMembership.MeanOfPayment.choices)
-    paiement_method = forms.ChoiceField(label="Méthode de paiement", choices=UserMembership.PaymentMethod.choices)
+    payment_installments = forms.TypedChoiceField(
+        label="Paiement en X fois",
+        choices=PAYMENT_INSTALLMENTS_CHOICES,
+        coerce=int
+    )
+    payment_months = forms.TypedChoiceField(
+        label="Étalé sur X mois",
+        choices=PAYMENT_MONTHS_CHOICES,
+        coerce=int
+    )
     paid_validated = forms.BooleanField(label="Paiement effectué", required=False, help_text="Ne pas cocher si le paiement sera effectué plus tard, pour les virements par exemple")
 
 
