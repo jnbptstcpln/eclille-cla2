@@ -778,14 +778,6 @@ class UserMembership(models.Model):
         TRANSFER = "transfer", "Virement"
         CARD = "card", "Carte bancaire"
 
-    class PaymentMethod(models.TextChoices):
-        CASH = "cash", "En une fois"
-        MONTH_2 = "month-2", "En 2 fois (étalé sur 2 mois)"
-        MONTH_3 = "month-3", "En 3 fois (étalé sur 3 mois)"
-        MONTH_4 = "month-4", "En 4 fois (étalé sur 4 mois)"
-        MONTH_5 = "month-5", "En 5 fois (étalé sur 5 mois)"
-        MONTH_6 = "month-6", "En 6 fois (étalé sur 6 mois)"
-
     user = models.OneToOneField(
         User, on_delete=models.CASCADE, related_name="membership", to_field="username"
     )
@@ -800,12 +792,19 @@ class UserMembership(models.Model):
         blank=True,
     )
     paid_validated = models.BooleanField(default=False, verbose_name="Paiement validé")
-    paiement_method = models.CharField(
-        max_length=100,
-        choices=PaymentMethod.choices,
-        verbose_name="Méthode de paiement",
+    PAYMENT_INSTALLMENTS_CHOICES = [(1, "En 1 fois"), (2, "En 2 fois"), (3, "En 3 fois")]
+    payment_installments = models.PositiveSmallIntegerField(
+        choices=PAYMENT_INSTALLMENTS_CHOICES,
         blank=True,
         null=True,
+        verbose_name="Paiement en X fois",
+    )
+    PAYMENT_MONTHS_CHOICES = [(1, "Étalé sur 1 mois"), (2, "Étalé sur 2 mois"), (3, "Étalé sur 3 mois"), (4, "Étalé sur 4 mois"), (5, "Étalé sur 5 mois"), (6, "Étalé sur 6 mois")]
+    payment_months = models.PositiveSmallIntegerField(
+        choices=PAYMENT_MONTHS_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Étalé sur X mois",
     )
     refunded = models.BooleanField(
         default=False, blank=True, verbose_name="La cotisation a été remboursée"
@@ -815,6 +814,11 @@ class UserMembership(models.Model):
     )
     refunded_on = models.DateField(
         null=True, blank=True, verbose_name="Date du remboursement"
+    )
+    alumni_pack = models.BooleanField(
+        null=True,  # None pour les élèves ayant cotisé avant l'ajout de ce champ
+        verbose_name="A cotisé avec le pack alumni",
+        blank=True,
     )
 
     def __str__(self):

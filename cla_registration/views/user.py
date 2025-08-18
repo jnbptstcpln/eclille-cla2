@@ -122,7 +122,16 @@ class CentralePackDDRegistrationView(AbstractPackRegistrationView):
     school_domain = Registration.SchoolDomains.CENTRALE
     registration_type = Registration.Types.CENTRALE_DD_PACK
     contribution = 265
-    description = "Étudiante ou étudiant en double diplôme à l'école Centrale de Lille, vous souhaitez adhérer à Centrale Lille Associations et à Centrale Lille Alumni en profitant du pack CLA+Alumni."
+    description = "Étudiante ou étudiant en double diplôme à l'école Centrale de Lille en provenance d'un établissement français, vous souhaitez adhérer à Centrale Lille Associations et à Centrale Lille Alumni en profitant du pack CLA+Alumni."
+    send_email_notification = True
+
+
+class CentralePackDDInterRegistrationView(AbstractPackRegistrationView):
+    is_from_another_school = True
+    school_domain = Registration.SchoolDomains.CENTRALE
+    registration_type = Registration.Types.CENTRALE_DD_INTER_PACK
+    contribution = 125
+    description = "Étudiante ou étudiant en double diplôme international à l'école Centrale de Lille, vous souhaitez adhérer à Centrale Lille Associations et à Centrale Lille Alumni en profitant du pack CLA+Alumni."
     send_email_notification = True
 
 
@@ -147,7 +156,16 @@ class CentraleCLADDRegistrationView(AbstractRegistrationView):
     school_domain = Registration.SchoolDomains.CENTRALE
     registration_type = Registration.Types.CENTRALE_DD_CLA
     contribution = 180
-    description = "Étudiante ou étudiant en double diplôme à l'école Centrale de Lille, vous souhaitez adhérer à Centrale Lille Associations."
+    description = "Étudiante ou étudiant en double diplôme à l'école Centrale de Lille en provenance d'un établissement français, vous souhaitez adhérer à Centrale Lille Associations."
+    send_email_notification = True
+
+
+class CentraleCLADDInterRegistrationView(AbstractRegistrationView):
+    is_from_another_school = True
+    school_domain = Registration.SchoolDomains.CENTRALE
+    registration_type = Registration.Types.CENTRALE_DD_INTER_CLA
+    contribution = 40
+    description = "Étudiante ou étudiant en double diplôme international à l'école Centrale de Lille, vous souhaitez adhérer à Centrale Lille Associations."
     send_email_notification = True
 
 

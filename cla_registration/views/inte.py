@@ -3,7 +3,9 @@ from django.views.generic import CreateView, DetailView, TemplateView
 
 from cla_registration.mixins import CurrentRegistrationSessionMixin, InteRegistrationMixin
 from cla_registration.models import RegistrationSession, Registration
-from cla_registration.views.user import CentralePackRegistrationView, CentralePackDDRegistrationView, CentraleCLARegistrationView, CentraleCLADDRegistrationView
+from cla_registration.views.user import CentralePackRegistrationView, CentralePackDDRegistrationView, \
+    CentraleCLARegistrationView, CentraleCLADDRegistrationView, CentraleCLADDInterRegistrationView, \
+    CentralePackDDInterRegistrationView
 
 
 class IndexView(CurrentRegistrationSessionMixin, TemplateView):
@@ -19,11 +21,19 @@ class PackDDRegistrationView(InteRegistrationMixin, CentralePackDDRegistrationVi
     send_email_notification = False
 
 
+class PackDDInterRegistrationView(InteRegistrationMixin, CentralePackDDInterRegistrationView):
+    send_email_notification = False
+
+
 class CLARegistrationView(InteRegistrationMixin, CentraleCLARegistrationView):
     send_email_notification = False
 
 
 class CLADDRegistrationView(InteRegistrationMixin, CentraleCLADDRegistrationView):
+    send_email_notification = False
+
+
+class CLADDInterRegistrationView(InteRegistrationMixin, CentraleCLADDInterRegistrationView):
     send_email_notification = False
 
 

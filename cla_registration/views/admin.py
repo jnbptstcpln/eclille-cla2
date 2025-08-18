@@ -64,7 +64,7 @@ class RegistrationValidationView(UserPassesTestMixin, generic.FormView):
         )
         user.save()
 
-        # Creating associated informations
+        # Creating associated information
         user_infos = UserInfos(
             user=user,
             email_school=form.cleaned_data['email_school'],
@@ -83,7 +83,9 @@ class RegistrationValidationView(UserPassesTestMixin, generic.FormView):
             paid_on=form.cleaned_data['paid_on'],
             paid_by=form.cleaned_data['paid_by'],
             paid_validated=form.cleaned_data['paid_validated'],
-            paiement_method=form.cleaned_data['paiement_method']
+            payment_installments=form.cleaned_data['payment_installments'],
+            payment_months=form.cleaned_data['payment_months'],
+            alumni_pack=form.cleaned_data['pack'] == 1,
         )
         membership.save()
 
@@ -166,7 +168,8 @@ class RegistrationSessionExportView(UserPassesTestMixin, generic.View):
             if x.account is not None:
                 if hasattr(x.account, "membership"):
                     output = x.account.membership.get_paid_by_display()
-                    output += f" - {x.account.membership.get_paiement_method_display()}" if x.account.membership.paiement_method is not None else ""
+                    output += f" - {x.account.membership.get_payment_installments_display()}" if x.account.membership.payment_installments is not None else ""
+                    output += f" {x.account.membership.get_payment_months_display()}" if x.account.membership.payment_months is not None and x.account.membership.payment_months >= 2 else ""
                     return output
                 return "Aucune cotisation enregistrée"
             return "N'a pas encore payé"

@@ -55,8 +55,8 @@ class UserAdmin(UserAdmin):
     class MembershipInline(admin.StackedInline):
         model = UserMembership
         fields = (
-            ('amount', 'paid_validated', 'proof'),
-            ('paid_by', 'paiement_method', 'paid_on'),
+            ('amount', 'paid_validated', 'alumni_pack', 'proof'),
+            ('paid_by', 'payment_installments', 'payment_months', 'paid_on'),
             ('refunded', 'refunded_amount', 'refunded_on')
         )
         readonly_fields = ("proof",)

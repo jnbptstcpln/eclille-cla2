@@ -163,6 +163,8 @@ class Registration(models.Model):
         CENTRALE_CLA = "centrale_cla", "[Centrale Lille] Adhésion CLA"
         CENTRALE_DD_PACK = "centrale_dd_pack", "[Centrale Lille][Double diplôme] Pack Alumni+CLA"
         CENTRALE_DD_CLA = "centrale_dd_cla", "[Centrale Lille][Double diplôme] Adhésion CLA"
+        CENTRALE_DD_INTER_PACK = "centrale_dd_inter_pack", "[Centrale Lille][Double diplôme International] Pack Alumni+CLA"
+        CENTRALE_DD_INTER_CLA = "centrale_dd_inter_cla", "[Centrale Lille][Double diplôme International] Adhésion CLA"
         ITEEM_PACK = "iteem_pack", "[ITEEM] Pack Alumni+CLA"
         ITEEM_CLA = "iteem_cla", "[ITEEM] Adhésion CLA"
         ENSCL_CLA = "enscl_cla", "[ENSCL] Ahésion CLA"    

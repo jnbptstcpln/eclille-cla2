@@ -2,26 +2,49 @@
 # BUILDER #
 ###########
 
-# Pull official base image
-FROM python:3.9.4-buster
+FROM python:3.9-slim
 
-# Set work directory
+# Répertoire de travail
 WORKDIR /usr/src/app
 
-# Set environment variables
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+# Variables d'environnement pour Python
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
 
-# Install dependencies
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends gcc python3-dev musl-dev \
-    && apt-get install -y --no-install-recommends libjpeg62-turbo-dev libopenjp2-7-dev zlib1g-dev \
-    && apt-get install -y --no-install-recommends libsasl2-dev libldap2-dev libssl-dev libffi-dev
+# Installation des dépendances système nécessaires aux libs Python (dont mysqlclient et weasyprint)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc \
+    python3-dev \
+    musl-dev \
+    libjpeg62-turbo-dev \
+    libopenjp2-7-dev \
+    zlib1g-dev \
+    libsasl2-dev \
+    libldap2-dev \
+    libssl-dev \
+    libffi-dev \
+    default-libmysqlclient-dev \
+    # Ajout des dépendances pour Weasyprint (incluant Cairo)
+    libpangocairo-1.0-0 \
+    libpangoft2-1.0-0 \
+    libgdk-pixbuf2.0-0 \
+    libffi-dev \
+    shared-mime-info \
+    libpango-1.0-0 \
+    # La ligne suivante installe Cairo et ses dépendances
+    libcairo2-dev \
+    # Autres dépendances de Weasyprint
+    libharfbuzz-dev \
+    libfontconfig1 \
+    libfreetype6-dev \
+ && rm -rf /var/lib/apt/lists/*
 
-# Install dependencies
-COPY ./requirements.txt ./requirements.txt
-RUN pip install -r requirements.txt
+# Copie des dépendances Python
+COPY requirements.txt .
 
-# Clear build dependencies
-RUN apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+# Installation des dépendances Python
+RUN pip install --upgrade pip \
+ && pip install --no-cache-dir -r requirements.txt
+
+# Copie du reste du projet
+COPY . .
