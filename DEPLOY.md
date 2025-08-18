@@ -14,7 +14,7 @@ Une fois connecté au serveur, se rendre dans le répertoire ``/var/www/centrale
 
 ```bash
 # Activation du virtualenv
-source /venv/bin/activate
+source ./venv/bin/activate
 
 # Mise à jour du code
 git pull
