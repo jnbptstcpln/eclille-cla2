@@ -37,8 +37,6 @@ SERVER_EMAIL = config("EMAIL_FROM")
 # Application definition
 
 INSTALLED_APPS = [
-    # Admin pages theme
-    'jazzmin',
     # Django's built-in apps
     'django.contrib.admin',
     'django.contrib.auth',
