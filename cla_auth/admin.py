@@ -134,7 +134,11 @@ class UserAdmin(UserAdmin):
         parameter_name = "validated"
 
         def lookups(self, request, model_admin):
-            return [(1, "Compte validé"), (2, "Compte activé")]
+            return [
+                (1, "Compte validé"),
+                (2, "Compte activé"),
+                (3, "Compte non activé"),
+            ]
 
         def queryset(self, request, queryset):
             raw_val = self.value()
@@ -144,6 +148,8 @@ class UserAdmin(UserAdmin):
                     return queryset.filter(infos__valid_until__gt=timezone.now())
                 elif val == 2:
                     return queryset.filter(infos__activated_on__isnull=False)
+                elif val == 3:
+                    return queryset.filter(infos__activated_on__isnull=True)
             return queryset
 
     class SchoolFilter(SimpleListFilter):
