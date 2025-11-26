@@ -30,7 +30,7 @@ def login(req):
             if user is not None:
                 auth.login(req, user)
 
-                response = redirect(req.session.get("next", "cla_member:lobby"))
+                response = redirect(req.session.get("next", None) or "cla_member:lobby")
 
                 if hasattr(user, "infos"):
                     # Check if the account lost its validation since last login
