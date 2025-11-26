@@ -23,16 +23,16 @@ def validate(req):
     user: User = req.user
 
     # Only deal with non management users
-    if not hasattr(user, 'infos'):
-        return redirect(req.session.get('next', 'cla_member:account'))
+    if not hasattr(user, "infos"):
+        return redirect(req.session.get("next", "cla_member:account"))
 
     # Redirect the user if its account is not activated
     if user.infos.activated_on is None:
-        return redirect(req.session.get('next', 'cla_member:account'))
+        return redirect(req.session.get("next", "cla_member:account"))
 
     # Redirect the user if its account is validated
     if user.infos.valid_until is not None and user.infos.valid_until > timezone.now():
-        return redirect(req.session.get('next', 'cla_member:account'))
+        return redirect(req.session.get("next", "cla_member:account"))
 
     validation_request = user.infos.validation_request
 
@@ -45,52 +45,60 @@ def validate(req):
             # Set valid_until to a random date between 10th September and 25th September
             # The lower boundaries (10/09) is set to not create to much problems on the first "soirée dansante"
             # With people who wouldn't get their place because of account validation delay
-            user.infos.valid_until = timezone.datetime(year=current_school_year()+1, month=9, day=random.randint(10, 25))
-            user.infos.cursus = form.cleaned_data['cursus']
+            user.infos.valid_until = timezone.datetime(
+                year=current_school_year() + 1, month=9, day=random.randint(10, 25)
+            )
+            user.infos.cursus = form.cleaned_data["cursus"]
             user.infos.save()
 
             return render(
                 req,
                 "cla_auth/validation/validate_success_standalone.html",
                 {
-                    'redirect': resolve_url(req.session.get('next', 'cla_member:account'))
-                }
+                    "redirect": resolve_url(
+                        req.session.get("next", "cla_member:account")
+                    )
+                },
             )
     else:
         # Only send the email when it has not been sent or has been sent more than 1 hour ago
-        if validation_request.sent_on is None or validation_request.sent_on + timezone.timedelta(hours=1) < timezone.now():
+        if (
+            validation_request.sent_on is None
+            or validation_request.sent_on + timezone.timedelta(hours=1) < timezone.now()
+        ):
             try:
                 send_mail(
-                    subject='[CLA] Validation de votre compte',
+                    subject="[CLA] Validation de votre compte",
                     from_email=settings.EMAIL_HOST_FROM,
                     recipient_list=[user.infos.email_school],
                     message=f"Voici le code à indiquer pour valider votre compte : {validation_request.code}",
                     html_message=render_to_string(
-                        'cla_auth/validation/mail.html',
+                        "cla_auth/validation/mail.html",
                         {
-                            'site_href': f"https://{settings.ALLOWED_HOSTS[0]}",
-                            'validation_href': f"https://{settings.ALLOWED_HOSTS[0]}{resolve_url('cla_auth:validate')}",
-                            'validation_request': validation_request,
-                        }
+                            "site_href": f"https://{settings.ALLOWED_HOSTS[0]}",
+                            "validation_href": f"https://{settings.ALLOWED_HOSTS[0]}{resolve_url('cla_auth:validate')}",
+                            "validation_request": validation_request,
+                        },
                     ),
                 )
                 validation_request.sent_on = timezone.now()
                 validation_request.save()
             except Exception as e:
-                send_mail(
-                    subject=f'[VALIDATION] Erreur lors de l\'envoie à {user.infos.email_school}',
-                    from_email=settings.EMAIL_HOST_FROM,
-                    recipient_list=[settings.EMAIL_HOST_FROM],
-                    message=f"Une erreur s'est produite lors de l'envoi du mail de validation de compte à {user.infos.email_school} : {e}"
-                )
+                print("❌ Validation email not sent:", e)
+                # send_mail(
+                #     subject=f'[VALIDATION] Erreur lors de l\'envoie à {user.infos.email_school}',
+                #     from_email=settings.EMAIL_HOST_FROM,
+                #     recipient_list=[settings.EMAIL_HOST_FROM],
+                #     message=f"Une erreur s'est produite lors de l'envoi du mail de validation de compte à {user.infos.email_school} : {e}"
+                # )
 
         form = ValidationForm(user=req.user)
 
     return render(
         req,
-        'cla_auth/validation/validate_standalone.html',
+        "cla_auth/validation/validate_standalone.html",
         {
-            'form': form,
-            'redirect': resolve_url(req.session.get('next', 'cla_member:account'))
-        }
+            "form": form,
+            "redirect": resolve_url(req.session.get("next", "cla_member:account")),
+        },
     )

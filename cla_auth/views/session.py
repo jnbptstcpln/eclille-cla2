@@ -143,12 +143,13 @@ def forgot_password(req):
                             ),
                         )
                     except Exception as e:
-                        send_mail(
-                            subject=f'[RESET] Erreur lors de l\'envoie à {user.email}',
-                            from_email=settings.EMAIL_HOST_FROM,
-                            recipient_list=[settings.EMAIL_HOST_FROM],
-                            message=f"Une erreur s'est produite lors de l'envoi du mail de réinitilisation de mot de passe à {user.email} : {e}"
-                        )
+                        print("❌ Reset email not sent:", e)
+                        # send_mail(
+                        #     subject=f'[RESET] Erreur lors de l\'envoie à {user.email}',
+                        #     from_email=settings.EMAIL_HOST_FROM,
+                        #     recipient_list=[settings.EMAIL_HOST_FROM],
+                        #     message=f"Une erreur s'est produite lors de l'envoi du mail de réinitilisation de mot de passe à {user.email} : {e}"
+                        # )
                     success = True
                 else:
                     warning = True

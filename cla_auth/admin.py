@@ -1,4 +1,5 @@
 import copy
+from urllib.parse import quote
 
 from django.contrib import admin, messages
 from django.contrib.auth.models import User
@@ -99,7 +100,7 @@ class UserAdmin(UserAdmin):
             'fields': (('first_name', 'last_name'), 'email'),
         }),
     )
-    readonly_fields = 'account_status', 'username', 'last_login', 'date_joined', 'link_activation', 'link_reset'
+    readonly_fields = 'account_status', 'username', 'last_login', 'date_joined', 'activation_email', 'link_activation', 'reset_email', 'link_reset'
     inlines = [
         UserInfosInline,
         MembershipInline,
@@ -231,6 +232,17 @@ class UserAdmin(UserAdmin):
 
     link_reset.short_description = ""
 
+    def reset_email(self, obj: User):
+        reset_url = f"https://{settings.ALLOWED_HOSTS[0]}{resolve_url('cla_auth:reset', obj.infos.reset_request.get_reset_jwt(exp=False))}"
+        subject = quote("Réinitialisation de votre mot de passe")
+        body = quote(reset_url)
+        mailto_link = f"mailto:{escape(obj.email)}?subject={subject}&body={body}"
+        return mark_safe(
+            f"<a class='button' href='{mailto_link}'>Envoyer l'email de réinitialisation</a>"
+        )
+
+    reset_email.short_description = 'Email de réinitialisation du mot de passe'
+
     def link_activation(self, obj: User):
         return mark_safe(
             (
@@ -241,6 +253,17 @@ class UserAdmin(UserAdmin):
         )
 
     link_activation.short_description = 'Activation du compte'
+    
+    def activation_email(self, obj: User):
+        activation_url = f"https://{settings.ALLOWED_HOSTS[0]}{resolve_url('cla_auth:activate', obj.infos.activation_jwt)}"
+        subject = quote("Activation de votre compte")
+        body = quote(activation_url)
+        mailto_link = f"mailto:{escape(obj.email)}?subject={subject}&body={body}"
+        return mark_safe(
+            f"<a class='button' href='{mailto_link}'>Envoyer l'email d'activation</a>"
+        )
+
+    activation_email.short_description = 'Email d\'activation du compte'
     
     def paiement_validated(self, obj: User):
         if hasattr(obj, 'membership'):
@@ -262,7 +285,7 @@ class UserAdmin(UserAdmin):
                 # Détection et affichage si une requête de réinitialisation est en cours
                 reset_request = PasswordResetRequest.objects.get_current_reset_request(obj)
                 if reset_request:
-                    fieldsets[0][1]['fields'] = ['link_reset'] + fieldsets[0][1]['fields']
+                    fieldsets[0][1]['fields'] = ['reset_email', 'link_reset'] + fieldsets[0][1]['fields']
         return fieldsets
 
     def get_urls(self):
