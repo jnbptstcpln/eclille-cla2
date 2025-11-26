@@ -15,7 +15,7 @@ class FilePath:
 
     @classmethod
     def _path(cls, instance, pathlist, filename):
-        ext = filename.split('.')[-1]
+        ext = filename.split(".")[-1]
         filename = "%s-%s.%s" % (uuid.uuid4(), instance.slug, ext)
         pathlist.append(filename)
         return os.path.join(*pathlist)
@@ -46,7 +46,7 @@ class AssociationManager(models.Manager):
                 type=self.model.Types.ASSOC_1901,
                 category=self.model.Category.BDX,
                 description="Centrale Lille Associations est une association loi 1901 fondée en 2008, continuation de plus d'un siècle et demi de développement perpétuel des structures associatives de Centrale Lille par ses étudiants.",
-                display=False
+                display=False,
             )
 
     def get_bde(self):
@@ -60,7 +60,7 @@ class AssociationManager(models.Manager):
                 type=self.model.Types.BDX,
                 category=self.model.Category.BDX,
                 description="Le BDE est le bureau des élèves de l'école Centrale de Lille",
-                display=False
+                display=False,
             )
 
 
@@ -71,7 +71,7 @@ class Association(models.Model):
     class Meta:
         verbose_name = "Association"
         verbose_name_plural = "Associations"
-        ordering = "name",
+        ordering = ("name",)
 
     class Types(models.TextChoices):
         CLUB = "club", "Club de CLA"
@@ -98,26 +98,42 @@ class Association(models.Model):
         OTHER = "other", "Autre"
 
     name = models.CharField(max_length=100, verbose_name="Nom de l'association")
-    subtitle = models.CharField(max_length=100, verbose_name="Sous-titre", null=True, blank=True)
+    subtitle = models.CharField(
+        max_length=100, verbose_name="Sous-titre", null=True, blank=True
+    )
     slug = models.SlugField(verbose_name="Identifiant unique de l'association")
-    type = models.CharField(max_length=250, choices=Types.choices, verbose_name="Forme juridique")
-    category = models.CharField(max_length=250, choices=Category.choices, verbose_name="Catégorie")
+    type = models.CharField(
+        max_length=250, choices=Types.choices, verbose_name="Forme juridique"
+    )
+    category = models.CharField(
+        max_length=250, choices=Category.choices, verbose_name="Catégorie"
+    )
     description = models.TextField(max_length=350, verbose_name="Description rapide")
-    presentation_html = SummernoteTextField(verbose_name="Présentation de l'association", blank=True)
-    logo = ResizedImageField(size=[500, 500], force_format="PNG", upload_to=FilePath.association_logo, null=True, blank=True, verbose_name="Logo de l'association")
+    presentation_html = SummernoteTextField(
+        verbose_name="Présentation de l'association", blank=True
+    )
+    logo = ResizedImageField(
+        size=[500, 500],
+        force_format="PNG",
+        upload_to=FilePath.association_logo,
+        null=True,
+        blank=True,
+        verbose_name="Logo de l'association",
+    )
 
     display = models.BooleanField(default=True, verbose_name="Afficher sur le site")
-    active = models.BooleanField(default=True, verbose_name="Active", help_text="Une association active peut effectuer des demandes de réservation du foyer, du synthé, du barbecue...")
+    active = models.BooleanField(
+        default=True,
+        verbose_name="Active",
+        help_text="Une association active peut effectuer des demandes de réservation du foyer, du synthé, du barbecue...",
+    )
 
     def get_absolute_url(self):
         return resolve_url("cla_association:public:detail", self.slug)
 
     @property
     def is_club_or_commission(self):
-        return self.type in {
-            self.Types.CLUB,
-            self.Types.COMMISSION
-        }
+        return self.type in {self.Types.CLUB, self.Types.COMMISSION}
 
     @property
     def handover_folder_to_depose(self):
@@ -128,7 +144,7 @@ class Association(models.Model):
         return self.handover_folders.filter(validated=True)
 
     def __str__(self):
-        return self.name
+        return str(self.name)
 
 
 class AssociationMember(models.Model):
@@ -149,10 +165,27 @@ class AssociationMember(models.Model):
         RESPO_EVENT = "100_respo_event", "Responsable événement"
         CUSTOM = "999_custom", "Personnalisé"
 
-    association = models.ForeignKey(Association, on_delete=models.CASCADE, related_name="members")
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="association_memberships", null=True, blank=True, verbose_name="Étudiant")
-    _role = models.CharField(max_length=250, choices=Roles.choices, verbose_name="Poste")
-    _role_custom = models.CharField(max_length=250, null=True, blank=True, verbose_name="Poste personnalisé", help_text="A indiquer avec le poste \"Personnalisé\"")
+    association = models.ForeignKey(
+        Association, on_delete=models.CASCADE, related_name="members"
+    )
+    user = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        related_name="association_memberships",
+        null=True,
+        blank=True,
+        verbose_name="Étudiant",
+    )
+    _role = models.CharField(
+        max_length=250, choices=Roles.choices, verbose_name="Poste"
+    )
+    _role_custom = models.CharField(
+        max_length=250,
+        null=True,
+        blank=True,
+        verbose_name="Poste personnalisé",
+        help_text='A indiquer avec le poste "Personnalisé"',
+    )
 
     @property
     def role(self):
@@ -161,7 +194,7 @@ class AssociationMember(models.Model):
         return self.get__role_display()
 
     def __str__(self):
-        return self.role
+        return str(self.role)
 
 
 class AssociationLink(models.Model):
@@ -181,9 +214,19 @@ class AssociationLink(models.Model):
         YOUTUBE = "060_youtube", "YouTube"
         CUSTOM = "999_custom", "Personnalisé"
 
-    association = models.ForeignKey(Association, on_delete=models.CASCADE, related_name="links")
-    _type = models.CharField(max_length=250, choices=Types.choices, verbose_name="Poste")
-    _type_custom = models.CharField(max_length=250, null=True, blank=True, verbose_name="Type personnalisé", help_text="A indiquer avec le type \"Personnalisé\"")
+    association = models.ForeignKey(
+        Association, on_delete=models.CASCADE, related_name="links"
+    )
+    _type = models.CharField(
+        max_length=250, choices=Types.choices, verbose_name="Poste"
+    )
+    _type_custom = models.CharField(
+        max_length=250,
+        null=True,
+        blank=True,
+        verbose_name="Type personnalisé",
+        help_text='A indiquer avec le type "Personnalisé"',
+    )
     href = models.URLField(verbose_name="Lien")
 
     @property
@@ -197,13 +240,17 @@ class AssociationLink(models.Model):
         return self.get__type_display()
 
     def __str__(self):
-        return self.type
+        return str(self.type)
 
 
 class HandoverFolderManager(models.Manager):
 
     def to_depose(self, association):
-        return self.filter(association=association, opened=True, validated=False).order_by("-deposed_on").first()
+        return (
+            self.filter(association=association, opened=True, validated=False)
+            .order_by("-deposed_on")
+            .first()
+        )
 
 
 class HandoverFolder(models.Model):
@@ -215,14 +262,39 @@ class HandoverFolder(models.Model):
         verbose_name_plural = "Dossiers de passation"
         ordering = "-deposed_on", "association__name"
 
-    association = models.ForeignKey(Association, on_delete=models.CASCADE, related_name="handover_folders")
-    deposed_on = models.DateField(default=date.today, verbose_name="Date de la passation", help_text="Doit correspondre à l'année de fin du mandat")
-    president = models.CharField(max_length=75, blank=True, verbose_name="Président sortant")
-    treasurer = models.CharField(max_length=75, blank=True, verbose_name="Trésorier sortant")
-    quitus = models.FileField(null=True, blank=True, upload_to=FilePath.association_quitus, verbose_name="Quitus", help_text="De préférence au format PDF")
-    archive = models.FileField(null=True, blank=True, upload_to=FilePath.association_archive, verbose_name="Archive", help_text="De préférence au format ZIP et contenant toutes les ressources intéressantes de l'association (logo, trésorerie, photos, ...)")
+    association = models.ForeignKey(
+        Association, on_delete=models.CASCADE, related_name="handover_folders"
+    )
+    deposed_on = models.DateField(
+        default=date.today,
+        verbose_name="Date de la passation",
+        help_text="Doit correspondre à l'année de fin du mandat",
+    )
+    president = models.CharField(
+        max_length=75, blank=True, verbose_name="Président sortant"
+    )
+    treasurer = models.CharField(
+        max_length=75, blank=True, verbose_name="Trésorier sortant"
+    )
+    quitus = models.FileField(
+        null=True,
+        blank=True,
+        upload_to=FilePath.association_quitus,
+        verbose_name="Quitus",
+        help_text="De préférence au format PDF",
+    )
+    archive = models.FileField(
+        null=True,
+        blank=True,
+        upload_to=FilePath.association_archive,
+        verbose_name="Archive",
+        help_text="De préférence au format ZIP et contenant toutes les ressources intéressantes de l'association (logo, trésorerie, photos, ...)",
+    )
 
-    opened = models.BooleanField(default=False, verbose_name="Les responsables de l'association peuvent déposer le quitus et l'archive")
+    opened = models.BooleanField(
+        default=False,
+        verbose_name="Les responsables de l'association peuvent déposer le quitus et l'archive",
+    )
     validated = models.BooleanField(default=False, verbose_name="Le dossier est validé")
 
     @property
