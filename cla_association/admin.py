@@ -1,7 +1,11 @@
-
 from django.contrib import admin
 
-from cla_association.models import Association, AssociationMember, AssociationLink, HandoverFolder
+from cla_association.models import (
+    Association,
+    AssociationMember,
+    AssociationLink,
+    HandoverFolder,
+)
 
 
 @admin.register(Association)
@@ -9,7 +13,7 @@ class AssociationAdmin(admin.ModelAdmin):
 
     class MemberInline(admin.TabularInline):
         model = AssociationMember
-        autocomplete_fields = ['user']
+        autocomplete_fields = ["user"]
         extra = 0
 
     class LinkInline(admin.TabularInline):
@@ -21,8 +25,5 @@ class AssociationAdmin(admin.ModelAdmin):
 
 @admin.register(HandoverFolder)
 class HandoverFolderAdmin(admin.ModelAdmin):
-    list_display = [
-        '__str__',
-        'validated'
-    ]
-    search_fields = ['association']
+    list_display = ["__str__", "validated"]
+    search_fields = ["association__name", "association__slug", "association__slug"]
