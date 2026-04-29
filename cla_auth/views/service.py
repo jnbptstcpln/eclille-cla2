@@ -53,6 +53,22 @@ def _get_success_json_response(payload, status_code=200):
     )
 
 
+def _get_association_roles_payload(user):
+    memberships = user.association_memberships.filter(
+        association__active=True
+    ).select_related("association")
+
+    # Add only the association roles, without changing the existing payload.
+    return [
+        {
+            'associationSlug': membership.association.slug,
+            'associationName': membership.association.name,
+            'role': membership.role,
+        }
+        for membership in memberships
+    ]
+
+
 def authenticate(req, identifier):
 
     service: Service = get_object_or_404(Service, identifier=identifier)
@@ -183,13 +199,17 @@ def validate(req, identifier, ticket_jwt):
                         "This user has not validated his account"
                     )
 
+                association_roles = _get_association_roles_payload(ticket.user)
+
                 return _get_success_json_response({
                     'username': ticket.user.username,
                     'firstName': ticket.user.first_name,
                     'lastName': ticket.user.last_name,
                     'emailSchool': ticket.user.infos.email_school,
                     'cursus': ticket.user.infos.cursus,
-                    'promo': ticket.user.infos.promo
+                    'promo': ticket.user.infos.promo,
+                    'hasAssociationRole': len(association_roles) > 0,
+                    'associationRoles': association_roles,
                 })
 
     return _get_error_json_response("This ticket is invalid, authentication failed")
