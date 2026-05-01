@@ -30,6 +30,11 @@
             margin-top: 0;
         }
 
+        .admin-rights-editor {
+            position: sticky;
+            top: 20px;
+        }
+
         .admin-rights-table {
             width: 100%;
         }
@@ -64,6 +69,10 @@
 
             .admin-rights-card {
                 margin-bottom: 20px;
+            }
+
+            .admin-rights-editor {
+                position: static;
             }
         }
     </style>
@@ -155,7 +164,7 @@
                 </table>
             </div>
 
-            <div class="admin-rights-card">
+            <div class="admin-rights-card admin-rights-editor">
                 <h2>Modifier un compte</h2>
                 <form method="get" class="admin-rights-search">
                     <label for="id_q">Rechercher un utilisateur</label><br>

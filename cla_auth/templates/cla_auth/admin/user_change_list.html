@@ -1,13 +1,13 @@
 {% extends "admin/change_list.html" %}
 {% load i18n admin_urls %}
 
-{% block object-tools-items %}
+{% block search %}
     {% if request.user.is_superuser %}
-        <li>
-            <a href="{% url 'admin:auth_user_admin_rights' %}" class="addlink">
-                Droits admins
+        <div class="module" style="padding: 12px 14px; margin-bottom: 10px;">
+            <a href="{% url 'admin:auth_user_admin_rights' %}" class="button">
+                Gérer les droits admin
             </a>
-        </li>
+        </div>
     {% endif %}
     {{ block.super }}
 {% endblock %}
