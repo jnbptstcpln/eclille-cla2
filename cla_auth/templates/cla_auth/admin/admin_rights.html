@@ -89,12 +89,15 @@
                         <h3>Résultats</h3>
                         {% if search_results %}
                             <ul>
-                                {% for user in search_results %}
+                                {% for row in search_results %}
                                     <li>
-                                        <a href="{% url 'admin:auth_user_admin_rights' %}?user={{ user.pk }}">
-                                            {{ user.get_full_name|default:user.username }}
+                                        <a href="{% url 'admin:auth_user_admin_rights' %}?user={{ row.user.pk }}">
+                                            {{ row.user.get_full_name|default:row.user.username }}
                                         </a>
-                                        <span class="admin-rights-muted">{{ user.username }}{% if user.email %} - {{ user.email }}{% endif %}</span>
+                                        <span class="admin-rights-muted">
+                                            {{ row.user.username }}{% if row.user.email %} - {{ row.user.email }}{% endif %}
+                                            <br>{{ row.user_info }}
+                                        </span>
                                     </li>
                                 {% endfor %}
                             </ul>
@@ -110,7 +113,10 @@
                         <input type="hidden" name="user_id" value="{{ selected_user.pk }}">
                         <fieldset class="module aligned">
                             <h3>{{ selected_user.get_full_name|default:selected_user.username }}</h3>
-                            <p class="admin-rights-muted">{{ selected_user.username }}{% if selected_user.email %} - {{ selected_user.email }}{% endif %}</p>
+                            <p class="admin-rights-muted">
+                                {{ selected_user.username }}{% if selected_user.email %} - {{ selected_user.email }}{% endif %}<br>
+                                {{ selected_user_info }}
+                            </p>
                             {% if form.errors %}
                                 <p class="errornote">
                                     {% if form.errors.items|length == 1 %}{% translate "Please correct the error below." %}{% else %}{% translate "Please correct the errors below." %}{% endif %}
@@ -155,7 +161,10 @@
                         <tr>
                             <td>
                                 <strong>{{ row.user.get_full_name|default:row.user.username }}</strong><br>
-                                <span class="admin-rights-muted">{{ row.user.username }}{% if row.user.email %} - {{ row.user.email }}{% endif %}</span>
+                                <span class="admin-rights-muted">
+                                    {{ row.user.username }}{% if row.user.email %} - {{ row.user.email }}{% endif %}<br>
+                                    {{ row.user_info }}
+                                </span>
                             </td>
                             <td>
                                 {% if row.user.is_active %}Actif{% else %}Inactif{% endif %}<br>

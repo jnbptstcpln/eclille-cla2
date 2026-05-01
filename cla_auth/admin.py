@@ -397,11 +397,23 @@ class UserAdmin(UserAdmin):
             user.pk,
         )
 
+    def admin_rights_user_info(self, user: User):
+        if hasattr(user, "infos"):
+            infos = user.infos
+            user_infos = []
+            if infos.cursus:
+                user_infos.append(infos.cursus)
+            if infos.promo:
+                user_infos.append(f"Promo {infos.promo}")
+            return " - ".join(user_infos) or "Compte adhérent"
+        return "Compte de gestion"
+
     def admin_rights(self, request: HttpRequest):
         if not request.user.is_superuser:
             raise PermissionDenied()
 
         selected_user = None
+        selected_user_info = None
         search_results = None
 
         if request.method == "POST":
@@ -422,15 +434,23 @@ class UserAdmin(UserAdmin):
             user_id = request.GET.get("user")
             if user_id:
                 selected_user = self.get_object(request, user_id)
+                selected_user_info = self.admin_rights_user_info(selected_user)
 
             q = request.GET.get("q")
             if q:
-                search_results = User.objects.filter(
+                search_users = User.objects.filter(
                     Q(username__icontains=q)
                     | Q(first_name__icontains=q)
                     | Q(last_name__icontains=q)
                     | Q(email__icontains=q)
-                ).order_by("last_name", "first_name", "username")[:25]
+                ).select_related("infos").order_by("last_name", "first_name", "username")[:25]
+                search_results = [
+                    {
+                        "user": user,
+                        "user_info": self.admin_rights_user_info(user),
+                    }
+                    for user in search_users
+                ]
 
             form = AdminRightsForm(instance=selected_user) if selected_user else None
 
@@ -441,6 +461,7 @@ class UserAdmin(UserAdmin):
                 | Q(groups__isnull=False)
                 | Q(user_permissions__isnull=False)
             )
+            .select_related("infos")
             .prefetch_related(
                 "groups",
                 "groups__permissions",
@@ -461,6 +482,7 @@ class UserAdmin(UserAdmin):
             admin_rows.append(
                 {
                     "user": user,
+                    "user_info": self.admin_rights_user_info(user),
                     "groups": user.groups.all(),
                     "direct_permissions": user.user_permissions.all(),
                     "group_permissions": sorted(
@@ -476,6 +498,7 @@ class UserAdmin(UserAdmin):
             "opts": self.model._meta,
             "admin_rows": admin_rows,
             "selected_user": selected_user,
+            "selected_user_info": selected_user_info,
             "search_results": search_results,
             "form": form,
             "q": request.GET.get("q", ""),
