@@ -14,25 +14,18 @@
         }
 
         .admin-rights-layout {
-            display: grid;
-            grid-template-columns: minmax(0, 2fr) minmax(320px, 1fr);
-            gap: 20px;
-            align-items: start;
+            display: block;
         }
 
         .admin-rights-card {
             background: var(--body-bg);
             border: 1px solid var(--hairline-color);
             padding: 16px;
+            margin-bottom: 20px;
         }
 
         .admin-rights-card h2 {
             margin-top: 0;
-        }
-
-        .admin-rights-editor {
-            position: sticky;
-            top: 20px;
         }
 
         .admin-rights-table {
@@ -62,18 +55,8 @@
             max-width: 360px;
         }
 
-        @media (max-width: 960px) {
-            .admin-rights-layout {
-                display: block;
-            }
-
-            .admin-rights-card {
-                margin-bottom: 20px;
-            }
-
-            .admin-rights-editor {
-                position: static;
-            }
+        .admin-rights-editor {
+            max-width: 800px;
         }
     </style>
 {% endblock %}
@@ -93,6 +76,67 @@
 {% block content %}
     <div id="content-main">
         <div class="admin-rights-layout">
+            <div class="admin-rights-card admin-rights-editor">
+                <h2>Modifier un compte</h2>
+                <form method="get" class="admin-rights-search">
+                    <label for="id_q">Rechercher un utilisateur</label><br>
+                    <input type="text" id="id_q" name="q" value="{{ q }}">
+                    <input type="submit" value="Rechercher">
+                </form>
+
+                {% if search_results is not None %}
+                    <div class="module">
+                        <h3>Résultats</h3>
+                        {% if search_results %}
+                            <ul>
+                                {% for user in search_results %}
+                                    <li>
+                                        <a href="{% url 'admin:auth_user_admin_rights' %}?user={{ user.pk }}">
+                                            {{ user.get_full_name|default:user.username }}
+                                        </a>
+                                        <span class="admin-rights-muted">{{ user.username }}{% if user.email %} - {{ user.email }}{% endif %}</span>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p>Aucun utilisateur trouvé.</p>
+                        {% endif %}
+                    </div>
+                {% endif %}
+
+                {% if selected_user %}
+                    <form method="post" id="{{ opts.model_name }}_form">
+                        {% csrf_token %}
+                        <input type="hidden" name="user_id" value="{{ selected_user.pk }}">
+                        <fieldset class="module aligned">
+                            <h3>{{ selected_user.get_full_name|default:selected_user.username }}</h3>
+                            <p class="admin-rights-muted">{{ selected_user.username }}{% if selected_user.email %} - {{ selected_user.email }}{% endif %}</p>
+                            {% if form.errors %}
+                                <p class="errornote">
+                                    {% if form.errors.items|length == 1 %}{% translate "Please correct the error below." %}{% else %}{% translate "Please correct the errors below." %}{% endif %}
+                                </p>
+                            {% endif %}
+
+                            {% for field in form %}
+                                <div class="form-row">
+                                    {{ field.errors }}
+                                    {{ field.label_tag }} {{ field }}
+                                    {% if field.help_text %}
+                                        <div class="help">{{ field.help_text|safe }}</div>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </fieldset>
+                        <div class="submit-row">
+                            <input type="submit" value="Enregistrer les droits" class="default">
+                            <a class="button" href="{% url 'admin:auth_user_change' selected_user.pk %}">Voir la fiche utilisateur</a>
+                        </div>
+                    </form>
+                {% else %}
+                    <p class="admin-rights-muted">Sélectionnez un compte dans la liste ou via la recherche pour modifier ses droits.</p>
+                {% endif %}
+            </div>
+
             <div class="admin-rights-card">
                 <h2>Comptes avec droits</h2>
                 <table class="admin-rights-table">
@@ -162,67 +206,6 @@
                     {% endfor %}
                     </tbody>
                 </table>
-            </div>
-
-            <div class="admin-rights-card admin-rights-editor">
-                <h2>Modifier un compte</h2>
-                <form method="get" class="admin-rights-search">
-                    <label for="id_q">Rechercher un utilisateur</label><br>
-                    <input type="text" id="id_q" name="q" value="{{ q }}">
-                    <input type="submit" value="Rechercher">
-                </form>
-
-                {% if search_results is not None %}
-                    <div class="module">
-                        <h3>Résultats</h3>
-                        {% if search_results %}
-                            <ul>
-                                {% for user in search_results %}
-                                    <li>
-                                        <a href="{% url 'admin:auth_user_admin_rights' %}?user={{ user.pk }}">
-                                            {{ user.get_full_name|default:user.username }}
-                                        </a>
-                                        <span class="admin-rights-muted">{{ user.username }}{% if user.email %} - {{ user.email }}{% endif %}</span>
-                                    </li>
-                                {% endfor %}
-                            </ul>
-                        {% else %}
-                            <p>Aucun utilisateur trouvé.</p>
-                        {% endif %}
-                    </div>
-                {% endif %}
-
-                {% if selected_user %}
-                    <form method="post" id="{{ opts.model_name }}_form">
-                        {% csrf_token %}
-                        <input type="hidden" name="user_id" value="{{ selected_user.pk }}">
-                        <fieldset class="module aligned">
-                            <h3>{{ selected_user.get_full_name|default:selected_user.username }}</h3>
-                            <p class="admin-rights-muted">{{ selected_user.username }}{% if selected_user.email %} - {{ selected_user.email }}{% endif %}</p>
-                            {% if form.errors %}
-                                <p class="errornote">
-                                    {% if form.errors.items|length == 1 %}{% translate "Please correct the error below." %}{% else %}{% translate "Please correct the errors below." %}{% endif %}
-                                </p>
-                            {% endif %}
-
-                            {% for field in form %}
-                                <div class="form-row">
-                                    {{ field.errors }}
-                                    {{ field.label_tag }} {{ field }}
-                                    {% if field.help_text %}
-                                        <div class="help">{{ field.help_text|safe }}</div>
-                                    {% endif %}
-                                </div>
-                            {% endfor %}
-                        </fieldset>
-                        <div class="submit-row">
-                            <input type="submit" value="Enregistrer les droits" class="default">
-                            <a class="button" href="{% url 'admin:auth_user_change' selected_user.pk %}">Voir la fiche utilisateur</a>
-                        </div>
-                    </form>
-                {% else %}
-                    <p class="admin-rights-muted">Sélectionnez un compte dans la liste ou via la recherche pour modifier ses droits.</p>
-                {% endif %}
             </div>
         </div>
     </div>
