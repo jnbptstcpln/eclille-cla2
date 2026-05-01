@@ -1,0 +1,220 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static %}
+
+{% block extrahead %}{{ block.super }}
+    <script src="{% url 'admin:jsi18n' %}"></script>
+    {{ form.media }}
+{% endblock %}
+
+{% block extrastyle %}{{ block.super }}
+    <link rel="stylesheet" type="text/css" href="{% static "admin/css/forms.css" %}">
+    <style>
+        #content {
+            max-width: 1200px;
+        }
+
+        .admin-rights-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 2fr) minmax(320px, 1fr);
+            gap: 20px;
+            align-items: start;
+        }
+
+        .admin-rights-card {
+            background: var(--body-bg);
+            border: 1px solid var(--hairline-color);
+            padding: 16px;
+        }
+
+        .admin-rights-card h2 {
+            margin-top: 0;
+        }
+
+        .admin-rights-table {
+            width: 100%;
+        }
+
+        .admin-rights-table td,
+        .admin-rights-table th {
+            vertical-align: top;
+        }
+
+        .admin-rights-list {
+            margin: 0;
+            padding-left: 16px;
+        }
+
+        .admin-rights-muted {
+            color: var(--body-quiet-color);
+        }
+
+        .admin-rights-search {
+            margin-bottom: 16px;
+        }
+
+        .admin-rights-search input[type="text"] {
+            width: 70%;
+            max-width: 360px;
+        }
+
+        @media (max-width: 960px) {
+            .admin-rights-layout {
+                display: block;
+            }
+
+            .admin-rights-card {
+                margin-bottom: 20px;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block coltype %}colM{% endblock %}
+{% block bodyclass %}{{ block.super }} {{ opts.app_label }}-{{ opts.model_name }} change-form{% endblock %}
+
+{% block breadcrumbs %}
+    <div class="breadcrumbs">
+        <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
+        &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+        &rsaquo; <a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+        &rsaquo; Gestion des droits administrateurs
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div id="content-main">
+        <div class="admin-rights-layout">
+            <div class="admin-rights-card">
+                <h2>Comptes avec droits</h2>
+                <table class="admin-rights-table">
+                    <thead>
+                    <tr>
+                        <th>Utilisateur</th>
+                        <th>Statut</th>
+                        <th>Groupes</th>
+                        <th>Permissions directes</th>
+                        <th>Permissions via groupes</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for row in admin_rows %}
+                        <tr>
+                            <td>
+                                <strong>{{ row.user.get_full_name|default:row.user.username }}</strong><br>
+                                <span class="admin-rights-muted">{{ row.user.username }}{% if row.user.email %} - {{ row.user.email }}{% endif %}</span>
+                            </td>
+                            <td>
+                                {% if row.user.is_active %}Actif{% else %}Inactif{% endif %}<br>
+                                {% if row.user.is_staff %}Admin{% else %}<span class="admin-rights-muted">Pas admin</span>{% endif %}<br>
+                                {% if row.user.is_superuser %}<strong>Superuser</strong>{% endif %}
+                            </td>
+                            <td>
+                                {% if row.groups %}
+                                    <ul class="admin-rights-list">
+                                        {% for group in row.groups %}
+                                            <li>{{ group.name }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                {% else %}
+                                    <span class="admin-rights-muted">Aucun</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if row.direct_permissions %}
+                                    <ul class="admin-rights-list">
+                                        {% for permission in row.direct_permissions %}
+                                            <li>{{ permission.content_type.app_label }}.{{ permission.codename }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                {% else %}
+                                    <span class="admin-rights-muted">Aucune</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if row.group_permissions %}
+                                    <ul class="admin-rights-list">
+                                        {% for permission in row.group_permissions %}
+                                            <li>{{ permission.content_type.app_label }}.{{ permission.codename }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                {% else %}
+                                    <span class="admin-rights-muted">Aucune</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a class="button" href="{% url 'admin:auth_user_admin_rights' %}?user={{ row.user.pk }}">Modifier</a>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="6">Aucun compte avec droits.</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="admin-rights-card">
+                <h2>Modifier un compte</h2>
+                <form method="get" class="admin-rights-search">
+                    <label for="id_q">Rechercher un utilisateur</label><br>
+                    <input type="text" id="id_q" name="q" value="{{ q }}">
+                    <input type="submit" value="Rechercher">
+                </form>
+
+                {% if search_results is not None %}
+                    <div class="module">
+                        <h3>Résultats</h3>
+                        {% if search_results %}
+                            <ul>
+                                {% for user in search_results %}
+                                    <li>
+                                        <a href="{% url 'admin:auth_user_admin_rights' %}?user={{ user.pk }}">
+                                            {{ user.get_full_name|default:user.username }}
+                                        </a>
+                                        <span class="admin-rights-muted">{{ user.username }}{% if user.email %} - {{ user.email }}{% endif %}</span>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p>Aucun utilisateur trouvé.</p>
+                        {% endif %}
+                    </div>
+                {% endif %}
+
+                {% if selected_user %}
+                    <form method="post" id="{{ opts.model_name }}_form">
+                        {% csrf_token %}
+                        <input type="hidden" name="user_id" value="{{ selected_user.pk }}">
+                        <fieldset class="module aligned">
+                            <h3>{{ selected_user.get_full_name|default:selected_user.username }}</h3>
+                            <p class="admin-rights-muted">{{ selected_user.username }}{% if selected_user.email %} - {{ selected_user.email }}{% endif %}</p>
+                            {% if form.errors %}
+                                <p class="errornote">
+                                    {% if form.errors.items|length == 1 %}{% translate "Please correct the error below." %}{% else %}{% translate "Please correct the errors below." %}{% endif %}
+                                </p>
+                            {% endif %}
+
+                            {% for field in form %}
+                                <div class="form-row">
+                                    {{ field.errors }}
+                                    {{ field.label_tag }} {{ field }}
+                                    {% if field.help_text %}
+                                        <div class="help">{{ field.help_text|safe }}</div>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </fieldset>
+                        <div class="submit-row">
+                            <input type="submit" value="Enregistrer les droits" class="default">
+                            <a class="button" href="{% url 'admin:auth_user_change' selected_user.pk %}">Voir la fiche utilisateur</a>
+                        </div>
+                    </form>
+                {% else %}
+                    <p class="admin-rights-muted">Sélectionnez un compte dans la liste ou via la recherche pour modifier ses droits.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

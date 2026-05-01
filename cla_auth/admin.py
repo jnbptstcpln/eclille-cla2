@@ -10,14 +10,16 @@ from django.utils.translation import gettext_lazy as _
 from django.urls import path
 from django.http import Http404, HttpRequest
 from django.core.exceptions import PermissionDenied
+from django.db.models import Q
 from django.shortcuts import resolve_url
+from django.template.response import TemplateResponse
 from django.utils.html import mark_safe, escape
 from django.conf import settings
 from django.utils import timezone
 
 from cla_registration.views.admin import MembershipProofView
 from cla_web.utils import current_school_year
-from cla_auth.forms.admin_user_form import UserCreationForm, UserChangeForm
+from cla_auth.forms.admin_user_form import UserCreationForm, UserChangeForm, AdminRightsForm
 from cla_registration.models import Registration, ImageRightAgreement
 from .models import UserInfos, UserMembership, Service, PasswordResetRequest
 
@@ -206,6 +208,7 @@ class UserAdmin(UserAdmin):
     search_fields = ("username", "first_name", "last_name", "email")
     form = UserChangeForm
     add_form = UserCreationForm
+    change_list_template = "cla_auth/admin/user_change_list.html"
 
     def email_school(self, obj: User):
         return obj.infos.email_school
@@ -344,6 +347,11 @@ class UserAdmin(UserAdmin):
     def get_urls(self):
         return [
             path(
+                "droits-admins/",
+                self.admin_site.admin_view(self.admin_rights),
+                name="auth_user_admin_rights",
+            ),
+            path(
                 "<id>/password-reset",
                 self.admin_site.admin_view(self.user_reset_password),
                 name="auth_user_password_reset",
@@ -388,6 +396,91 @@ class UserAdmin(UserAdmin):
             f"{self.admin_site.name}:{user._meta.app_label}_{user._meta.model_name}_change",
             user.pk,
         )
+
+    def admin_rights(self, request: HttpRequest):
+        if not request.user.is_superuser:
+            raise PermissionDenied()
+
+        selected_user = None
+        search_results = None
+
+        if request.method == "POST":
+            selected_user = self.get_object(request, request.POST.get("user_id"))
+            if selected_user is None:
+                raise Http404()
+
+            form = AdminRightsForm(request.POST, instance=selected_user)
+            if form.is_valid():
+                form.save()
+                self.log_change(request, selected_user, "Droits administrateur modifiés")
+                messages.success(
+                    request,
+                    f"Les droits de {selected_user.get_full_name() or selected_user.username} ont été mis à jour.",
+                )
+                return redirect("admin:auth_user_admin_rights")
+        else:
+            user_id = request.GET.get("user")
+            if user_id:
+                selected_user = self.get_object(request, user_id)
+
+            q = request.GET.get("q")
+            if q:
+                search_results = User.objects.filter(
+                    Q(username__icontains=q)
+                    | Q(first_name__icontains=q)
+                    | Q(last_name__icontains=q)
+                    | Q(email__icontains=q)
+                ).order_by("last_name", "first_name", "username")[:25]
+
+            form = AdminRightsForm(instance=selected_user) if selected_user else None
+
+        admin_users = (
+            User.objects.filter(
+                Q(is_staff=True)
+                | Q(is_superuser=True)
+                | Q(groups__isnull=False)
+                | Q(user_permissions__isnull=False)
+            )
+            .prefetch_related(
+                "groups",
+                "groups__permissions",
+                "groups__permissions__content_type",
+                "user_permissions",
+                "user_permissions__content_type",
+            )
+            .distinct()
+            .order_by("last_name", "first_name", "username")
+        )
+
+        admin_rows = []
+        for user in admin_users:
+            group_permissions = []
+            for group in user.groups.all():
+                group_permissions += list(group.permissions.all())
+
+            admin_rows.append(
+                {
+                    "user": user,
+                    "groups": user.groups.all(),
+                    "direct_permissions": user.user_permissions.all(),
+                    "group_permissions": sorted(
+                        set(group_permissions),
+                        key=lambda p: (p.content_type.app_label, p.content_type.model, p.codename),
+                    ),
+                }
+            )
+
+        context = {
+            **self.admin_site.each_context(request),
+            "title": "Gestion des droits administrateurs",
+            "opts": self.model._meta,
+            "admin_rows": admin_rows,
+            "selected_user": selected_user,
+            "search_results": search_results,
+            "form": form,
+            "q": request.GET.get("q", ""),
+        }
+        return TemplateResponse(request, "cla_auth/admin/admin_rights.html", context)
 
     def has_view_permission(self, request: HttpRequest, obj: User = None):
         perm = super().has_view_permission(request, obj)

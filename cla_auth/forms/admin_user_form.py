@@ -1,5 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
+from django.contrib.auth.models import Group, Permission
+from django.contrib.admin.widgets import FilteredSelectMultiple
 from django.utils.text import slugify
 from django.contrib.auth.forms import UserChangeForm as Auth_UserChangeForm
 
@@ -68,3 +70,31 @@ class UserResetPasswordForm(forms.Form):
             user=self.user,
             count_attempt=False
         )
+
+
+class AdminRightsForm(forms.ModelForm):
+    groups = forms.ModelMultipleChoiceField(
+        label="Groupes",
+        queryset=Group.objects.all().order_by("name"),
+        required=False,
+        widget=FilteredSelectMultiple("groupes", is_stacked=False),
+    )
+    user_permissions = forms.ModelMultipleChoiceField(
+        label="Permissions directes",
+        queryset=Permission.objects.select_related("content_type").order_by(
+            "content_type__app_label",
+            "content_type__model",
+            "codename",
+        ),
+        required=False,
+        widget=FilteredSelectMultiple("permissions directes", is_stacked=False),
+    )
+
+    class Meta:
+        model = User
+        fields = ("is_active", "is_staff", "is_superuser", "groups", "user_permissions")
+        labels = {
+            "is_active": "Compte actif",
+            "is_staff": "Accès à l'administration",
+            "is_superuser": "Super-utilisateur",
+        }
