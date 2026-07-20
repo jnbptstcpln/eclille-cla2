@@ -208,6 +208,7 @@ def validate(req, identifier, ticket_jwt):
                     'emailSchool': ticket.user.infos.email_school,
                     'cursus': ticket.user.infos.cursus,
                     'promo': ticket.user.infos.promo,
+                    'isAdmin': ticket.user.is_superuser,
                     'hasAssociationRole': len(association_roles) > 0,
                     'associationRoles': association_roles,
                 })
