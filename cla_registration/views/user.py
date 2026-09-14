@@ -26,6 +26,7 @@ class AbstractRegistrationView(CreateView):
     pack = False
     contribution = None
     school_domain = None
+    extra_school_domains = ()
     registration_type = None
     template_name = "cla_registration/registration/register.html"
     ticketing_field = ""
@@ -82,6 +83,7 @@ class AbstractRegistrationView(CreateView):
         kwargs = super().get_form_kwargs()
         kwargs.update({
             'school_domain': self.school_domain,
+            'extra_school_domains': self.extra_school_domains,
             'is_from_another_school': self.is_from_another_school
         })
         return kwargs
@@ -120,6 +122,7 @@ class CentralePackRegistrationView(AbstractPackRegistrationView):
 class CentralePackDDRegistrationView(AbstractPackRegistrationView):
     is_from_another_school = True
     school_domain = Registration.SchoolDomains.CENTRALE
+    extra_school_domains = ("master.centralelille.fr",)
     registration_type = Registration.Types.CENTRALE_DD_PACK
     contribution = 265
     description = "Étudiante ou étudiant en double diplôme à l'école Centrale de Lille en provenance d'un établissement français, vous souhaitez adhérer à Centrale Lille Associations et à Centrale Lille Alumni en profitant du pack CLA+Alumni."
@@ -154,6 +157,7 @@ class CentraleCLARegistrationView(AbstractRegistrationView):
 class CentraleCLADDRegistrationView(AbstractRegistrationView):
     is_from_another_school = True
     school_domain = Registration.SchoolDomains.CENTRALE
+    extra_school_domains = ("master.centralelille.fr",)
     registration_type = Registration.Types.CENTRALE_DD_CLA
     contribution = 180
     description = "Étudiante ou étudiant en double diplôme à l'école Centrale de Lille en provenance d'un établissement français, vous souhaitez adhérer à Centrale Lille Associations."

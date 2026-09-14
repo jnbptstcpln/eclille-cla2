@@ -30,7 +30,9 @@ class AbstractRegistrationForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         self.school_domain = kwargs.pop("school_domain", "centralelille.fr")
+        self.extra_school_domains = kwargs.pop("extra_school_domains", ())
         self.is_from_another_school = kwargs.pop("is_from_another_school", False)
+        self.valid_school_domains = (self.school_domain,) + tuple(self.extra_school_domains)
         super().__init__(*args, **kwargs)
 
         if self.is_from_another_school:
@@ -46,7 +48,8 @@ class AbstractRegistrationForm(forms.ModelForm):
         self.fields['last_name'].widget.attrs['placeholder'] = f"Nom"
         self.fields['birthdate'].widget.attrs['placeholder'] = f"DD/MM/YYYY"
         self.fields['email'].widget.attrs['placeholder'] = f"prenom.nom@example.com"
-        self.fields['email_school'].widget.attrs['placeholder'] = f"prenom.nom@{self.school_domain}"
+        school_domains_example = " ou ".join(f"prenom.nom@{domain}" for domain in self.valid_school_domains)
+        self.fields['email_school'].widget.attrs['placeholder'] = school_domains_example
         self.fields['phone'].widget.attrs['placeholder'] = f"+33 6 00 00 00 00"
 
 
@@ -58,8 +61,9 @@ class AbstractRegistrationForm(forms.ModelForm):
     def clean_email_school(self):
         email = self.cleaned_data['email']
         email_school = self.cleaned_data['email_school']
-        if not email_school.endswith(self.school_domain):
-            raise forms.ValidationError(f"Veuillez vérifier que votre adresse mail scolaire finit bien en @{self.school_domain}")
+        if not email_school.endswith(self.valid_school_domains):
+            domains = " ou ".join(f"@{domain}" for domain in self.valid_school_domains)
+            raise forms.ValidationError(f"Veuillez vérifier que votre adresse mail scolaire finit bien en {domains}")
         if email == email_school:
             raise forms.ValidationError('Veuillez indiquer une adresse mail personnelle différente de votre adresse mail fournie par l\'école')
         return email_school
