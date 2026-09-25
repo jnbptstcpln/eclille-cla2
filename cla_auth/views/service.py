@@ -7,12 +7,14 @@ from django.shortcuts import render, redirect, reverse, resolve_url, get_object_
 from django.utils.http import urlencode
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.db.models import Prefetch
 from django.template.loader import render_to_string
 from django.utils import timezone
 
 from cla_web.middlewares import StayLoggedInMiddleware
 from cla_auth.models import Service, ServiceTicket, ServiceAuthorization
 from cla_auth.forms.session import LoginForm, ForgotForm
+from cla_association.models import Association, AssociationMember
 
 
 def _get_service_ticket_from_jwt(ticket_jwt) -> ServiceTicket:
@@ -53,19 +55,52 @@ def _get_success_json_response(payload, status_code=200):
     )
 
 
-def _get_association_roles_payload(user):
+def _get_association_roles_payload(user, include_type=False):
     memberships = user.association_memberships.filter(
         association__active=True
     ).select_related("association")
 
     # Add only the association roles, without changing the existing payload.
-    return [
-        {
+    roles = []
+    for membership in memberships:
+        role = {
             'associationSlug': membership.association.slug,
             'associationName': membership.association.name,
             'role': membership.role,
         }
-        for membership in memberships
+        # Only services with share_all_associations receive the type.
+        if include_type:
+            role['associationType'] = membership.association.type
+        roles.append(role)
+    return roles
+
+
+def _get_all_associations_payload():
+    # Every active association with its members, for services with
+    # share_all_associations when the user is a superuser.
+    associations = Association.objects.filter(active=True).prefetch_related(
+        Prefetch(
+            'members',
+            queryset=AssociationMember.objects.filter(user__isnull=False).select_related('user'),
+        )
+    )
+
+    return [
+        {
+            'slug': association.slug,
+            'name': association.name,
+            'type': association.type,
+            'members': [
+                {
+                    'username': member.user.username,
+                    'firstName': member.user.first_name,
+                    'lastName': member.user.last_name,
+                    'role': member.role,
+                }
+                for member in association.members.all()
+            ],
+        }
+        for association in associations
     ]
 
 
@@ -199,9 +234,11 @@ def validate(req, identifier, ticket_jwt):
                         "This user has not validated his account"
                     )
 
-                association_roles = _get_association_roles_payload(ticket.user)
+                association_roles = _get_association_roles_payload(
+                    ticket.user, include_type=service.share_all_associations
+                )
 
-                return _get_success_json_response({
+                payload = {
                     'username': ticket.user.username,
                     'firstName': ticket.user.first_name,
                     'lastName': ticket.user.last_name,
@@ -211,6 +248,10 @@ def validate(req, identifier, ticket_jwt):
                     'isAdmin': ticket.user.is_superuser,
                     'hasAssociationRole': len(association_roles) > 0,
                     'associationRoles': association_roles,
-                })
+                }
+                if service.share_all_associations and ticket.user.is_superuser:
+                    payload['allAssociations'] = _get_all_associations_payload()
+
+                return _get_success_json_response(payload)
 
     return _get_error_json_response("This ticket is invalid, authentication failed")

@@ -850,6 +850,10 @@ class Service(models.Model):
         blank=True,
     )
     auto_login = models.BooleanField(default=True, verbose_name="Connexion automatique")
+    share_all_associations = models.BooleanField(
+        default=False,
+        verbose_name="Partager le type des associations et, pour les superutilisateurs, toutes les associations actives et leurs membres",
+    )
 
     def has_user_gave_authorization(self, user: User):
         return ServiceAuthorization.objects.filter(service=self, user=user).count() > 0

@@ -532,6 +532,7 @@ class ServiceAdmin(admin.ModelAdmin):
                     "authorization_required",
                     "auto_login",
                     "colleges",
+                    "share_all_associations",
                 ),
             },
         ),
