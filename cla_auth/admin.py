@@ -163,7 +163,11 @@ class UserAdmin(UserAdmin):
 
         def queryset(self, request, queryset):
             if self.value() is not None:
-                return queryset.filter(infos__email_school__endswith=f"@{self.value()}")
+                # Les adresses @master.centralelille.fr sont communes à plusieurs écoles :
+                # on se base aussi sur l'école indiquée dans le formulaire d'adhésion lié au compte
+                return queryset.filter(
+                    Q(infos__email_school__endswith=f"@{self.value()}") | Q(registration__school=self.value())
+                )
             else:
                 return queryset
 

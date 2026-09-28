@@ -184,6 +184,7 @@ class ITEEMCLARegistrationView(AbstractRegistrationView):
 class ENSCLCLARegistrationView(AbstractRegistrationView):
     form_class = EnsclRegistrationForm
     school_domain = Registration.SchoolDomains.ENSCL
+    extra_school_domains = ("master.centralelille.fr",)
     registration_type = Registration.Types.ENSCL_CLA
     contribution = 225
     description = "Étudiante ou étudiant à l'ENSCL, vous souhaitez adhérer à Centrale Lille Associations."
