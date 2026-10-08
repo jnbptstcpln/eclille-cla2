@@ -2,7 +2,7 @@
 # BUILDER #
 ###########
 
-FROM python:3.9-slim
+FROM python:3.9-slim-bookworm
 
 # Répertoire de travail
 WORKDIR /usr/src/app
@@ -14,6 +14,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 # Installation des dépendances système nécessaires aux libs Python (dont mysqlclient et weasyprint)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
+    curl \
     python3-dev \
     musl-dev \
     libjpeg62-turbo-dev \
@@ -48,3 +49,9 @@ RUN pip install --upgrade pip \
 
 # Copie du reste du projet
 COPY . .
+# --- Déploiement (Coolify) ---
+# Le docker-compose.yml de dev surcharge command + DJANGO_SETTINGS_MODULE, donc inchangé pour le dev local.
+ENV DJANGO_SETTINGS_MODULE=cla_web.settings.coolify
+RUN chmod +x /usr/src/app/entrypoint.sh
+EXPOSE 8000
+CMD ["/usr/src/app/entrypoint.sh"]
