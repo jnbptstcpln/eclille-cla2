@@ -5,6 +5,42 @@
 {% block content %}
     <div class="container">
 
+        <style>
+            .cla-notice { background: #fff8d6; border: 2px solid #f5c400; border-left-width: 10px; border-radius: 6px; padding: 1.25rem 1.5rem; margin: 1.5rem 0; color: #3d3200; }
+            .cla-notice h2 { margin: 0 0 .75rem; font-size: 1.4rem; color: #7a5c00; }
+            .cla-notice ul { margin: .5rem 0 1rem; }
+            .cla-notice p:last-child { margin-bottom: 0; }
+        </style>
+        <aside class="cla-notice" role="alert">
+            <h2>&#9888; Fuite de données</h2>
+            <p>Bonjour à tous,</p>
+            <p>
+                Le site CLA a été victime d'une fuite de données cet après-midi. Des mesures d'urgence ont été déployées
+                le plus rapidement possible pour en limiter l'impact : avec l'aide de la DSI de Centrale Lille, le site a
+                été mis hors ligne et la boîte mail a été bloquée. Cela nous a permis de reprendre rapidement le contrôle
+                de la situation et de stopper tout envoi d'e-mails.
+            </p>
+            <p>Concernant les données compromises, voici l'inventaire provisoire que nous avons établi :</p>
+            <ul>
+                <li>Environ 30 IBAN distincts</li>
+                <li>20 fichiers contenant des RIB</li>
+                <li>De nombreux numéros de téléphone, adresses e-mail et dates de naissance</li>
+                <li>Les mots de passe (ces derniers ont fuité uniquement sous leur forme hachée, mais il sera néanmoins nécessaire de les réinitialiser)</li>
+            </ul>
+            <p>Nous tenons à vous présenter nos plus sincères excuses pour l'exposition de vos données personnelles.</p>
+            <p>
+                Grâce à l'intervention de notre responsable web, Foucault Wattinne, le site est de nouveau en ligne et sécurisé.
+            </p>
+            <p>
+                À la suite de cet incident, nous avons échangé avec la Direction des Services, la Direction du Pôle Juridique
+                ainsi que la Direction Générale de Centrale Lille Institut afin de faire un point complet sur la situation.
+                Le Conseil d'Administration de CLA se réunira dans les prochains jours pour définir les actions à entreprendre
+                face à cette attaque.
+            </p>
+            <p>Nous reviendrons vers vous dans les plus brefs délais pour vous tenir informés des suites données à cet événement.</p>
+            <p><b>Le bureau de CLA</b></p>
+        </aside>
+
         <h1 class="border-primary">Centrale Lille Associations</h1>
         <section>
             <p class="text-justify">
