@@ -2,7 +2,7 @@
 # BUILDER #
 ###########
 
-FROM python:3.9-slim-bookworm
+FROM python:3.12-slim-bookworm
 
 # Répertoire de travail
 WORKDIR /usr/src/app
@@ -16,7 +16,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
     curl \
     python3-dev \
-    musl-dev \
     libjpeg62-turbo-dev \
     libopenjp2-7-dev \
     zlib1g-dev \
@@ -25,6 +24,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libssl-dev \
     libffi-dev \
     default-libmysqlclient-dev \
+    pkg-config \
     # Ajout des dépendances pour Weasyprint (incluant Cairo)
     libpangocairo-1.0-0 \
     libpangoft2-1.0-0 \
