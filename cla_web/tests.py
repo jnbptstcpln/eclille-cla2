@@ -2,14 +2,18 @@
 Tests de fumée : chargent les pages principales pour détecter ce qui casse lors des montées de version.
 Lancer avec : DJANGO_SETTINGS_MODULE=cla_web.settings.test python manage.py test
 """
+import io
+import tempfile
 from datetime import date, timedelta
 
 from django.contrib import admin
 from django.contrib.auth.models import User
+from django.core.files.base import ContentFile
 from django.template.loader import render_to_string
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
+from PIL import Image
 from weasyprint import HTML
 
 from cla_auth.models import Service, UserInfos
@@ -74,6 +78,14 @@ class SmokeTest(TestCase):
         # Le ticket est à usage unique
         reused = self.client.get(reverse("cla_auth:service_validate", args=[service.identifier, ticket])).json()
         self.assertFalse(reused["success"])
+
+    def test_picture_resize(self):
+        image = io.BytesIO()
+        Image.new("RGB", (1000, 800)).save(image, "PNG")
+        with tempfile.TemporaryDirectory() as media_root, self.settings(MEDIA_ROOT=media_root):
+            self.user.infos.picture_compressed.save("photo.png", ContentFile(image.getvalue()))
+            with Image.open(self.user.infos.picture_compressed.path) as resized:
+                self.assertEqual((resized.format, max(resized.size)), ("JPEG", 500))
 
     def test_pdf(self):
         agreement = ImageRightAgreement(first_name="Jean", last_name="Dupont", birthdate=date(2004, 1, 1),
