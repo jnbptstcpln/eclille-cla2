@@ -197,8 +197,7 @@ BLEACH_ALLOWED_TAGS = [
     "ul",
     "p",
     "sup",
-    "sub"
-    "img",
+    "sub",
     "hr",
     "div"
 ]
