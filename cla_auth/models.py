@@ -155,7 +155,7 @@ class UserInfos(models.Model):
         IE5 = "IE5", "IE5"
         IE5P = "IE5P", "IE5'"
 
-        IE5_DIPLOME = "IE5-DIPLOME", "Diplomé de l\ITEEM"
+        IE5_DIPLOME = "IE5-DIPLOME", "Diplomé de l'ITEEM"
 
         # # # # # # # # #
         # CURSUS CHIMIE #
