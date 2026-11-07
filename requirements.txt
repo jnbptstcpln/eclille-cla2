@@ -1,6 +1,6 @@
 asgiref==3.13.0
 bcrypt==4.3.0
-bleach==4.1.0
+bleach==6.4.0
 bugsnag==4.9.2
 certifi==2026.10.23
 Django==5.2.19
@@ -11,12 +11,12 @@ django-resized==1.0.3
 django-summernote==0.8.20.0
 django-weasyprint==2.6.0
 WeasyPrint==70.0
-icalendar==4.0.9
+icalendar==7.3.0
 idna==3.20
 marshmallow==3.26.2
 mysqlclient==2.2.8
 Pillow==11.3.0
-PyJWT==2.1.0
+PyJWT==2.15.1
 python-decouple==3.8
 requests==2.32.5
 sqlparse==0.5.5

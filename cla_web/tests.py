@@ -4,8 +4,11 @@ Lancer avec : DJANGO_SETTINGS_MODULE=cla_web.settings.test python manage.py test
 """
 import io
 import tempfile
-from datetime import date, timedelta
+from datetime import date, time, timedelta
 
+import bleach
+
+from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
@@ -17,11 +20,30 @@ from django.utils import timezone
 from PIL import Image
 from weasyprint import HTML
 
+from cla_association.models import Association
 from cla_auth.models import Service, UserInfos, UserMembership
+from cla_event.models import Event, EventPlace, EventType
 from cla_registration.models import ImageRightAgreement
 
 # Ajout seulement via un bouton depuis un évènement/une soirée (paramètres GET requis)
 NO_ADD_VIEW = {"eventregistration", "dancingpartyregistration"}
+
+# Les styles en ligne sont tous vidés : aucun `styles`/`css_sanitizer` n'est passé à bleach.clean
+BLEACH_EXPECTED = {
+    '<p style="color: red; text-align: center;">Texte <b>gras</b> <sub>2</sub> <sup>3</sup></p>':
+        '<p style="">Texte <b>gras</b> <sub>2</sub> <sup>3</sup></p>',
+    '<script>alert(1)</script><a href="javascript:alert(1)" onclick="x()">lien</a>':
+        '&lt;script&gt;alert(1)&lt;/script&gt;<a>lien</a>',
+    '<a href="https://example.com" title="t" target="_blank">ok</a> <img src="https://example.com/a.png" style="width: 50%;" onerror="x()">':
+        '<a href="https://example.com" title="t">ok</a> <img src="https://example.com/a.png" style="">',
+    '<span style="font-weight: bold; background-image: url(javascript:alert(1))">s</span><table><tr><td>t</td></tr></table>':
+        '<span style="">s</span>&lt;table&gt;&lt;tr&gt;&lt;td&gt;t&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;',
+    '<h2 style="color:#123">Titre</h2><div class="c" style="margin:0">d</div><hr><ul><li>a</li></ul>':
+        '<h2 style="">Titre</h2><div style="">d</div><hr><ul><li>a</li></ul>',
+    # bleach 4.1 supprimait la balise non fermée, bleach 6 l'échappe
+    'Texte & <non fermé':
+        'Texte &amp; &lt;non fermé',
+}
 
 
 class SmokeTest(TestCase):
@@ -104,6 +126,28 @@ class SmokeTest(TestCase):
         response = self.client.get(reverse("admin:auth_user_membership", args=[self.user.pk]))
         self.assertEqual(response.status_code, 200)
         self.assertTrue(response.rendered_content.startswith(b"%PDF"))
+
+    def test_ics_export(self):
+        tomorrow = date.today() + timedelta(days=1)
+        Event.objects.create(
+            association=Association.objects.get_cla(), name="Soirée test", name_school="Soirée test",
+            type=EventType.objects.create(name="Soirée"), place=EventPlace.objects.create(name="Foyer"),
+            start_date=tomorrow, start_time=time(20), end_time=time(23), validated=True, admin_display=True,
+        )
+        response = self.client.get(reverse("cla_event:school_admin:index-ics"))
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b"BEGIN:VEVENT", response.content)
+        self.assertIn(b"Soir\xc3\xa9e test", response.content)
+        self.assertIn(tomorrow.strftime("%Y%m%d").encode() + b"T200000", response.content)
+
+    def test_bleach(self):
+        # Sorties de bleach 4.1 avec les réglages du projet : la montée de version ne doit pas les changer
+        def clean(html):
+            return bleach.clean(html, tags=settings.BLEACH_ALLOWED_TAGS, attributes=settings.BLEACH_ALLOWED_ATTRIBUTES)
+
+        for html, expected in BLEACH_EXPECTED.items():
+            with self.subTest(html=html):
+                self.assertEqual(clean(html), expected)
 
     def test_pdf(self):
         agreement = ImageRightAgreement(first_name="Jean", last_name="Dupont", birthdate=date(2004, 1, 1),
