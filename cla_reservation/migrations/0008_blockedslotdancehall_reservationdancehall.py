@@ -3,7 +3,7 @@
 from django.conf import settings
 from django.db import migrations, models
 import django.db.models.deletion
-import django_summernote.fields
+import cla_web.fields
 import multiselectfield.db.fields
 
 
@@ -42,7 +42,7 @@ class Migration(migrations.Migration):
             name='ReservationDanceHall',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('description_event', django_summernote.fields.SummernoteTextField(blank=True, help_text='Précisez ici comment va être organisé votre événement, quelles activités seront proposées et quels seront vos besoins (électrique, équipements particulier, ...)', null=True, verbose_name="Description de l'événement")),
+                ('description_event', cla_web.fields.SummernoteTextField(blank=True, help_text='Précisez ici comment va être organisé votre événement, quelles activités seront proposées et quels seront vos besoins (électrique, équipements particulier, ...)', null=True, verbose_name="Description de l'événement")),
                 ('start_date', models.DateField(help_text='Indiquez ici la date à partir de laquelle vous souhaitez occuper le lieu', verbose_name='Date de début')),
                 ('start_time', models.TimeField(help_text='Au format HH:MM (par exemple 18:30)', verbose_name='Heure de début')),
                 ('end_time', models.TimeField(help_text='Au format HH:MM (par exemple 01:00), elle correspond au moment où vous devez avoir rangé et nettoyé le lieu', verbose_name='Heure de fin')),
@@ -57,7 +57,7 @@ class Migration(migrations.Migration):
                 ('validated_on', models.DateTimeField(blank=True, editable=False, null=True, verbose_name='Validé le')),
                 ('admin_display', models.BooleanField(default=False, verbose_name="L'événement apparait sur le planning de l'administration")),
                 ('member_display', models.BooleanField(default=True, verbose_name="L'événement apparait sur le planning des cotisants")),
-                ('rejected_for', django_summernote.fields.SummernoteTextField(blank=True, null=True, verbose_name='Raison du refus')),
+                ('rejected_for', cla_web.fields.SummernoteTextField(blank=True, null=True, verbose_name='Raison du refus')),
                 ('created_by', models.ForeignKey(blank=True, editable=False, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to=settings.AUTH_USER_MODEL)),
                 ('event', models.OneToOneField(blank=True, editable=False, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='reservation_dancehall', to='cla_event.event', verbose_name='Réserver dans le cadre de cet événement')),
                 ('sport_activity', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to='cla_reservation.sportactivity', verbose_name='Sport ou activité')),

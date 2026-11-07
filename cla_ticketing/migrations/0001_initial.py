@@ -3,7 +3,7 @@
 from django.conf import settings
 from django.db import migrations, models
 import django.db.models.deletion
-import django_summernote.fields
+import cla_web.fields
 import multiselectfield.db.fields
 
 
@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=75, verbose_name="Nom de l'événement")),
-                ('description', django_summernote.fields.SummernoteTextField(blank=True, verbose_name="Présentation de l'événement")),
+                ('description', cla_web.fields.SummernoteTextField(blank=True, verbose_name="Présentation de l'événement")),
                 ('organizer', models.CharField(max_length=100, verbose_name="Organisateur de l'événement")),
                 ('event_starts_on', models.DateTimeField(verbose_name="Début de l'événement")),
                 ('event_ends_on', models.DateTimeField(verbose_name="Fin de l'événement")),
@@ -42,7 +42,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=75, verbose_name="Nom de l'événement")),
-                ('description', django_summernote.fields.SummernoteTextField(blank=True, verbose_name="Présentation de l'événement")),
+                ('description', cla_web.fields.SummernoteTextField(blank=True, verbose_name="Présentation de l'événement")),
                 ('organizer', models.CharField(max_length=100, verbose_name="Organisateur de l'événement")),
                 ('event_starts_on', models.DateTimeField(verbose_name="Début de l'événement")),
                 ('event_ends_on', models.DateTimeField(verbose_name="Fin de l'événement")),

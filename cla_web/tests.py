@@ -9,6 +9,7 @@ from datetime import date, timedelta
 from django.contrib import admin
 from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
+from django.template import Context, Template
 from django.template.loader import render_to_string
 from django.test import TestCase
 from django.urls import reverse
@@ -16,7 +17,7 @@ from django.utils import timezone
 from PIL import Image
 from weasyprint import HTML
 
-from cla_auth.models import Service, UserInfos
+from cla_auth.models import Service, UserInfos, UserMembership
 from cla_registration.models import ImageRightAgreement
 
 # Ajout seulement via un bouton depuis un évènement/une soirée (paramètres GET requis)
@@ -51,7 +52,7 @@ class SmokeTest(TestCase):
     def test_admin_pages(self):
         # Les formulaires d'ajout utilisent le template admin/includes/fieldset.html surchargé
         self.client.force_login(self.user)
-        urls = ["/admin/"]
+        urls = ["/admin/", "/summernote/editor/id_presentation_html/"]
         for model in admin.site._registry:
             info = (model._meta.app_label, model._meta.model_name)
             urls.append(reverse("admin:%s_%s_changelist" % info))
@@ -86,6 +87,23 @@ class SmokeTest(TestCase):
             self.user.infos.picture_compressed.save("photo.png", ContentFile(image.getvalue()))
             with Image.open(self.user.infos.picture_compressed.path) as resized:
                 self.assertEqual((resized.format, max(resized.size)), ("JPEG", 500))
+
+    def test_qr_code(self):
+        # Même balise que les billets de soirée (cla_ticketing/party/view_registration_*.html)
+        url = Template(
+            "{% load qr_code %}{% qr_url_from_text text size=8 version=10 image_format='png' dark_color='#34495e' %}"
+        ).render(Context({"text": "billet"}))
+        response = self.client.get(url.replace("&amp;", "&"))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "image/png")
+
+    def test_membership_pdf(self):
+        # Justificatif de cotisation généré par django-weasyprint depuis l'admin
+        UserMembership.objects.create(user=self.user, amount=100, paid_on=date.today())
+        self.client.force_login(self.user)
+        response = self.client.get(reverse("admin:auth_user_membership", args=[self.user.pk]))
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.rendered_content.startswith(b"%PDF"))
 
     def test_pdf(self):
         agreement = ImageRightAgreement(first_name="Jean", last_name="Dupont", birthdate=date(2004, 1, 1),

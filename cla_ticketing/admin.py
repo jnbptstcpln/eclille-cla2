@@ -1,7 +1,7 @@
 from django.contrib import admin, messages
 from django.urls import path
 from django.shortcuts import redirect
-from django_admin_inline_paginator.admin import TabularInlinePaginated
+from django_admin_inline_paginator_plus.admin import TabularInlinePaginated
 from django.core.exceptions import PermissionDenied
 from django.db.models import Q
 from django.http import HttpRequest, Http404
@@ -105,6 +105,7 @@ class EventAdmin(admin.ModelAdmin):
         readonly_fields = ['last_name', 'first_name', 'created_on', 'is_contributor', 'type', 'place_paid', 'edit_button']
         model = EventRegistration
         classes = []
+        htmx_enabled = False  # pas de script htmx chargé depuis un CDN
         per_page = 10
         max_num = 0
         ordering = "-created_on",
@@ -546,6 +547,7 @@ class DancingPartyAdmin(admin.ModelAdmin):
         readonly_fields = ['last_name', 'first_name', 'place', 'place_paid', 'validated', 'created_on', 'edit_button']
         model = DancingPartyRegistration
         classes = []
+        htmx_enabled = False  # pas de script htmx chargé depuis un CDN
         per_page = 10
         max_num = 0
         ordering = "-created_on",

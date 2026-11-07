@@ -15,7 +15,10 @@ MIDDLEWARE.insert(
     MIDDLEWARE.index("django.middleware.security.SecurityMiddleware") + 1,
     "whitenoise.middleware.WhiteNoiseMiddleware",
 )
-STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
+STORAGES = {
+    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    "staticfiles": {"BACKEND": "whitenoise.storage.CompressedStaticFilesStorage"},
+}
 
 # Médias servis par Django seulement si SERVE_MEDIA=true (cf. urls.py)
 SERVE_MEDIA = config("SERVE_MEDIA", False, cast=bool)  # noqa: F405

@@ -11,7 +11,7 @@ from django.db.models import F
 from django.utils.text import slugify
 from multiselectfield import MultiSelectField
 from cla_auth.models import UserInfos
-from django_summernote.fields import SummernoteTextField
+from cla_web.fields import SummernoteTextField
 from django.contrib.auth.models import User, Group, Permission
 from django.utils import timezone
 

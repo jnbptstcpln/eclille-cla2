@@ -10,6 +10,6 @@ for key in ("SECRET_KEY", "ALLOWED_HOSTS", "EMAIL_FROM", "EMAIL_HOST", "EMAIL_LO
 from .coolify import *  # noqa: E402,F401,F403
 
 DATABASES = {"default": {"ENGINE": "django.db.backends.sqlite3", "NAME": ":memory:"}}
-STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"
+STORAGES = {**STORAGES, "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"}}
 SESSION_COOKIE_SECURE = CSRF_COOKIE_SECURE = False
 PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]  # tests plus rapides

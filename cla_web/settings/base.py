@@ -48,7 +48,7 @@ INSTALLED_APPS = [
     'django.contrib.flatpages',
     # Addons
     'django_summernote',
-    'django_admin_inline_paginator',
+    'django_admin_inline_paginator_plus',
     'qr_code',
     # CLA-Web's apps
     'cla_auth.apps.ClaAuthConfig',
@@ -146,8 +146,6 @@ LANGUAGE_CODE = 'fr-fr'
 TIME_ZONE = 'Europe/Paris'
 
 USE_I18N = True
-
-USE_L10N = True
 
 USE_TZ = True
 

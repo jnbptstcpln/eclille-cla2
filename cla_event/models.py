@@ -13,7 +13,7 @@ from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django_resized import ResizedImageField
-from django_summernote.fields import SummernoteTextField
+from cla_web.fields import SummernoteTextField
 
 from cla_association.models import Association
 from cla_auth.models import UserInfos, Service

@@ -5,7 +5,7 @@ import cla_reservation.models.foyer
 from django.conf import settings
 from django.db import migrations, models
 import django.db.models.deletion
-import django_summernote.fields
+import cla_web.fields
 
 
 class Migration(migrations.Migration):
@@ -23,7 +23,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('created_on', models.DateTimeField(auto_now_add=True)),
-                ('description', django_summernote.fields.SummernoteTextField(help_text='Rappelle des éléments important tel que les différents chèques de cautions', verbose_name='Présentation')),
+                ('description', cla_web.fields.SummernoteTextField(help_text='Rappelle des éléments important tel que les différents chèques de cautions', verbose_name='Présentation')),
                 ('file', models.FileField(blank=True, help_text='De préférence au format PDF ou Excel', null=True, upload_to=cla_reservation.models.barbecue.FilePath.rules, verbose_name='Fichier')),
                 ('available', models.BooleanField(default=False, verbose_name='Cette version est disponible à la consultation')),
             ],
@@ -67,7 +67,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('created_on', models.DateTimeField(auto_now_add=True)),
-                ('description', django_summernote.fields.SummernoteTextField(help_text='Rappelle des éléments important tel que les différents chèques de cautions', verbose_name='Présentation')),
+                ('description', cla_web.fields.SummernoteTextField(help_text='Rappelle des éléments important tel que les différents chèques de cautions', verbose_name='Présentation')),
                 ('file', models.FileField(blank=True, help_text='De préférence au format PDF ou Excel', null=True, upload_to=cla_reservation.models.foyer.FilePath.rules, verbose_name='Fichier')),
                 ('available', models.BooleanField(default=False, verbose_name='Cette version est disponible à la consultation')),
             ],
@@ -95,7 +95,7 @@ class Migration(migrations.Migration):
             name='ReservationSynthe',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('description_event', django_summernote.fields.SummernoteTextField(blank=True, help_text='Précisez ici comment va être organisé votre événement, quelles activités seront proposées et quels seront vos besoins (électrique, équipements particulier, ...)', null=True, verbose_name="Description de l'événement")),
+                ('description_event', cla_web.fields.SummernoteTextField(blank=True, help_text='Précisez ici comment va être organisé votre événement, quelles activités seront proposées et quels seront vos besoins (électrique, équipements particulier, ...)', null=True, verbose_name="Description de l'événement")),
                 ('start_date', models.DateField(help_text='Indiquez ici la date à partir de laquelle vous souhaitez occuper le lieu', verbose_name='Date de début')),
                 ('start_time', models.TimeField(help_text='Au format HH:MM (par exemple 18:30)', verbose_name='Heure de début')),
                 ('end_time', models.TimeField(help_text='Au format HH:MM (par exemple 01:00), elle correspond au moment où vous devez avoir rangé et nettoyé le lieu', verbose_name='Heure de fin')),
@@ -126,7 +126,7 @@ class Migration(migrations.Migration):
             name='ReservationFoyer',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('description', django_summernote.fields.SummernoteTextField(help_text='Précisez ici comment va être organisé votre événement, quelles activités seront proposées et quels seront vos besoins (électrique, équipements particulier, ...)', verbose_name="Description de l'événement")),
+                ('description', cla_web.fields.SummernoteTextField(help_text='Précisez ici comment va être organisé votre événement, quelles activités seront proposées et quels seront vos besoins (électrique, équipements particulier, ...)', verbose_name="Description de l'événement")),
                 ('beer_selection', models.TextField(blank=True, help_text='Indiquez sur chaque ligne "NOM DE LA BIERE : QUANTITE"', max_length=500, verbose_name='Sélection de bière')),
                 ('start_date', models.DateField(help_text="Indiquez ici la date à partir de laquelle vous souhaitez occuper le lieu pour l'installation", verbose_name="Date de début de l'installation")),
                 ('start_time', models.TimeField(help_text='Au format HH:MM (par exemple 18:30)', verbose_name="Heure de début de l'installation")),
@@ -158,8 +158,8 @@ class Migration(migrations.Migration):
             name='ReservationBarbecue',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('description_event', django_summernote.fields.SummernoteTextField(help_text='Précisez ici comment va être organisé votre événement, quelles activités seront proposées et quels seront vos besoins (électrique, équipements particulier, ...)', verbose_name="Description de l'événement")),
-                ('description_user', django_summernote.fields.SummernoteTextField(help_text='Précisez ici dans quel cadre est organisée cette réservation et le nombre de personnes participantes', verbose_name="Description de l'événement")),
+                ('description_event', cla_web.fields.SummernoteTextField(help_text='Précisez ici comment va être organisé votre événement, quelles activités seront proposées et quels seront vos besoins (électrique, équipements particulier, ...)', verbose_name="Description de l'événement")),
+                ('description_user', cla_web.fields.SummernoteTextField(help_text='Précisez ici dans quel cadre est organisée cette réservation et le nombre de personnes participantes', verbose_name="Description de l'événement")),
                 ('start_date', models.DateField(help_text="Indiquez ici la date à partir de laquelle vous souhaitez occuper le lieu pour l'installation", verbose_name="Date de début de l'installation")),
                 ('start_time', models.TimeField(help_text='Au format HH:MM (par exemple 18:30)', verbose_name="Heure de début de l'installation")),
                 ('end_time', models.TimeField(help_text='Au format HH:MM (par exemple 01:00), elle correspond au moment où vous devez avoir rangé et nettoyé le lieu', verbose_name='Heure de fin du rangement')),
