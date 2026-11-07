@@ -16,7 +16,7 @@ services:
       - cla-web-db
 
   cla-web-db:
-    image: mysql
+    image: mysql:8.4
     container_name: cla-web-db
     hostname: cla-web-db
     volumes:
