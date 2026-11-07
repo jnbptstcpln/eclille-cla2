@@ -1,3 +1,5 @@
+import bleach
+from django import forms
 from django.contrib import admin, messages
 from django.urls import path
 from django.shortcuts import redirect
@@ -18,8 +20,20 @@ from cla_ticketing.views.admin import (
 )
 
 
+
+class AbstractEventAdminForm(forms.ModelForm):
+    # La description est éditable par les responsables (pas forcément superutilisateurs) et affichée avec |safe
+    def clean_description(self):
+        return bleach.clean(
+            self.cleaned_data['description'],
+            tags=settings.BLEACH_ALLOWED_TAGS,
+            attributes=settings.BLEACH_ALLOWED_ATTRIBUTES
+        )
+
+
 @admin.register(Event)
 class EventAdmin(admin.ModelAdmin):
+    form = AbstractEventAdminForm
     class EventRegistrationTypeInline(admin.TabularInline):
         fields = ['name', 'description', 'open_to', 'visible', 'price']
         model = EventRegistrationType
@@ -500,6 +514,7 @@ class EventRegistrationAdmin(admin.ModelAdmin):
 
 @admin.register(DancingParty)
 class DancingPartyAdmin(admin.ModelAdmin):
+    form = AbstractEventAdminForm
 
     class DancingPartyRegistrationCustomFieldInline(admin.StackedInline):
         fields = [

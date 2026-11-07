@@ -14,7 +14,7 @@ from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
 from django.template import Context, Template
 from django.template.loader import render_to_string
-from django.test import TestCase
+from django.test import RequestFactory, TestCase
 from django.urls import reverse
 from django.utils import timezone
 from PIL import Image
@@ -24,6 +24,7 @@ from cla_association.models import Association
 from cla_auth.models import Service, UserInfos, UserMembership
 from cla_event.models import Event, EventPlace, EventType
 from cla_registration.models import ImageRightAgreement
+from cla_ticketing.models import DancingParty, Event as TicketingEvent
 
 # Ajout seulement via un bouton depuis un évènement/une soirée (paramètres GET requis)
 NO_ADD_VIEW = {"eventregistration", "dancingpartyregistration"}
@@ -148,6 +149,16 @@ class SmokeTest(TestCase):
         for html, expected in BLEACH_EXPECTED.items():
             with self.subTest(html=html):
                 self.assertEqual(clean(html), expected)
+
+    def test_ticketing_description_is_sanitized(self):
+        # Affichée avec |safe sur les pages publiques de billetterie
+        for model in (TicketingEvent, DancingParty):
+            with self.subTest(model=model.__name__):
+                request = RequestFactory().get("/")
+                request.user = self.user
+                form = admin.site._registry[model].get_form(request)()
+                form.cleaned_data = {"description": '<p onclick="x()">ok</p><script>alert(1)</script>'}
+                self.assertEqual(form.clean_description(), "<p>ok</p>&lt;script&gt;alert(1)&lt;/script&gt;")
 
     def test_pdf(self):
         agreement = ImageRightAgreement(first_name="Jean", last_name="Dupont", birthdate=date(2004, 1, 1),
