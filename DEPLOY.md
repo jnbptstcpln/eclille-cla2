@@ -33,6 +33,7 @@ Les réglages Django utilisés sont `cla_web.settings.coolify` (valeur par défa
 | `SECURE_COOKIES` | non | `True` par défaut (cookies réservés au HTTPS). |
 | `SERVE_MEDIA` | non | `False` par défaut. `True` pour que Django serve lui-même `/media/`. |
 | `GUNICORN_WORKERS` | non | Nombre de workers gunicorn, 3 par défaut. |
+| `OIDC_RSA_PRIVATE_KEY` | non | Clé RSA (PEM) qui signe les jetons OpenID Connect. Sans elle, OpenID Connect est désactivé et seul l'ancien SSO fonctionne. Les retours à la ligne peuvent être écrits `\n`. À ne pas changer sans raison : les jetons déjà émis ne seraient plus vérifiables. Voir [OIDC.md](OIDC.md). |
 
 ## Mails (Brevo)
 

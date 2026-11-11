@@ -541,6 +541,15 @@ class ServiceAdmin(admin.ModelAdmin):
             },
         ),
         (
+            "OpenID Connect",
+            {
+                "fields": ("oidc_application",),
+                "description": "Pour passer le service à OIDC : créer une application (type confidentiel, "
+                               "autorisation par code, algorithme RS256) dans « Django OAuth Toolkit » puis la "
+                               "sélectionner ici. L'ancien SSO continue de fonctionner en parallèle.",
+            },
+        ),
+        (
             "Dernières connexions",
             {"fields": ("last_tickets",), "classes": ("wide", "collapse")},
         ),

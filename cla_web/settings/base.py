@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     'django_summernote',
     'django_admin_inline_paginator_plus',
     'qr_code',
+    'oauth2_provider',
     # CLA-Web's apps
     'cla_auth.apps.ClaAuthConfig',
     'cla_public.apps.ClaPublicConfig',
@@ -177,6 +178,29 @@ LOGIN_URL = "/connexion"
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 SESSION_COOKIE_AGE = 3600
 SESSION_SAVE_EVERY_REQUEST = True
+
+# OpenID Connect (django-oauth-toolkit), servi sous /auth/
+# Clé RSA privée au format PEM (les retours à la ligne peuvent être écrits « \n »).
+# Sans clé, OIDC est désactivé et seul l'ancien SSO fonctionne.
+OIDC_RSA_PRIVATE_KEY = config("OIDC_RSA_PRIVATE_KEY", "").replace("\\n", "\n")
+OAUTH2_PROVIDER_APPLICATION_MODEL = "oauth2_provider.Application"  # Requis pour la migration de Service.oidc_application
+OAUTH2_PROVIDER = {
+    "OIDC_ENABLED": bool(OIDC_RSA_PRIVATE_KEY),
+    "OIDC_RSA_PRIVATE_KEY": OIDC_RSA_PRIVATE_KEY,
+    "OAUTH2_VALIDATOR_CLASS": "cla_auth.oidc.ClaOAuth2Validator",
+    "SCOPES": {
+        "openid": "Votre identifiant CLA",
+        "profile": "Votre nom et prénom",
+        "email": "Votre adresse mail de l'école",
+        "cla": "Votre promotion, votre cursus et vos rôles dans les associations",
+    },
+    "DEFAULT_SCOPES": ["openid"],
+    "PKCE_REQUIRED": True,
+    "ACCESS_TOKEN_EXPIRE_SECONDS": 3600,
+    "REFRESH_TOKEN_EXPIRE_SECONDS": 30 * 24 * 3600,
+    "OIDC_RP_INITIATED_LOGOUT_ENABLED": True,
+    "OIDC_RP_INITIATED_LOGOUT_ALWAYS_PROMPT": False,  # Confirmation demandée seulement sans id_token_hint valide
+}
 
 # Bleach default config
 BLEACH_ALLOWED_TAGS = [

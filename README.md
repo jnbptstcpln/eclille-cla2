@@ -54,3 +54,7 @@ DJANGO_SETTINGS_MODULE=cla_web.settings.test python manage.py test
 ## Déploiement
 
 Voir [DEPLOY.md](DEPLOY.md).
+
+## Connexion des services (SSO)
+
+Voir [OIDC.md](OIDC.md).

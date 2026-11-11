@@ -1,5 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.urls import path
+from oauth2_provider import views as oauth2_views
 
 from cla_auth import views
 
@@ -49,3 +50,20 @@ urlpatterns = [
         name="debug__import_legacy_users",
     ),
 ]
+
+# OpenID Connect, monté sous /auth/ (cla_web/urls.py) avec le namespace attendu par django-oauth-toolkit.
+# Les vues de gestion des applications de django-oauth-toolkit ne sont volontairement pas exposées :
+# les applications se créent dans l'administration.
+oidc_urlpatterns = (
+    [
+        path("authorize/", views.oidc.AuthorizationView.as_view(), name="authorize"),
+        path("token/", oauth2_views.TokenView.as_view(), name="token"),
+        path("revoke_token/", oauth2_views.RevokeTokenView.as_view(), name="revoke-token"),
+        path("userinfo/", oauth2_views.UserInfoView.as_view(), name="user-info"),
+        path("logout/", views.oidc.LogoutView.as_view(), name="rp-initiated-logout"),
+        path(".well-known/openid-configuration", oauth2_views.ConnectDiscoveryInfoView.as_view(),
+             name="oidc-connect-discovery-info"),
+        path(".well-known/jwks.json", oauth2_views.JwksInfoView.as_view(), name="jwks-info"),
+    ],
+    "oauth2_provider",
+)

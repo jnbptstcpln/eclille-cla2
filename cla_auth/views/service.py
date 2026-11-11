@@ -103,6 +103,20 @@ def _get_all_associations_payload():
     ]
 
 
+ACCESS_ERROR_TEMPLATES = {
+    "invalid_account": "cla_auth/service/invalid_account.html",
+    "access_denied": "cla_auth/service/access_denied.html",
+    "validation_required": "cla_auth/service/validate_alert_standalone.html",
+}
+
+
+def render_access_error(req, service, error, redirect_url):
+    """Page expliquant pourquoi l'utilisateur ne peut pas se connecter (cf. Service.access_error)."""
+    if error == "validation_required":
+        req.session["next"] = redirect_url  # La vue de validation y renvoie une fois le compte validé
+    return render(req, ACCESS_ERROR_TEMPLATES[error], {'service': service, 'redirect': redirect_url}, status=403)
+
+
 def authenticate(req, identifier):
 
     service: Service = get_object_or_404(Service, identifier=identifier)
@@ -110,40 +124,13 @@ def authenticate(req, identifier):
     if not req.user.is_authenticated or (not service.auto_login and not req.session.get(f"cla_auth:{service.identifier}_login", False)):
         return login(req, identifier)
 
-    # Check if the account has infos, i.e. it belongs to a real user
-    if not hasattr(req.user, "infos"):
-        return render(
-            req,
-            "cla_auth/service/invalid_account.html",
-            {
-                'service': service
-            }
-        )
-
-    # Check if college user can connect to the service
-    if req.user.infos.college not in service.colleges:
-        return render(
-            req,
-            "cla_auth/service/access_denied.html",
-            {
-                'service': service
-            }
-        )
+    error = service.access_error(req.user)
+    if error:
+        return render_access_error(req, service, error, resolve_url('cla_auth:service_authenticate', service.identifier))
 
     # Check if user has given authorization to share its infos with the service
     if service.authorization_required and not service.has_user_gave_authorization(req.user):
         return authorize(req, identifier)
-
-    # Check if the account lost its validation since last login if needed
-    if service.validation_required and not req.user.infos.is_valid():
-        return render(
-            req,
-            "cla_auth/service/validate_alert_standalone.html",
-            {
-                'service': service,
-                'redirect': resolve_url('cla_auth:service_authenticate', service.identifier)
-            }
-        )
 
     # Create ticket and redirect to the service
     ticket = service.create_ticket(req.user)

@@ -7,4 +7,5 @@ from . import (
     service,
     debug,
     docs,
+    oidc,
 )

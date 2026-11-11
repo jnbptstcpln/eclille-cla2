@@ -14,6 +14,7 @@ from django.utils import timezone
 from django.utils.text import slugify
 from django_resized import ResizedImageField
 from multiselectfield import MultiSelectField
+from oauth2_provider.settings import oauth2_settings
 
 from cla_web.utils import current_school_year
 
@@ -856,6 +857,28 @@ class Service(models.Model):
         default=False,
         verbose_name="Partager le type des associations et, pour les superutilisateurs, toutes les associations actives et leurs membres",
     )
+    oidc_application = models.OneToOneField(
+        oauth2_settings.APPLICATION_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="service",
+        verbose_name="Application OpenID Connect",
+        help_text="Permet au service de se connecter via OIDC (/auth/), en plus de l'ancien SSO",
+    )
+
+    def access_error(self, user: User):
+        """
+        Raison pour laquelle `user` ne peut pas se connecter au service, None s'il le peut.
+        Partagé par l'ancien SSO et OIDC.
+        """
+        if not hasattr(user, "infos"):  # Compte n'appartenant pas à un vrai utilisateur
+            return "invalid_account"
+        if user.infos.college not in self.colleges:
+            return "access_denied"
+        if self.validation_required and not user.infos.is_valid():
+            return "validation_required"
+        return None
 
     def has_user_gave_authorization(self, user: User):
         return ServiceAuthorization.objects.filter(service=self, user=user).count() > 0

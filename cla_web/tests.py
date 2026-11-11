@@ -79,10 +79,13 @@ class SmokeTest(TestCase):
         # Une campagne d'adhésion pour ouvrir sa fiche (avec la liste des inscriptions en dessous)
         RegistrationSession.objects.create(date_start=date.today(), date_end=date.today() + timedelta(days=30))
         urls = ["/admin/", "/summernote/editor/id_presentation_html/"]
-        for model in admin.site._registry:
+        request = RequestFactory().get("/admin/")
+        request.user = self.user
+        for model, model_admin in admin.site._registry.items():
             info = (model._meta.app_label, model._meta.model_name)
             urls.append(reverse("admin:%s_%s_changelist" % info))
-            if model._meta.model_name not in NO_ADD_VIEW:
+            # Les jetons OIDC ne s'ajoutent pas à la main (ajout désactivé par django-oauth-toolkit)
+            if model._meta.model_name not in NO_ADD_VIEW and model_admin.has_add_permission(request):
                 urls.append(reverse("admin:%s_%s_add" % info))
             # Fiche du premier objet existant, s'il y en a un
             obj = model.objects.first()

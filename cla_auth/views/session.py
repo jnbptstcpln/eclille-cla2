@@ -20,7 +20,8 @@ logger = logging.getLogger(__name__)
 
 @csrf_protect
 def login(req):
-    if req.user.is_authenticated:
+    # prompt=login : un service OIDC demande de ressaisir le mot de passe
+    if req.user.is_authenticated and req.method == "GET" and req.GET.get("prompt") != "login":
         return redirect(req.GET.get("next", "cla_member:lobby"))
 
     if req.method == "POST":
