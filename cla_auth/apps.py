@@ -6,6 +6,7 @@ class ClaAuthConfig(AppConfig):
     verbose_name = "Gestion de l'authentification"
 
     def ready(self):
+        from . import checks  # noqa: F401  Vérification des services : manage.py check --database default
         # Enregistrement des fonctions de l'application liées aux signaux
         from .models import UserInfos
         from django.db.models.signals import post_save
