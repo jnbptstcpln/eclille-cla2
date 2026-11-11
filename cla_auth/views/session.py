@@ -7,6 +7,7 @@ from django.shortcuts import render, redirect, reverse, resolve_url
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.utils import timezone
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.csrf import csrf_protect
 
 from cla_web.middlewares import StayLoggedInMiddleware
@@ -18,18 +19,25 @@ from cla_mail.sending import send
 logger = logging.getLogger(__name__)
 
 
+def _safe_next(req, url):
+    """Refuse les redirections vers un autre site (open redirect)."""
+    if url and url_has_allowed_host_and_scheme(url, allowed_hosts={req.get_host()}, require_https=req.is_secure()):
+        return url
+    return "cla_member:lobby"
+
+
 @csrf_protect
 def login(req):
     # prompt=login : un service OIDC demande de ressaisir le mot de passe
     if req.user.is_authenticated and req.method == "GET" and req.GET.get("prompt") != "login":
-        return redirect(req.GET.get("next", "cla_member:lobby"))
+        return redirect(_safe_next(req, req.GET.get("next")))
 
     if req.method == "POST":
         form = LoginForm(req.POST)
         if form.is_valid():
             username = form.cleaned_data["username"]
             password = form.cleaned_data["password"]
-            req.session["next"] = form.cleaned_data["redirect"]
+            req.session["next"] = _safe_next(req, form.cleaned_data["redirect"])
             user: User = auth.authenticate(req, username=username, password=password)
             if user is not None:
                 auth.login(req, user)
@@ -67,7 +75,7 @@ def login(req):
             else:
                 form.add_error(None, "Combinaison identifiant/mot de passe incorrecte")
     else:
-        req.session["next"] = req.GET.get("next", "cla_member:lobby")
+        req.session["next"] = _safe_next(req, req.GET.get("next"))
         req.session["validation_alert"] = req.GET.get("validation_alert", "1") == "1"
         form = LoginForm(initial={"redirect": req.session["next"]})
 
