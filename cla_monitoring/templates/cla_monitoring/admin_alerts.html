@@ -1,0 +1,7 @@
+{% for label, url in alerts %}
+    <a href="{{ url }}" class="cla-admin-alert"
+       style="display: inline-block; margin-right: 6px; padding: 2px 10px; border-radius: 12px; border: 0;
+              background: #c62828; color: #fff; font-weight: 600; text-decoration: none;">
+        <span aria-hidden="true">●</span> {{ label }}
+    </a>
+{% endfor %}

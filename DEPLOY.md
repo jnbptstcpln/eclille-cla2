@@ -74,6 +74,10 @@ Les pages qui plantent (erreur 500) et les erreurs signalées par le code sont e
 - Le journal ne contient jamais ce que l'utilisateur a tapé (formulaires, mots de passe).
 - Les erreurs réglées depuis plus de 90 jours sont effacées par la tâche planifiée.
 
+## Pastille d'alerte
+
+En haut de chaque page de l'admin, une pastille rouge signale ce qui demande une action : **erreurs à traiter** et **mails en échec** des 7 derniers jours. Un clic mène au journal concerné. Chaque admin ne voit que les pastilles des journaux qu'il a le droit de consulter (les superusers voient tout). Elle s'éteint quand les erreurs sont marquées comme réglées et les mails renvoyés avec succès.
+
 ## Tâche planifiée
 
 Une seule tâche planifiée Coolify, à créer une fois sur l'application (*Scheduled Tasks*) :

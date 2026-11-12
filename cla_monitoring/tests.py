@@ -120,3 +120,37 @@ class ScheduledTasksTest(TestCase):
 
         sub_command.assert_called_once_with("send_pending_mails", stdout=mock.ANY)
         self.assertEqual(set(Error.objects.values_list("fingerprint", flat=True)), {"old-open", "recent-resolved"})
+
+
+class AdminAlertsTest(TestCase):
+    def setUp(self):
+        from cla_mail.models import Mail
+        Error.objects.create(fingerprint="open", title="a", last_seen=timezone.now())
+        Error.objects.create(fingerprint="done", title="b", last_seen=timezone.now(), resolved_on=timezone.now())
+        old_failure = Mail.objects.create(kind=Mail.Kind.TEST, recipient="x@example.com", status=Mail.Status.FAILED)
+        Mail.objects.filter(pk=old_failure.pk).update(created_on=timezone.now() - timezone.timedelta(days=8))
+        for status in (Mail.Status.FAILED, Mail.Status.FAILED, Mail.Status.PENDING, Mail.Status.SENT):
+            Mail.objects.create(kind=Mail.Kind.TEST, recipient="x@example.com", status=status)
+
+    def test_superuser_sees_alerts_on_every_admin_page(self):
+        self.client.force_login(User.objects.create_superuser("admin", "admin@example.com", "password"))
+        for url in (reverse("admin:index"), reverse("admin:auth_user_changelist")):
+            response = self.client.get(url)
+            self.assertContains(response, "1 erreur à traiter")
+            self.assertContains(response, "2 mails en échec")  # en attente, envoyés et anciens échecs ignorés
+            self.assertContains(response, "?statut=a_traiter")
+
+    def test_alerts_follow_permissions(self):
+        staff = User.objects.create(username="staff", is_staff=True)
+        staff.user_permissions.add(Permission.objects.get(codename="view_mail"))
+        self.client.force_login(staff)
+        response = self.client.get(reverse("admin:index"))
+        self.assertContains(response, "2 mails en échec")
+        self.assertNotContains(response, "à traiter")
+
+    def test_no_alert_when_everything_is_fine(self):
+        from cla_mail.models import Mail
+        Error.objects.update(resolved_on=timezone.now())
+        Mail.objects.update(status=Mail.Status.SENT)
+        self.client.force_login(User.objects.create_superuser("admin", "admin@example.com", "password"))
+        self.assertNotContains(self.client.get(reverse("admin:index")), "cla-admin-alert")
