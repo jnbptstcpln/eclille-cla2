@@ -5,10 +5,8 @@ Préproduction : mêmes réglages que la prod, mais :
 """
 import os
 
-# production.py exige ces variables SMTP ; inutiles ici car le backend est surchargé plus bas.
-os.environ.setdefault("EMAIL_HOST", "unused")
-os.environ.setdefault("EMAIL_LOGIN", "unused")
-os.environ.setdefault("EMAIL_PASSWORD", "unused")
+# production.py exige la clé Brevo ; inutile ici car le backend est surchargé plus bas.
+os.environ.setdefault("BREVO_API_KEY", "unused")
 
 from .coolify import *  # noqa: E402,F401,F403
 

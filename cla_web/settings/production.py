@@ -6,13 +6,12 @@ DEBUG = False
 
 # Email
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = config("EMAIL_HOST")
-EMAIL_HOST_FROM = config("EMAIL_FROM")
-EMAIL_HOST_USER = config("EMAIL_LOGIN")
-EMAIL_HOST_PASSWORD = config("EMAIL_PASSWORD")
-EMAIL_PORT = 465
-EMAIL_USE_SSL = True
+# Les mails partent par l'API de Brevo (via django-anymail) : le serveur ne connaît
+# aucun mot de passe de boîte mail, seulement une clé Brevo qui ne permet que d'envoyer.
+EMAIL_BACKEND = "anymail.backends.brevo.EmailBackend"
+ANYMAIL = {"BREVO_API_KEY": config("BREVO_API_KEY")}
+EMAIL_HOST_FROM = config("EMAIL_FROM")  # adresse noreply, sans boîte de réception
+DEFAULT_FROM_EMAIL = EMAIL_HOST_FROM
 
 
 # Database

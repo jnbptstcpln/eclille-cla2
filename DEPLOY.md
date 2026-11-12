@@ -23,13 +23,32 @@ Les réglages Django utilisés sont `cla_web.settings.coolify` (valeur par défa
 | `ALLOWED_HOSTS` | oui | Noms de domaine séparés par des virgules. Le premier sert à construire les liens absolus dans les mails. |
 | `DATABASE_HOST`, `DATABASE_PORT` | non | Par défaut `127.0.0.1` et `3306`. |
 | `DATABASE_USER`, `DATABASE_PASSWORD`, `DATABASE_NAME` | oui | Accès MySQL. |
-| `EMAIL_FROM`, `EMAIL_HOST`, `EMAIL_LOGIN`, `EMAIL_PASSWORD` | oui | Envoi des mails (SMTP, SSL sur le port 465). |
+| `EMAIL_FROM` | oui | Adresse d'expédition des mails : `noreply@centralelilleassos.fr` (voir [Mails](#mails-brevo)). |
+| `BREVO_API_KEY` | oui | Clé API Brevo (v3). Inutile en préproduction. |
 | `ADMINS` | non | Adresses des administrateurs, séparées par des virgules. |
 | `BUGSNAG_KEY`, `BUGSNAG_STAGE` | non | Bugsnag n'est notifié que si `BUGSNAG_STAGE=production`. |
 | `DJANGO_SETTINGS_MODULE` | non | `cla_web.settings.coolify` par défaut, `cla_web.settings.staging` en préproduction. |
 | `SECURE_COOKIES` | non | `True` par défaut (cookies réservés au HTTPS). |
 | `SERVE_MEDIA` | non | `False` par défaut. `True` pour que Django serve lui-même `/media/`. |
 | `GUNICORN_WORKERS` | non | Nombre de workers gunicorn, 3 par défaut. |
+
+## Mails (Brevo)
+
+Les mails du site (activation de compte, mot de passe oublié, code de validation, alertes aux responsables) sont envoyés par l'API de [Brevo](https://www.brevo.com), depuis `noreply@centralelilleassos.fr`.
+
+- **Cette adresse n'a pas de boîte de réception** : personne ne peut lire les réponses. L'adresse de contact réelle est cla@centralelille.fr.
+- Le serveur ne connaît **aucun mot de passe de boîte mail**. Il n'a que la clé API Brevo, qui sert uniquement à envoyer des mails depuis les expéditeurs vérifiés. Si elle fuit, on la supprime dans Brevo et on en crée une autre.
+- Offre gratuite : **300 mails par jour**.
+
+Configuration du compte Brevo (à refaire seulement si on change de compte) :
+
+1. **Domaine** : *Senders, Domains & Dedicated IPs* → *Domains* → ajouter `centralelilleassos.fr` et copier dans les DNS du domaine les enregistrements donnés par Brevo (code Brevo, DKIM, DMARC). Attendre que le domaine soit *authentifié*.
+2. **Expéditeur** : *Senders* → ajouter `noreply@centralelilleassos.fr`.
+3. **Clé API** : *SMTP & API* → *API Keys* → créer une clé (v3, pas une clé SMTP) et la mettre dans `BREVO_API_KEY` sur Coolify.
+4. **Sécurité** : *Security* → *Authorised IPs* → n'autoriser que l'IP du serveur Coolify. Une clé volée ne marche alors nulle part ailleurs.
+5. **Suivi** : désactiver le suivi des clics (et des ouvertures) des mails transactionnels, sinon Brevo réécrit les liens d'activation et de réinitialisation.
+
+En préproduction (`cla_web.settings.staging`) et en local, aucun mail n'est envoyé : ils sont affichés dans les logs.
 
 ## Déployer une nouvelle version
 

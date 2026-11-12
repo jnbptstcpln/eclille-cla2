@@ -3,7 +3,7 @@ Réglages pour `python manage.py test` : mêmes réglages que Coolify, mais SQLi
 """
 import os
 
-for key in ("SECRET_KEY", "ALLOWED_HOSTS", "EMAIL_FROM", "EMAIL_HOST", "EMAIL_LOGIN", "EMAIL_PASSWORD",
+for key in ("SECRET_KEY", "ALLOWED_HOSTS", "EMAIL_FROM", "BREVO_API_KEY",
             "DATABASE_USER", "DATABASE_PASSWORD", "DATABASE_NAME"):
     os.environ.setdefault(key, "test")
 

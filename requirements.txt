@@ -5,6 +5,7 @@ bugsnag==4.9.2
 certifi==2026.10.23
 Django==5.2.19
 django-admin-inline-paginator-plus==0.1.5
+django-anymail==15.2
 django-multiselectfield==1.0.1
 django-qr-code==4.2.0
 django-resized==1.0.3
