@@ -14,7 +14,7 @@ from cla_auth.models import UserInfos
 from cla_auth.forms.validation import ValidationForm
 from cla_web.utils import current_school_year
 from cla_mail.models import Mail
-from cla_mail.sending import absolute_url, send
+from cla_mail.sending import send
 
 
 @login_required()
@@ -65,16 +65,7 @@ def validate(req):
             validation_request.sent_on is None
             or validation_request.sent_on + timezone.timedelta(hours=1) < timezone.now()
         ):
-            mail = send(
-                Mail.Kind.ACCOUNT_VALIDATION, user.infos.email_school, "[CLA] Validation de votre compte",
-                f"Voici le code à indiquer pour valider votre compte : {validation_request.code}",
-                template="cla_auth/validation/mail.html",
-                context={
-                    "validation_href": absolute_url(resolve_url("cla_auth:validate")),
-                    "validation_request": validation_request,
-                },
-                user=user,
-            )
+            mail = send(Mail.Kind.ACCOUNT_VALIDATION, target=validation_request, user=user)
             if mail.status == Mail.Status.SENT:
                 validation_request.sent_on = timezone.now()
                 validation_request.save()

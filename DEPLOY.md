@@ -26,6 +26,8 @@ Les réglages Django utilisés sont `cla_web.settings.coolify` (valeur par défa
 | `EMAIL_FROM` | oui | Adresse d'expédition des mails : `noreply@send.centralelilleassos.fr` (voir [Mails](#mails-brevo)). |
 | `BREVO_API_KEY` | oui | Clé API Brevo (v3). Inutile en préproduction. |
 | `CONTACT_EMAIL` | non | Adresse qui reçoit les réponses aux mails du site, `cla@centralelille.fr` par défaut. |
+| `MAIL_DAILY_LIMIT`, `MAIL_URGENT_RESERVE` | non | Quota de mails par jour (300 par défaut) et part réservée aux mails urgents (50 par défaut). Voir [Quota](#quota-et-mails-en-attente). |
+| `MAIL_RETENTION_DAYS` | non | Durée de conservation du journal des mails, 90 jours par défaut. |
 | `BUGSNAG_KEY`, `BUGSNAG_STAGE` | non | Bugsnag n'est notifié que si `BUGSNAG_STAGE=production`. |
 | `DJANGO_SETTINGS_MODULE` | non | `cla_web.settings.coolify` par défaut, `cla_web.settings.staging` en préproduction. |
 | `SECURE_COOKIES` | non | `True` par défaut (cookies réservés au HTTPS). |
@@ -50,6 +52,22 @@ Configuration du compte Brevo (à refaire seulement si on change de compte) :
 5. **Suivi** : désactiver le suivi des clics (et des ouvertures) des mails transactionnels, sinon Brevo réécrit les liens d'activation et de réinitialisation.
 
 En préproduction (`cla_web.settings.staging`) et en local, aucun mail n'est envoyé : ils sont affichés dans les logs.
+
+### Quota et mails en attente
+
+Pour ne jamais dépasser les 300 mails par jour (par exemple le jour où l'on valide toutes les adhésions de la rentrée), le site compte lui-même les mails envoyés depuis minuit :
+
+- **Mails urgents** (mot de passe oublié, code de validation, mail de test) : toujours envoyés tout de suite. Les 50 derniers mails du quota leur sont réservés.
+- **Mails qui peuvent attendre** (activation de compte, alertes « à valider » aux responsables) : envoyés tout de suite tant qu'on reste sous 250 mails dans la journée. Au-delà, ils passent **« En attente »** dans le journal et partent automatiquement dès que le quota le permet.
+
+Les mails en attente sont envoyés par une **tâche planifiée Coolify**, à créer une fois sur l'application (*Scheduled Tasks*) :
+
+- **Commande** : `python manage.py send_pending_mails`
+- **Fréquence** : `0 * * * *` (toutes les heures)
+
+La même commande efface du journal les mails de plus de 90 jours. Si Brevo refuse un mail en attente, il est réessayé au passage suivant, puis marqué « Échec » après 3 tentatives.
+
+Si on passe à une offre Brevo payante, augmenter `MAIL_DAILY_LIMIT`.
 
 ## Déployer une nouvelle version
 

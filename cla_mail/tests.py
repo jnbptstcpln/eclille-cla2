@@ -3,15 +3,43 @@ from unittest import mock
 
 from django.contrib.auth.models import Group, Permission, User
 from django.core import mail as outbox
+from django.core.management import call_command
 from django.test import TestCase, override_settings
 from django.urls import NoReverseMatch, reverse
+from django.utils import timezone
 
 from cla_association.models import Association
-from cla_auth.models import UserInfos
+from cla_auth.models import PasswordResetRequest, UserInfos
 from cla_event.models import Event, EventPlace, EventType
 
 from .models import Mail
 from .sending import send, send_to_users, users_with_permission
+
+SEND = "cla_mail.sending.EmailMultiAlternatives.send"
+
+
+def create_student(username="jdupont", activated=False):
+    user = User.objects.create(username=username, email=f"{username}@example.com")
+    UserInfos.objects.create(user=user, email_school=f"{username}@centrale.centralelille.fr", cursus="G1",
+                             promo=date.today().year + 3, birthdate=date(2004, 1, 1),
+                             activated_on=timezone.now() if activated else None)
+    return user
+
+
+def create_event():
+    return Event.objects.create(
+        association=Association.objects.get_cla(), name="Soirée test", name_school="Soirée test",
+        type=EventType.objects.create(name="Soirée"), place=EventPlace.objects.create(name="Foyer"),
+        start_date=date.today() + timedelta(days=1), start_time=time(20), end_time=time(23),
+    )
+
+
+def fill_quota(count):
+    """Simule `count` mails déjà envoyés aujourd'hui."""
+    Mail.objects.bulk_create(
+        Mail(kind=Mail.Kind.TEST, recipient="x@example.com", status=Mail.Status.SENT, sent_on=timezone.now())
+        for _ in range(count)
+    )
 
 
 @override_settings(EMAIL_HOST_FROM="noreply@example.com", CONTACT_EMAIL="contact@example.com",
@@ -19,29 +47,28 @@ from .sending import send, send_to_users, users_with_permission
 class SendTest(TestCase):
     def test_success_is_logged(self):
         user = User.objects.create(username="jdupont", email="jean@example.com")
-        mail = send(Mail.Kind.TEST, "jean@example.com", "[CLA] Test", "texte",
-                    template="cla_auth/reset/mail.html", context={"reset_href": "https://site.example.com/r"}, user=user)
+        mail = send(Mail.Kind.TEST, user=user)
 
         self.assertEqual(mail.status, Mail.Status.SENT)
         self.assertIsNotNone(mail.sent_on)
-        self.assertEqual(Mail.objects.get().user, user)
+        self.assertEqual((mail.recipient, mail.subject, mail.attempts), ("jean@example.com", "[CLA] Mail de test", 1))
 
         message = outbox.outbox[0]
         self.assertEqual(message.from_email, "noreply@example.com")
         self.assertEqual(message.to, ["jean@example.com"])
         self.assertEqual(message.reply_to, ["contact@example.com"])
-        self.assertEqual(message.alternatives[0][1], "text/html")
 
     def test_failure_is_logged_without_raising(self):
-        with mock.patch("cla_mail.sending.EmailMultiAlternatives.send", side_effect=RuntimeError("quota dépassé")):
-            mail = send(Mail.Kind.TEST, "jean@example.com", "[CLA] Test", "texte")
+        user = User.objects.create(username="jdupont", email="jean@example.com")
+        with mock.patch(SEND, side_effect=RuntimeError("panne Brevo")):
+            mail = send(Mail.Kind.TEST, user=user)
 
         self.assertEqual(mail.status, Mail.Status.FAILED)
         self.assertIsNone(mail.sent_on)
-        self.assertIn("quota dépassé", Mail.objects.get().error)
+        self.assertIn("panne Brevo", Mail.objects.get().error)
 
-    def test_template_error_is_logged_without_raising(self):
-        mail = send(Mail.Kind.TEST, "jean@example.com", "[CLA] Test", "texte", template="inexistant.html")
+    def test_content_error_is_logged_without_raising(self):
+        mail = send(Mail.Kind.TEST, user=None)  # pas d'utilisateur : le contenu ne peut pas être construit
         self.assertEqual(mail.status, Mail.Status.FAILED)
         self.assertEqual(outbox.outbox, [])
 
@@ -49,10 +76,94 @@ class SendTest(TestCase):
         users = [User.objects.create(username=f"u{i}", email=f"u{i}@example.com") for i in range(3)]
         users.append(User.objects.create(username="sansmail", email=""))
 
-        mails = send_to_users(Mail.Kind.EVENT_TO_VALIDATE, users, "[CLA] Événement", "texte")
+        mails = send_to_users(Mail.Kind.TEST, users)
 
         self.assertEqual(len(mails), 3)
         self.assertEqual([m.to for m in outbox.outbox], [["u0@example.com"], ["u1@example.com"], ["u2@example.com"]])
+
+    def test_html_content_and_target(self):
+        user = create_student()
+        mail = Mail.objects.get()
+        self.assertEqual((mail.kind, mail.target, mail.user), (Mail.Kind.ACTIVATION, user.infos, user))
+        html = outbox.outbox[0].alternatives[0][0]
+        self.assertIn("https://site.example.com/activation/", html)
+
+
+@override_settings(MAIL_DAILY_LIMIT=5, MAIL_URGENT_RESERVE=2)
+class QuotaTest(TestCase):
+    def test_deferrable_mail_waits_when_quota_is_low(self):
+        fill_quota(3)  # 5 - 2 de réserve : plus de place pour les mails qui peuvent attendre
+        create_student()
+
+        mail = Mail.objects.get(kind=Mail.Kind.ACTIVATION)
+        self.assertEqual(mail.status, Mail.Status.PENDING)
+        self.assertEqual(mail.recipient, "jdupont@centrale.centralelille.fr")
+        self.assertEqual(outbox.outbox, [])
+
+    def test_urgent_mail_uses_the_reserve(self):
+        fill_quota(4)
+        user = create_student(activated=True)
+        reset_request = PasswordResetRequest.objects.create(user=user, email=user.email)
+
+        mail = send(Mail.Kind.PASSWORD_RESET, target=reset_request, user=user)
+
+        self.assertEqual(mail.status, Mail.Status.SENT)
+        self.assertEqual(outbox.outbox[0].to, [user.email])
+
+    def test_old_sent_mails_do_not_count(self):
+        fill_quota(3)
+        Mail.objects.update(sent_on=timezone.now() - timedelta(days=1))
+        create_student()
+        self.assertEqual(Mail.objects.get(kind=Mail.Kind.ACTIVATION).status, Mail.Status.SENT)
+
+
+@override_settings(MAIL_DAILY_LIMIT=5, MAIL_URGENT_RESERVE=2)
+class SendPendingMailsTest(TestCase):
+    def setUp(self):
+        fill_quota(3)
+        self.users = [create_student(f"etudiant{i}") for i in range(3)]
+        self.assertEqual(Mail.objects.filter(status=Mail.Status.PENDING).count(), 3)
+
+    def run_command(self):
+        call_command("send_pending_mails", stdout=mock.MagicMock())
+
+    def test_pending_mails_wait_for_quota(self):
+        self.run_command()
+        self.assertEqual(Mail.objects.filter(status=Mail.Status.PENDING).count(), 3)
+
+    def test_pending_mails_are_sent_the_next_day_within_quota(self):
+        Mail.objects.filter(status=Mail.Status.SENT).update(sent_on=timezone.now() - timedelta(days=1))
+        self.run_command()
+
+        sent = Mail.objects.filter(kind=Mail.Kind.ACTIVATION, status=Mail.Status.SENT).order_by("created_on")
+        self.assertEqual([m.user for m in sent], self.users[:3])  # 5 - 2 = 3 places : tous partent
+        self.assertIn("/activation/", outbox.outbox[0].alternatives[0][0])
+
+    def test_refused_mail_stays_pending_then_fails(self):
+        Mail.objects.filter(status=Mail.Status.SENT).update(sent_on=timezone.now() - timedelta(days=1))
+        with mock.patch(SEND, side_effect=RuntimeError("quota Brevo dépassé")):
+            for _ in range(3):
+                self.run_command()
+                first = Mail.objects.filter(kind=Mail.Kind.ACTIVATION).earliest("created_on")
+        self.assertEqual((first.status, first.attempts), (Mail.Status.FAILED, 3))
+        # le passage s'arrête au premier refus : les suivants n'ont pas été tentés
+        self.assertEqual(Mail.objects.filter(status=Mail.Status.PENDING, attempts=0).count(), 2)
+
+    def test_deleted_target_fails(self):
+        Mail.objects.filter(status=Mail.Status.SENT).update(sent_on=timezone.now() - timedelta(days=1))
+        UserInfos.objects.filter(user=self.users[0]).delete()
+        for _ in range(3):
+            self.run_command()
+        mail = Mail.objects.get(user=self.users[0])
+        self.assertEqual(mail.status, Mail.Status.FAILED)
+        self.assertIn("supprimé", mail.error)
+
+    @override_settings(MAIL_RETENTION_DAYS=90)
+    def test_old_mails_are_purged(self):
+        Mail.objects.update(created_on=timezone.now() - timedelta(days=91))
+        self.run_command()
+        # les mails envoyés sont effacés, les mails en attente sont gardés
+        self.assertEqual(set(Mail.objects.values_list("status", flat=True)), {Mail.Status.PENDING})
 
 
 class MailAdminTest(TestCase):
@@ -76,15 +187,6 @@ class MailAdminTest(TestCase):
 class CallSitesTest(TestCase):
     """Les mails du site passent bien par le journal."""
 
-    def test_activation_mail_on_account_creation(self):
-        user = User.objects.create(username="jdupont", email="jean@example.com")
-        UserInfos.objects.create(user=user, email_school="jean.dupont@centrale.centralelille.fr", cursus="G1",
-                                 promo=date.today().year + 3, birthdate=date(2004, 1, 1))
-
-        mail = Mail.objects.get()
-        self.assertEqual((mail.kind, mail.recipient, mail.user), (Mail.Kind.ACTIVATION, "jean.dupont@centrale.centralelille.fr", user))
-        self.assertIn("/activation/", outbox.outbox[0].alternatives[0][0])
-
     def test_event_notification_one_mail_per_manager(self):
         permission = Permission.objects.get(content_type__app_label="cla_event", codename="change_event")
         groups = [Group.objects.create(name=n) for n in ("Bureau", "Vie asso")]
@@ -98,17 +200,14 @@ class CallSitesTest(TestCase):
 
         self.assertEqual(sorted(u.username for u in users_with_permission("cla_event", "change_event")), ["both", "other"])
 
-        event = Event.objects.create(
-            association=Association.objects.get_cla(), name="Soirée test", name_school="Soirée test",
-            type=EventType.objects.create(name="Soirée"), place=EventPlace.objects.create(name="Foyer"),
-            start_date=date.today() + timedelta(days=1), start_time=time(20), end_time=time(23),
-        )
+        event = create_event()
         outbox.outbox.clear()
         Mail.objects.all().delete()
         event.send_notification()
 
         self.assertEqual(sorted(m.to[0] for m in outbox.outbox), ["both@example.com", "other@example.com"])
         self.assertEqual(set(Mail.objects.values_list("kind", flat=True)), {Mail.Kind.EVENT_TO_VALIDATE})
+        self.assertEqual(Mail.objects.first().target, event)
 
     def test_mail_test_page_is_removed(self):
         with self.assertRaises(NoReverseMatch):

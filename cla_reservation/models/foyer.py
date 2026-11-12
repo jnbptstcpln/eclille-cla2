@@ -11,7 +11,7 @@ from cla_web.fields import SummernoteTextField
 
 from cla_event.models import Event
 from cla_mail.models import Mail
-from cla_mail.sending import absolute_url, send_to_users, users_with_permission
+from cla_mail.sending import send_to_users, users_with_permission
 from cla_reservation.models._base import AbstractBlockedSlot
 
 
@@ -310,12 +310,8 @@ class ReservationFoyer(models.Model):
             return mark_safe("<span class='badge badge-secondary'>A envoyer</span>")
 
     def send_notification(self):
-        send_to_users(
-            Mail.Kind.RESERVATION_TO_VALIDATE, users_with_permission("cla_reservation", "change_reservationfoyer"),
-            "[CLA][FOYER] Nouvelle demande de réservation", "Une demande de réservation du foyer a été reçue",
-            template="cla_reservation/manage/mail.html",
-            context={"detail_href": absolute_url(resolve_url("cla_reservation:manage:foyer-detail", self.pk)), "reservation": self},
-        )
+        managers = users_with_permission("cla_reservation", "change_reservationfoyer")
+        send_to_users(Mail.Kind.RESERVATION_TO_VALIDATE, managers, target=self)
 
     def save(
         self, force_insert=False, force_update=False, using=None, update_fields=None

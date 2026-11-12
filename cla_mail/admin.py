@@ -3,7 +3,7 @@ from django.utils.html import format_html
 
 from .models import Mail
 
-STATUS_COLORS = {Mail.Status.SENT: "#2e7d32", Mail.Status.FAILED: "#c62828"}
+STATUS_COLORS = {Mail.Status.SENT: "#2e7d32", Mail.Status.PENDING: "#ef6c00", Mail.Status.FAILED: "#c62828"}
 
 
 @admin.register(Mail)
@@ -15,8 +15,13 @@ class MailAdmin(admin.ModelAdmin):
     search_fields = ("recipient", "subject", "user__username", "user__first_name", "user__last_name")
     date_hierarchy = "created_on"
     list_select_related = ("user",)
-    fields = ("created_on", "sent_on", "kind", "recipient", "user", "subject", "status", "error")
+    fields = ("created_on", "sent_on", "kind", "recipient", "user", "target_display", "subject", "status",
+              "attempts", "error")
     readonly_fields = fields
+
+    @admin.display(description="objet concerné")
+    def target_display(self, obj):
+        return obj.target or "-"
 
     @admin.display(description="statut", ordering="status")
     def status_badge(self, obj):

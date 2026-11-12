@@ -36,6 +36,11 @@ SERVER_EMAIL = config("EMAIL_FROM")
 # Adresse de contact réelle : reçoit les réponses aux mails du site (qui partent du noreply)
 CONTACT_EMAIL = config("CONTACT_EMAIL", "cla@centralelille.fr")
 
+# Quota d'envoi (offre gratuite Brevo : 300 mails par jour), voir cla_mail/sending.py
+MAIL_DAILY_LIMIT = config("MAIL_DAILY_LIMIT", 300, cast=int)
+MAIL_URGENT_RESERVE = config("MAIL_URGENT_RESERVE", 50, cast=int)  # gardés pour les mails urgents
+MAIL_RETENTION_DAYS = config("MAIL_RETENTION_DAYS", 90, cast=int)  # durée de conservation du journal
+
 # Application definition
 
 INSTALLED_APPS = [

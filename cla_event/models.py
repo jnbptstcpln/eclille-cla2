@@ -4,7 +4,6 @@ from datetime import datetime, timedelta
 
 from django.contrib.auth.models import User
 from django.db import models
-from django.shortcuts import resolve_url
 from django.template.defaultfilters import date
 from django.utils import timezone
 from django.utils.safestring import mark_safe
@@ -14,7 +13,7 @@ from cla_web.fields import SummernoteTextField
 from cla_association.models import Association
 from cla_auth.models import UserInfos, Service
 from cla_mail.models import Mail
-from cla_mail.sending import absolute_url, send_to_users, users_with_permission
+from cla_mail.sending import send_to_users, users_with_permission
 
 
 class FilePath:
@@ -226,12 +225,8 @@ class Event(models.Model):
         return True
 
     def send_notification(self):
-        send_to_users(
-            Mail.Kind.EVENT_TO_VALIDATE, users_with_permission("cla_event", "change_event"),
-            "[CLA] Nouvel événement à valider", "Une demande de validation d'événement a été reçue",
-            template="cla_event/manage/mail.html",
-            context={"detail_href": absolute_url(resolve_url("cla_event:manage:event-detail", self.pk)), "event": self},
-        )
+        managers = users_with_permission("cla_event", "change_event")
+        send_to_users(Mail.Kind.EVENT_TO_VALIDATE, managers, target=self)
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         # Auto setup dates

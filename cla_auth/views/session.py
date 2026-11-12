@@ -12,7 +12,7 @@ from cla_web.middlewares import StayLoggedInMiddleware
 from cla_auth.models import PasswordResetRequest
 from cla_auth.forms.session import LoginForm, ForgotForm
 from cla_mail.models import Mail
-from cla_mail.sending import absolute_url, send
+from cla_mail.sending import send
 
 logger = logging.getLogger(__name__)
 
@@ -129,13 +129,7 @@ def forgot_password(req):
                 if (
                     reset_req.attempt < 3
                 ):  # Send reset email if less than 3 attempts were made
-                    send(
-                        Mail.Kind.PASSWORD_RESET, user.email, "[CLA] Réinitialiser votre mot de passe",
-                        "Réinitialiser le mot de passe de votre compte CLA",
-                        template="cla_auth/reset/mail.html",
-                        context={"reset_href": absolute_url(resolve_url("cla_auth:reset", reset_req.get_reset_jwt()))},
-                        user=user,
-                    )
+                    send(Mail.Kind.PASSWORD_RESET, target=reset_req, user=user)
                     success = True
                 else:
                     warning = True
