@@ -22,7 +22,9 @@ class FilePath:
     @classmethod
     def _path(cls, instance, pathlist, filename):
         ext = filename.split(".")[-1]
-        filename = "%s-%s.%s" % (instance.email_school, uuid.uuid4(), ext)
+        # Pas de points avant l'extension : Django 5.1+ considère tout ce qui suit le premier point comme
+        # l'extension, et ne peut alors plus raccourcir le nom pour respecter max_length (100).
+        filename = "%s-%s.%s" % (instance.email_school.replace(".", "_"), uuid.uuid4(), ext)
         pathlist.append(filename)
         return os.path.join(*pathlist)
 
@@ -153,7 +155,7 @@ class UserInfos(models.Model):
         IE5 = "IE5", "IE5"
         IE5P = "IE5P", "IE5'"
 
-        IE5_DIPLOME = "IE5-DIPLOME", "Diplomé de l\ITEEM"
+        IE5_DIPLOME = "IE5-DIPLOME", "Diplomé de l'ITEEM"
 
         # # # # # # # # #
         # CURSUS CHIMIE #

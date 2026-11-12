@@ -48,7 +48,7 @@ INSTALLED_APPS = [
     'django.contrib.flatpages',
     # Addons
     'django_summernote',
-    'django_admin_inline_paginator',
+    'django_admin_inline_paginator_plus',
     'qr_code',
     # CLA-Web's apps
     'cla_auth.apps.ClaAuthConfig',
@@ -147,8 +147,6 @@ TIME_ZONE = 'Europe/Paris'
 
 USE_I18N = True
 
-USE_L10N = True
-
 USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
@@ -197,8 +195,7 @@ BLEACH_ALLOWED_TAGS = [
     "ul",
     "p",
     "sup",
-    "sub"
-    "img",
+    "sub",
     "hr",
     "div"
 ]

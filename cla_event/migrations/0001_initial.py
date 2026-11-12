@@ -5,7 +5,7 @@ from django.conf import settings
 from django.db import migrations, models
 import django.db.models.deletion
 import django_resized.forms
-import django_summernote.fields
+import cla_web.fields
 
 
 class Migration(migrations.Migration):
@@ -50,7 +50,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=100, verbose_name='Nom')),
                 ('name_school', models.CharField(max_length=100, verbose_name='Nom "admin compatible"')),
-                ('presentation_html', django_summernote.fields.SummernoteTextField(blank=True, verbose_name="Présentation de l'événement")),
+                ('presentation_html', cla_web.fields.SummernoteTextField(blank=True, verbose_name="Présentation de l'événement")),
                 ('start_date', models.DateField(verbose_name='Date')),
                 ('start_time', models.TimeField(help_text='Au format HH:MM (par exemple 20:00)', verbose_name='Heure de début')),
                 ('end_time', models.TimeField(help_text="Au format HH:MM (par exemple 00:00), si l'heure de fin est inférieure à l'heure de début, cette dernière sera considérée comme étant le lendemain", verbose_name='Heure de fin')),

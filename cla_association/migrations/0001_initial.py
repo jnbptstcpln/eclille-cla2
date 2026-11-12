@@ -5,7 +5,7 @@ from django.conf import settings
 from django.db import migrations, models
 import django.db.models.deletion
 import django_resized.forms
-import django_summernote.fields
+import cla_web.fields
 
 
 class Migration(migrations.Migration):
@@ -26,7 +26,7 @@ class Migration(migrations.Migration):
                 ('type', models.CharField(choices=[('club', 'Club de CLA'), ('commission', 'Commission de CLA'), ('bdx', 'BDX'), ('asso_1901', 'Association loi 1901')], max_length=250, verbose_name='Forme juridique')),
                 ('category', models.CharField(choices=[('audiovisual', 'Audiovisuel'), ('sport', 'Autour du sport'), ('bdx', 'BDX'), ('bdx_list', 'BDX (Liste)'), ('foreign_cuture', 'Culture étrangère'), ('writing_drawing', 'Écriture et dessin'), ('open_minded', "Esprit d'ouverture"), ('events', 'Évènements'), ('gastronomy', 'Gastronomie'), ('enterprises', "Monde de l'entreprise"), ('engineering', "Monde de l'ingénieur"), ('music', 'Musique'), ('solidarity', 'Solidarité'), ('theater_cinema', 'Théâtre et cinéma'), ('residence_life', 'Vie sur la résidence'), ('other', 'Autre')], max_length=250, verbose_name='Catégorie')),
                 ('description', models.TextField(max_length=255, verbose_name='Description rapide')),
-                ('presentation_html', django_summernote.fields.SummernoteTextField(verbose_name="Présentation de l'association")),
+                ('presentation_html', cla_web.fields.SummernoteTextField(verbose_name="Présentation de l'association")),
                 ('logo', django_resized.forms.ResizedImageField(blank=True, crop=None, force_format='PNG', keep_meta=True, null=True, quality=0, size=[500, 500], upload_to=cla_association.models.FilePath.association_logo, verbose_name="Logo de l'association")),
                 ('display', models.BooleanField(default=True, verbose_name='Afficher sur le site')),
                 ('active', models.BooleanField(default=True, help_text='Une association active peut effectuer des demandes de réservation du foyer, du synthé, du barbecue...', verbose_name='Active')),

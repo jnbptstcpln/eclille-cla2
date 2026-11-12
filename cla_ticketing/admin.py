@@ -1,7 +1,9 @@
+import bleach
+from django import forms
 from django.contrib import admin, messages
 from django.urls import path
 from django.shortcuts import redirect
-from django_admin_inline_paginator.admin import TabularInlinePaginated
+from django_admin_inline_paginator_plus.admin import TabularInlinePaginated
 from django.core.exceptions import PermissionDenied
 from django.db.models import Q
 from django.http import HttpRequest, Http404
@@ -18,8 +20,20 @@ from cla_ticketing.views.admin import (
 )
 
 
+
+class AbstractEventAdminForm(forms.ModelForm):
+    # La description est éditable par les responsables (pas forcément superutilisateurs) et affichée avec |safe
+    def clean_description(self):
+        return bleach.clean(
+            self.cleaned_data['description'],
+            tags=settings.BLEACH_ALLOWED_TAGS,
+            attributes=settings.BLEACH_ALLOWED_ATTRIBUTES
+        )
+
+
 @admin.register(Event)
 class EventAdmin(admin.ModelAdmin):
+    form = AbstractEventAdminForm
     class EventRegistrationTypeInline(admin.TabularInline):
         fields = ['name', 'description', 'open_to', 'visible', 'price']
         model = EventRegistrationType
@@ -105,6 +119,7 @@ class EventAdmin(admin.ModelAdmin):
         readonly_fields = ['last_name', 'first_name', 'created_on', 'is_contributor', 'type', 'place_paid', 'edit_button']
         model = EventRegistration
         classes = []
+        htmx_enabled = False  # pas de script htmx chargé depuis un CDN
         per_page = 10
         max_num = 0
         ordering = "-created_on",
@@ -499,6 +514,7 @@ class EventRegistrationAdmin(admin.ModelAdmin):
 
 @admin.register(DancingParty)
 class DancingPartyAdmin(admin.ModelAdmin):
+    form = AbstractEventAdminForm
 
     class DancingPartyRegistrationCustomFieldInline(admin.StackedInline):
         fields = [
@@ -546,6 +562,7 @@ class DancingPartyAdmin(admin.ModelAdmin):
         readonly_fields = ['last_name', 'first_name', 'place', 'place_paid', 'validated', 'created_on', 'edit_button']
         model = DancingPartyRegistration
         classes = []
+        htmx_enabled = False  # pas de script htmx chargé depuis un CDN
         per_page = 10
         max_num = 0
         ordering = "-created_on",

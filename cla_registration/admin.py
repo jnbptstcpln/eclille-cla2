@@ -4,7 +4,7 @@ from django.contrib import admin
 from django.contrib.admin import SimpleListFilter
 from django.contrib.auth.models import User
 from django.http import HttpRequest, HttpResponse
-from django_admin_inline_paginator.admin import TabularInlinePaginated
+from django_admin_inline_paginator_plus.admin import TabularInlinePaginated
 from django.conf import settings
 from django.db.models import Q
 from django.template.loader import render_to_string
@@ -25,6 +25,7 @@ class RegistrationSessionAdmin(admin.ModelAdmin):
         readonly_fields = ['last_name', 'first_name', 'datetime_registration', 'is_linked_to_an_account', 'edit_button', 'has_pack', 'type']
         model = Registration
         classes = []
+        htmx_enabled = False  # pas de script htmx chargé depuis un CDN
         max_num = 0
         extra = 0
         ordering = "last_name",

@@ -2,7 +2,7 @@
 # BUILDER #
 ###########
 
-FROM python:3.9-slim-bookworm
+FROM python:3.12-slim-bookworm
 
 # Répertoire de travail
 WORKDIR /usr/src/app
@@ -11,33 +11,20 @@ WORKDIR /usr/src/app
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
 
-# Installation des dépendances système nécessaires aux libs Python (dont mysqlclient et weasyprint)
+# Dépendances système
+# - gcc, pkg-config, default-libmysqlclient-dev : compilation de mysqlclient (pas de wheel Linux)
+# - curl : healthcheck
+# - pango, harfbuzz-subset : WeasyPrint (n'utilise plus Cairo depuis la v53)
+# - fonts-dejavu-core : police de repli des PDF si Google Fonts est injoignable
 RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
-    curl \
-    python3-dev \
-    musl-dev \
-    libjpeg62-turbo-dev \
-    libopenjp2-7-dev \
-    zlib1g-dev \
-    libsasl2-dev \
-    libldap2-dev \
-    libssl-dev \
-    libffi-dev \
+    pkg-config \
     default-libmysqlclient-dev \
-    # Ajout des dépendances pour Weasyprint (incluant Cairo)
-    libpangocairo-1.0-0 \
-    libpangoft2-1.0-0 \
-    libgdk-pixbuf2.0-0 \
-    libffi-dev \
-    shared-mime-info \
+    curl \
     libpango-1.0-0 \
-    # La ligne suivante installe Cairo et ses dépendances
-    libcairo2-dev \
-    # Autres dépendances de Weasyprint
-    libharfbuzz-dev \
-    libfontconfig1 \
-    libfreetype6-dev \
+    libpangoft2-1.0-0 \
+    libharfbuzz-subset0 \
+    fonts-dejavu-core \
  && rm -rf /var/lib/apt/lists/*
 
 # Copie des dépendances Python

@@ -3,7 +3,7 @@ from django.forms import ValidationError
 from django.conf import settings
 from django.utils.translation import gettext, gettext_lazy as _
 from django.contrib.flatpages.models import FlatPage
-from django_summernote.fields import SummernoteTextFormField
+from cla_web.fields import SummernoteTextFormField
 
 
 class FlatpageForm(forms.ModelForm):

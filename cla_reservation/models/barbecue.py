@@ -10,7 +10,7 @@ from django.shortcuts import resolve_url
 from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.safestring import mark_safe
-from django_summernote.fields import SummernoteTextField
+from cla_web.fields import SummernoteTextField
 
 from cla_event.models import Event
 from cla_reservation.models._base import AbstractBlockedSlot
