@@ -23,7 +23,7 @@ from weasyprint import HTML
 from cla_association.models import Association
 from cla_auth.models import Service, UserInfos, UserMembership
 from cla_event.models import Event, EventPlace, EventType
-from cla_registration.models import ImageRightAgreement
+from cla_registration.models import ImageRightAgreement, RegistrationSession
 from cla_ticketing.models import DancingParty, Event as TicketingEvent
 
 # Ajout seulement via un bouton depuis un évènement/une soirée (paramètres GET requis),
@@ -76,12 +76,18 @@ class SmokeTest(TestCase):
     def test_admin_pages(self):
         # Les formulaires d'ajout utilisent le template admin/includes/fieldset.html surchargé
         self.client.force_login(self.user)
+        # Une campagne d'adhésion pour ouvrir sa fiche (avec la liste des inscriptions en dessous)
+        RegistrationSession.objects.create(date_start=date.today(), date_end=date.today() + timedelta(days=30))
         urls = ["/admin/", "/summernote/editor/id_presentation_html/"]
         for model in admin.site._registry:
             info = (model._meta.app_label, model._meta.model_name)
             urls.append(reverse("admin:%s_%s_changelist" % info))
             if model._meta.model_name not in NO_ADD_VIEW:
                 urls.append(reverse("admin:%s_%s_add" % info))
+            # Fiche du premier objet existant, s'il y en a un
+            obj = model.objects.first()
+            if obj is not None:
+                urls.append(reverse("admin:%s_%s_change" % info, args=[obj.pk]))
         self.assertPagesLoad(urls)
 
     def test_legacy_sso(self):

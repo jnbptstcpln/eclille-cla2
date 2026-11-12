@@ -70,7 +70,7 @@ class RegistrationSessionAdmin(admin.ModelAdmin):
     def get_inlines(self, request, obj):
         inlines = super().get_inlines(request, obj)
         if obj is not None:
-            return inlines + [self.RegistrationInline]
+            return [*inlines, self.RegistrationInline]  # inlines est un tuple depuis Django 4
         return inlines
 
     def get_fieldsets(self, request, obj=None):
