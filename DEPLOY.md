@@ -42,6 +42,7 @@ Les mails du site (activation de compte, mot de passe oublié, code de validatio
 - Le serveur ne connaît **aucun mot de passe de boîte mail**. Il n'a que la clé API Brevo, qui sert uniquement à envoyer des mails depuis les expéditeurs vérifiés. Si elle fuit, on la supprime dans Brevo et on en crée une autre.
 - Offre gratuite : **300 mails par jour**.
 - Tous les mails envoyés (ou en échec) sont listés dans l'admin : *Mails › Journal des mails*. Le contenu n'y est pas enregistré, car il contient des liens secrets.
+- Depuis ce journal, on peut **renvoyer** des mails (action « Renvoyer les mails sélectionnés », par exemple un mail d'activation en échec) et **s'envoyer un mail de test** (bouton en haut à droite) pour vérifier que Brevo fonctionne. Réservé aux superusers et aux comptes qui ont la permission « Peut renvoyer un mail et envoyer un mail de test ».
 
 Configuration du compte Brevo (à refaire seulement si on change de compte) :
 

@@ -16,6 +16,13 @@
                       </span>
                 </h1>
                 <div class="overflow-auto" style="max-height: 50vh">
+                    {% if mail_failed %}
+                        <div class="alert alert-danger">
+                            Le mail contenant votre code n'a pas pu être envoyé. Réessayez dans quelques heures en
+                            revenant sur cette page, ou écrivez-nous à
+                            <a href="mailto:{{ contact_email }}">{{ contact_email }}</a>.
+                        </div>
+                    {% endif %}
                     <p>
                         Veuillez indiquer ci-dessous le code que vous avez reçu à l'adresse :
                     </p>

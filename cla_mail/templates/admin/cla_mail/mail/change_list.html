@@ -1,0 +1,18 @@
+{% extends "admin/change_list.html" %}
+
+{% block object-tools-items %}
+    {% if can_send_mail %}
+        <li>
+            <form method="post" action="{% url 'admin:cla_mail_mail_test' %}" style="display: inline">
+                {% csrf_token %}
+                <button type="submit" title="Envoie un mail de test à votre adresse"
+                        style="display: block; float: left; padding: 3px 12px; border: 0; border-radius: 15px;
+                               background: var(--object-tools-bg); color: var(--object-tools-fg); cursor: pointer;
+                               font-size: 0.6875rem; font-weight: 400; letter-spacing: 0.5px; text-transform: uppercase;">
+                    Envoyer un mail de test
+                </button>
+            </form>
+        </li>
+    {% endif %}
+    {{ block.super }}
+{% endblock %}

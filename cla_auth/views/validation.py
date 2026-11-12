@@ -4,6 +4,7 @@ import jwt
 
 from django.views.generic import View
 from django.shortcuts import render, redirect, resolve_url
+from django.conf import settings
 from django.contrib import auth
 from django.contrib.auth.models import User
 from django.http import HttpResponse, Http404
@@ -34,6 +35,7 @@ def validate(req):
         return redirect(req.session.get("next", "cla_member:account"))
 
     validation_request = user.infos.validation_request
+    mail_failed = False
 
     if req.method == "POST":
         form = ValidationForm(req.POST, user=req.user)
@@ -69,6 +71,8 @@ def validate(req):
             if mail.status == Mail.Status.SENT:
                 validation_request.sent_on = timezone.now()
                 validation_request.save()
+            else:
+                mail_failed = True  # sent_on reste vide : le mail sera retenté au prochain chargement
 
         form = ValidationForm(user=req.user)
 
@@ -78,5 +82,7 @@ def validate(req):
         {
             "form": form,
             "redirect": resolve_url(req.session.get("next", "cla_member:account")),
+            "mail_failed": mail_failed,
+            "contact_email": settings.CONTACT_EMAIL,
         },
     )

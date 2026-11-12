@@ -2,15 +2,18 @@ from datetime import date, time, timedelta
 from unittest import mock
 
 from django.contrib.auth.models import Group, Permission, User
+from django.contrib.messages import get_messages
+from django.contrib.messages.storage.fallback import FallbackStorage
 from django.core import mail as outbox
 from django.core.management import call_command
-from django.test import TestCase, override_settings
+from django.test import RequestFactory, TestCase, override_settings
 from django.urls import NoReverseMatch, reverse
 from django.utils import timezone
 
 from cla_association.models import Association
 from cla_auth.models import PasswordResetRequest, UserInfos
 from cla_event.models import Event, EventPlace, EventType
+from cla_registration.views.admin import RegistrationValidationView
 
 from .models import Mail
 from .sending import send, send_to_users, users_with_permission
@@ -167,21 +170,92 @@ class SendPendingMailsTest(TestCase):
 
 
 class MailAdminTest(TestCase):
+    def setUp(self):
+        self.admin = User.objects.create_superuser("admin", "admin@example.com", "password")
+        self.client.force_login(self.admin)
+
     def test_journal_is_read_only(self):
-        admin = User.objects.create_superuser("admin", "admin@example.com", "password")
         mail = Mail.objects.create(kind=Mail.Kind.TEST, recipient="jean@example.com", subject="[CLA] Test",
                                    status=Mail.Status.FAILED, error="RuntimeError : quota dépassé")
-        self.client.force_login(admin)
 
         response = self.client.get(reverse("admin:cla_mail_mail_changelist"))
         self.assertContains(response, "jean@example.com")
         self.assertContains(response, "Échec")
+        self.assertContains(response, "Envoyer un mail de test")
 
         response = self.client.get(reverse("admin:cla_mail_mail_change", args=[mail.pk]))
         self.assertContains(response, "quota dépassé")
         self.assertNotContains(response, 'name="_save"')
 
         self.assertEqual(self.client.get(reverse("admin:cla_mail_mail_add")).status_code, 403)
+
+    def test_send_test_mail(self):
+        response = self.client.post(reverse("admin:cla_mail_mail_test"), follow=True)
+        self.assertContains(response, "Mail de test envoyé à admin@example.com")
+        self.assertEqual(outbox.outbox[0].to, ["admin@example.com"])
+        self.assertEqual(self.client.get(reverse("admin:cla_mail_mail_test")).status_code, 405)
+
+    def test_resend_failed_activation(self):
+        with mock.patch(SEND, side_effect=RuntimeError("panne Brevo")):
+            user = create_student()
+        mail = Mail.objects.get()
+        self.assertEqual(mail.status, Mail.Status.FAILED)
+
+        response = self.client.post(reverse("admin:cla_mail_mail_changelist"),
+                                    {"action": "resend", "_selected_action": [mail.pk]}, follow=True)
+
+        self.assertContains(response, "1 mail(s) renvoyé(s)")
+        mail.refresh_from_db()
+        self.assertEqual((mail.status, mail.attempts), (Mail.Status.SENT, 2))
+        self.assertEqual(outbox.outbox[0].to, [user.infos.email_school])
+
+    def test_staff_without_permission_cannot_send(self):
+        staff = User.objects.create(username="staff", email="staff@example.com", is_staff=True)
+        staff.user_permissions.add(Permission.objects.get(codename="view_mail"))
+        self.client.force_login(staff)
+
+        response = self.client.get(reverse("admin:cla_mail_mail_changelist"))
+        self.assertNotContains(response, "Envoyer un mail de test")
+        self.assertEqual(self.client.post(reverse("admin:cla_mail_mail_test")).status_code, 403)
+
+
+class ErrorMessagesTest(TestCase):
+    """Quand un mail ne part pas, la personne concernée le sait."""
+
+    def test_forgot_password_failure(self):
+        create_student(activated=True)
+        with mock.patch(SEND, side_effect=RuntimeError("panne Brevo")):
+            response = self.client.post(reverse("cla_auth:forgot_password"), {"email": "jdupont@example.com"})
+        self.assertContains(response, "n&#x27;a pas pu être envoyé")
+        self.assertNotContains(response, "vient de vous être envoyé")
+
+    def test_forgot_password_success(self):
+        create_student(activated=True)
+        response = self.client.post(reverse("cla_auth:forgot_password"), {"email": "jdupont@example.com"})
+        self.assertContains(response, "vient de vous être envoyé")
+
+    def test_validation_code_failure(self):
+        user = create_student(activated=True)
+        self.client.force_login(user)
+        with mock.patch(SEND, side_effect=RuntimeError("panne Brevo")):
+            response = self.client.get(reverse("cla_auth:validate"))
+        self.assertContains(response, "Le mail contenant votre code n'a pas pu être envoyé")
+
+    def admin_message_after_account_creation(self, status):
+        user = create_student(f"etudiant_{status}")
+        Mail.objects.filter(user=user).update(status=status)
+        request = RequestFactory().get("/")
+        request.session = {}
+        request._messages = FallbackStorage(request)
+        view = RegistrationValidationView()
+        view.request = request
+        view.report_activation_mail(user)
+        return [str(m) for m in get_messages(request)][0]
+
+    def test_admin_message_after_account_creation(self):
+        self.assertIn("a été envoyé", self.admin_message_after_account_creation(Mail.Status.SENT))
+        self.assertIn("en attente", self.admin_message_after_account_creation(Mail.Status.PENDING))
+        self.assertIn("n'a pas pu être envoyé", self.admin_message_after_account_creation(Mail.Status.FAILED))
 
 
 class CallSitesTest(TestCase):

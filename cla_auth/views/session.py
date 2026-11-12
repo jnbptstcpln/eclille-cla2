@@ -4,6 +4,7 @@ import jwt
 
 from django.contrib import auth, messages
 from django.shortcuts import render, redirect, reverse, resolve_url
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_protect
@@ -129,8 +130,14 @@ def forgot_password(req):
                 if (
                     reset_req.attempt < 3
                 ):  # Send reset email if less than 3 attempts were made
-                    send(Mail.Kind.PASSWORD_RESET, target=reset_req, user=user)
-                    success = True
+                    mail = send(Mail.Kind.PASSWORD_RESET, target=reset_req, user=user)
+                    if mail.status == Mail.Status.SENT:
+                        success = True
+                    else:
+                        error = (
+                            "Le mail de réinitialisation n'a pas pu être envoyé. Réessayez dans quelques heures "
+                            f"ou écrivez-nous à {settings.CONTACT_EMAIL}."
+                        )
                 else:
                     warning = True
             elif users.count() > 1:

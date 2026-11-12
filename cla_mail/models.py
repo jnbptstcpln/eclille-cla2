@@ -30,6 +30,7 @@ class Mail(models.Model):
         verbose_name = "mail"
         verbose_name_plural = "journal des mails"
         ordering = ("-created_on",)
+        permissions = [("send_mail", "Peut renvoyer un mail et envoyer un mail de test")]
 
     created_on = models.DateTimeField("créé le", auto_now_add=True, db_index=True)
     sent_on = models.DateTimeField("envoyé le", null=True, blank=True)

@@ -18,6 +18,7 @@ from cla_auth.utils import create_username
 from cla_registration.models import Registration, RegistrationSession
 from cla_registration.forms import RegistrationAdminForm
 from cla_auth.models import UserInfos, UserMembership
+from cla_mail.models import Mail
 
 
 class RegistrationValidationView(UserPassesTestMixin, generic.FormView):
@@ -39,6 +40,25 @@ class RegistrationValidationView(UserPassesTestMixin, generic.FormView):
         if self.registration.account is not None:
             raise Http404()
         return super().dispatch(request, *args, **kwargs)
+
+    def report_activation_mail(self, user):
+        """Indique à l'admin si le mail d'activation (envoyé à la création du compte) est parti."""
+        mail = Mail.objects.filter(user=user, kind=Mail.Kind.ACTIVATION).order_by("-created_on").first()
+        email = user.infos.email_school
+        if mail and mail.status == Mail.Status.SENT:
+            messages.success(self.request, f"L'utilisateur a été créé et le mail d'activation a été envoyé à {email}.")
+        elif mail and mail.status == Mail.Status.PENDING:
+            messages.warning(
+                self.request,
+                f"L'utilisateur a été créé. Le quota de mails du jour est presque atteint : le mail d'activation "
+                f"à {email} est en attente et partira automatiquement dès que possible.",
+            )
+        else:
+            messages.error(
+                self.request,
+                f"L'utilisateur a été créé, mais le mail d'activation à {email} n'a pas pu être envoyé. "
+                "Il peut être renvoyé depuis Mails › Journal des mails.",
+            )
 
     def form_valid(self, form):
         try:
@@ -100,10 +120,7 @@ class RegistrationValidationView(UserPassesTestMixin, generic.FormView):
         self.registration.account = user
         self.registration.save()
 
-        messages.success(
-            self.request,
-            f"L'utilisateur a été créé et un mail de bienvenue lui a été envoyé à {user.infos.email_school} avec un lien d'activation",
-        )
+        self.report_activation_mail(user)
         return redirect(
             "admin:cla_registration_registrationsession_change",
             self.registration.session.pk,
