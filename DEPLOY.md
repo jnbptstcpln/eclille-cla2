@@ -23,7 +23,7 @@ Les réglages Django utilisés sont `cla_web.settings.coolify` (valeur par défa
 | `ALLOWED_HOSTS` | oui | Noms de domaine séparés par des virgules. Le premier sert à construire les liens absolus dans les mails. |
 | `DATABASE_HOST`, `DATABASE_PORT` | non | Par défaut `127.0.0.1` et `3306`. |
 | `DATABASE_USER`, `DATABASE_PASSWORD`, `DATABASE_NAME` | oui | Accès MySQL. |
-| `EMAIL_FROM` | oui | Adresse d'expédition des mails : `noreply@send.centralelilleassos.fr` (voir [Mails](#mails-brevo)). |
+| `EMAIL_FROM` | oui | Adresse d'expédition des mails : `noreply@centralelilleassos.fr` (voir [Mails](#mails-brevo)). |
 | `BREVO_API_KEY` | oui | Clé API Brevo (v3). Inutile en préproduction. |
 | `CONTACT_EMAIL` | non | Adresse qui reçoit les réponses aux mails du site, `cla@centralelille.fr` par défaut. |
 | `MAIL_DAILY_LIMIT`, `MAIL_URGENT_RESERVE` | non | Quota de mails par jour (300 par défaut) et part réservée aux mails urgents (50 par défaut). Voir [Quota](#quota-et-mails-en-attente). |
@@ -36,7 +36,7 @@ Les réglages Django utilisés sont `cla_web.settings.coolify` (valeur par défa
 
 ## Mails (Brevo)
 
-Les mails du site (activation de compte, mot de passe oublié, code de validation, alertes aux responsables) sont envoyés par l'API de [Brevo](https://www.brevo.com), depuis `noreply@send.centralelilleassos.fr`.
+Les mails du site (activation de compte, mot de passe oublié, code de validation, alertes aux responsables) sont envoyés par l'API de [Brevo](https://www.brevo.com), depuis `noreply@centralelilleassos.fr`.
 
 - **Cette adresse n'a pas de boîte de réception** : personne ne peut lire les réponses. L'adresse de contact réelle est cla@centralelille.fr.
 - Le serveur ne connaît **aucun mot de passe de boîte mail**. Il n'a que la clé API Brevo, qui sert uniquement à envoyer des mails depuis les expéditeurs vérifiés. Si elle fuit, on la supprime dans Brevo et on en crée une autre.
@@ -46,8 +46,8 @@ Les mails du site (activation de compte, mot de passe oublié, code de validatio
 
 Configuration du compte Brevo (à refaire seulement si on change de compte) :
 
-1. **Domaine** : *Senders, Domains & Dedicated IPs* → *Domains* → ajouter le sous-domaine `send.centralelilleassos.fr` et copier dans les DNS de `centralelilleassos.fr` les enregistrements donnés par Brevo (code Brevo, DKIM, DMARC). Un sous-domaine dédié isole la réputation des mails du site de celle du domaine principal. Attendre que le domaine soit *authentifié*.
-2. **Expéditeur** : *Senders* → ajouter `noreply@send.centralelilleassos.fr`.
+1. **Domaine** : *Senders, Domains & Dedicated IPs* → *Domains* → ajouter `centralelilleassos.fr` et copier dans ses DNS les enregistrements donnés par Brevo (code Brevo, DKIM, DMARC). Attendre que le domaine soit *authentifié* : tant qu'il ne l'est pas, Brevo accepte les mails puis les rejette (« sender is not valid »).
+2. **Expéditeur** : *Senders* → ajouter `noreply@centralelilleassos.fr`. Sur un domaine authentifié, aucun code de confirmation n'est demandé (impossible à recevoir : l'adresse n'a pas de boîte).
 3. **Clé API** : *SMTP & API* → *API Keys* → créer une clé (v3, pas une clé SMTP) et la mettre dans `BREVO_API_KEY` sur Coolify.
 4. **Sécurité** : *Security* → *Authorised IPs* → n'autoriser que l'IP du serveur Coolify. Une clé volée ne marche alors nulle part ailleurs.
 5. **Suivi** : désactiver le suivi des clics (et des ouvertures) des mails transactionnels, sinon Brevo réécrit les liens d'activation et de réinitialisation.
