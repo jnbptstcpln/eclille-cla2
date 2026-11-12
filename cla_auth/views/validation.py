@@ -4,18 +4,17 @@ import jwt
 
 from django.views.generic import View
 from django.shortcuts import render, redirect, resolve_url
-from django.conf import settings
 from django.contrib import auth
 from django.contrib.auth.models import User
 from django.http import HttpResponse, Http404
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
-from django.core.mail import send_mail
-from django.template.loader import render_to_string
 
 from cla_auth.models import UserInfos
 from cla_auth.forms.validation import ValidationForm
 from cla_web.utils import current_school_year
+from cla_mail.models import Mail
+from cla_mail.sending import absolute_url, send
 
 
 @login_required()
@@ -66,31 +65,19 @@ def validate(req):
             validation_request.sent_on is None
             or validation_request.sent_on + timezone.timedelta(hours=1) < timezone.now()
         ):
-            try:
-                send_mail(
-                    subject="[CLA] Validation de votre compte",
-                    from_email=settings.EMAIL_HOST_FROM,
-                    recipient_list=[user.infos.email_school],
-                    message=f"Voici le code à indiquer pour valider votre compte : {validation_request.code}",
-                    html_message=render_to_string(
-                        "cla_auth/validation/mail.html",
-                        {
-                            "site_href": f"https://{settings.ALLOWED_HOSTS[0]}",
-                            "validation_href": f"https://{settings.ALLOWED_HOSTS[0]}{resolve_url('cla_auth:validate')}",
-                            "validation_request": validation_request,
-                        },
-                    ),
-                )
+            mail = send(
+                Mail.Kind.ACCOUNT_VALIDATION, user.infos.email_school, "[CLA] Validation de votre compte",
+                f"Voici le code à indiquer pour valider votre compte : {validation_request.code}",
+                template="cla_auth/validation/mail.html",
+                context={
+                    "validation_href": absolute_url(resolve_url("cla_auth:validate")),
+                    "validation_request": validation_request,
+                },
+                user=user,
+            )
+            if mail.status == Mail.Status.SENT:
                 validation_request.sent_on = timezone.now()
                 validation_request.save()
-            except Exception as e:
-                print("❌ Validation email not sent:", e)
-                # send_mail(
-                #     subject=f'[VALIDATION] Erreur lors de l\'envoie à {user.infos.email_school}',
-                #     from_email=settings.EMAIL_HOST_FROM,
-                #     recipient_list=[settings.EMAIL_HOST_FROM],
-                #     message=f"Une erreur s'est produite lors de l'envoi du mail de validation de compte à {user.infos.email_school} : {e}"
-                # )
 
         form = ValidationForm(user=req.user)
 

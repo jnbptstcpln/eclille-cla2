@@ -1,18 +1,20 @@
+import logging
+
 import jwt
 
 from django.contrib import auth, messages
-from django.core.mail import send_mail
 from django.shortcuts import render, redirect, reverse, resolve_url
-from django.conf import settings
 from django.contrib.auth.models import User
-from django.template.loader import render_to_string
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_protect
 
 from cla_web.middlewares import StayLoggedInMiddleware
 from cla_auth.models import PasswordResetRequest
 from cla_auth.forms.session import LoginForm, ForgotForm
-from cla_web.notification import send_generic_email
+from cla_mail.models import Mail
+from cla_mail.sending import absolute_url, send
+
+logger = logging.getLogger(__name__)
 
 
 @csrf_protect
@@ -93,10 +95,7 @@ def forgot_username(req):
                 username = user.username
             elif users.count() > 1:
                 server_error = True
-                send_generic_email(
-                    f"Plusieurs utilisateurs pour {email}",
-                    f"Lors de l'exécution de la fonction \"J'ai oublié mon identifiant\", l'adresse email {email} a retourné plusieurs comptes utilisateur. La personne concernée a été invitée à contacter cla@centralelille.fr et des actions doivent être prises pour préserver l'unicité utilisateur/email.",
-                )
+                logger.error("« J'ai oublié mon identifiant » : plusieurs comptes utilisateur ont l'adresse %s", email)
     else:
         form = ForgotForm()
 
@@ -130,37 +129,19 @@ def forgot_password(req):
                 if (
                     reset_req.attempt < 3
                 ):  # Send reset email if less than 3 attempts were made
-                    try:
-                        send_mail(
-                            subject="[CLA] Réinitialiser votre mot de passe",
-                            from_email=settings.EMAIL_HOST_FROM,
-                            recipient_list=[user.email],
-                            message="Réinitialiser le mot de passe de votre compte CLA",
-                            html_message=render_to_string(
-                                "cla_auth/reset/mail.html",
-                                {
-                                    "site_href": f"https://{settings.ALLOWED_HOSTS[0]}",
-                                    "reset_href": f"https://{settings.ALLOWED_HOSTS[0]}{resolve_url('cla_auth:reset', reset_req.get_reset_jwt())}",
-                                },
-                            ),
-                        )
-                    except Exception as e:
-                        print("❌ Reset email not sent:", e)
-                        # send_mail(
-                        #     subject=f'[RESET] Erreur lors de l\'envoie à {user.email}',
-                        #     from_email=settings.EMAIL_HOST_FROM,
-                        #     recipient_list=[settings.EMAIL_HOST_FROM],
-                        #     message=f"Une erreur s'est produite lors de l'envoi du mail de réinitilisation de mot de passe à {user.email} : {e}"
-                        # )
+                    send(
+                        Mail.Kind.PASSWORD_RESET, user.email, "[CLA] Réinitialiser votre mot de passe",
+                        "Réinitialiser le mot de passe de votre compte CLA",
+                        template="cla_auth/reset/mail.html",
+                        context={"reset_href": absolute_url(resolve_url("cla_auth:reset", reset_req.get_reset_jwt()))},
+                        user=user,
+                    )
                     success = True
                 else:
                     warning = True
             elif users.count() > 1:
                 server_error = True
-                send_generic_email(
-                    f"Plusieurs utilisateurs pour {email}",
-                    f"Lors de l'exécution de la fonction \"J'ai oublié mon mot de passe\", l'adresse email {email} a retourné plusieurs comptes utilisateur. La personne concernée a été invitée à contacter cla@centralelille.fr et des actions doivent être prises pour préserver l'unicité utilisateur/email.",
-                )
+                logger.error("« J'ai oublié mon mot de passe » : plusieurs comptes utilisateur ont l'adresse %s", email)
 
     else:
         form = ForgotForm()

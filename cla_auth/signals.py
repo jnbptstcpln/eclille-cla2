@@ -1,8 +1,7 @@
-from django.core.mail import send_mail
-from django.conf import settings
 from django.shortcuts import resolve_url
-from django.template.loader import render_to_string
 
+from cla_mail.models import Mail
+from cla_mail.sending import absolute_url, send
 from .models import UserInfos
 
 
@@ -14,25 +13,10 @@ def send_activation_email(sender, instance: UserInfos, created, **kwargs):
     """
     if created:
         if instance.activated_on is None:
-            try:
-                send_mail(
-                    subject='[CLA] Activation de votre compte',
-                    from_email=settings.EMAIL_HOST_FROM,
-                    recipient_list=[instance.email_school],
-                    message="Bienvenue au sein de Centrale Lille Associations",
-                    html_message=render_to_string(
-                        'cla_auth/activation/mail.html',
-                        {
-                            'site_href': f"https://{settings.ALLOWED_HOSTS[0]}",
-                            'activation_href': f"https://{settings.ALLOWED_HOSTS[0]}{resolve_url('cla_auth:activate', instance.activation_jwt)}",
-                        }
-                    ),
-                )
-            except Exception as e:
-                print("❌ Activation email not sent:", e)
-                # send_mail(
-                #     subject=f'[ACTIVATION] Erreur lors de l\'envoie à {instance.email_school}',
-                #     from_email=settings.EMAIL_HOST_FROM,
-                #     recipient_list=[settings.EMAIL_HOST_FROM],
-                #     message=f"Une erreur s'est produite lors de l'envoi du mail d'activation à {instance.email_school} : {e}"
-                # )
+            send(
+                Mail.Kind.ACTIVATION, instance.email_school, "[CLA] Activation de votre compte",
+                "Bienvenue au sein de Centrale Lille Associations",
+                template="cla_auth/activation/mail.html",
+                context={"activation_href": absolute_url(resolve_url("cla_auth:activate", instance.activation_jwt))},
+                user=instance.user,
+            )

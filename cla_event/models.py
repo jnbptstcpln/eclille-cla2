@@ -2,14 +2,10 @@ import os
 import uuid
 from datetime import datetime, timedelta
 
-import bugsnag
-from django.conf import settings
-from django.contrib.auth.models import User, Group, Permission
-from django.core.mail import send_mail
+from django.contrib.auth.models import User
 from django.db import models
 from django.shortcuts import resolve_url
 from django.template.defaultfilters import date
-from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django_resized import ResizedImageField
@@ -17,6 +13,8 @@ from cla_web.fields import SummernoteTextField
 
 from cla_association.models import Association
 from cla_auth.models import UserInfos, Service
+from cla_mail.models import Mail
+from cla_mail.sending import absolute_url, send_to_users, users_with_permission
 
 
 class FilePath:
@@ -228,31 +226,12 @@ class Event(models.Model):
         return True
 
     def send_notification(self):
-        try:
-            permission = Permission.objects.filter(content_type__app_label='cla_event', codename='change_event').first()
-            groups = Group.objects.filter(permissions__in=[permission])
-            for group in groups:
-                try:
-                    send_mail(
-                        subject='[CLA] Nouvel événement à valider',
-                        from_email=settings.EMAIL_HOST_FROM,
-                        recipient_list=[user.email for user in group.user_set.all()],
-                        message="Une demande de validation d'événement a été reçu",
-                        html_message=render_to_string(
-                            'cla_event/manage/mail.html',
-                            {
-                                'site_href': f"https://{settings.ALLOWED_HOSTS[0]}",
-                                'detail_href': f"https://{settings.ALLOWED_HOSTS[0]}{resolve_url('cla_event:manage:event-detail', self.pk)}",
-                                'event': self
-                            }
-                        ),
-                    )
-                except Exception as e:
-                    bugsnag.notify(e, metadata={
-                        "infos": {"message": f"An error occurred while sending new event notification"},
-                    })
-        except Exception as e:
-            print("event", e)
+        send_to_users(
+            Mail.Kind.EVENT_TO_VALIDATE, users_with_permission("cla_event", "change_event"),
+            "[CLA] Nouvel événement à valider", "Une demande de validation d'événement a été reçue",
+            template="cla_event/manage/mail.html",
+            context={"detail_href": absolute_url(resolve_url("cla_event:manage:event-detail", self.pk)), "event": self},
+        )
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         # Auto setup dates

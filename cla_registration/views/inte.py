@@ -14,27 +14,27 @@ class IndexView(CurrentRegistrationSessionMixin, TemplateView):
 
 
 class PackRegistrationView(InteRegistrationMixin, CentralePackRegistrationView):
-    send_email_notification = False
+    pass
 
 
 class PackDDRegistrationView(InteRegistrationMixin, CentralePackDDRegistrationView):
-    send_email_notification = False
+    pass
 
 
 class PackDDInterRegistrationView(InteRegistrationMixin, CentralePackDDInterRegistrationView):
-    send_email_notification = False
+    pass
 
 
 class CLARegistrationView(InteRegistrationMixin, CentraleCLARegistrationView):
-    send_email_notification = False
+    pass
 
 
 class CLADDRegistrationView(InteRegistrationMixin, CentraleCLADDRegistrationView):
-    send_email_notification = False
+    pass
 
 
 class CLADDInterRegistrationView(InteRegistrationMixin, CentraleCLADDInterRegistrationView):
-    send_email_notification = False
+    pass
 
 
 class RegistrationPaiementView(DetailView):

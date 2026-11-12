@@ -1,7 +1,6 @@
 import jwt
 
 from django.contrib import auth, messages
-from django.core.mail import send_mail
 from django.http import Http404, JsonResponse
 from django.shortcuts import render, redirect, reverse, resolve_url, get_object_or_404
 from django.utils.http import urlencode

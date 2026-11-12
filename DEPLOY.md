@@ -26,7 +26,6 @@ Les réglages Django utilisés sont `cla_web.settings.coolify` (valeur par défa
 | `EMAIL_FROM` | oui | Adresse d'expédition des mails : `noreply@send.centralelilleassos.fr` (voir [Mails](#mails-brevo)). |
 | `BREVO_API_KEY` | oui | Clé API Brevo (v3). Inutile en préproduction. |
 | `CONTACT_EMAIL` | non | Adresse qui reçoit les réponses aux mails du site, `cla@centralelille.fr` par défaut. |
-| `ADMINS` | non | Adresses des administrateurs, séparées par des virgules. |
 | `BUGSNAG_KEY`, `BUGSNAG_STAGE` | non | Bugsnag n'est notifié que si `BUGSNAG_STAGE=production`. |
 | `DJANGO_SETTINGS_MODULE` | non | `cla_web.settings.coolify` par défaut, `cla_web.settings.staging` en préproduction. |
 | `SECURE_COOKIES` | non | `True` par défaut (cookies réservés au HTTPS). |

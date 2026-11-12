@@ -1,8 +1,5 @@
-from django.conf import settings
-from django.core.mail import send_mail
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect, resolve_url
-from django.template.loader import render_to_string
 from django.views.generic import CreateView, DetailView
 from cla_registration.models import RegistrationSession, Registration
 from cla_registration.forms import RegistrationForm, RegistrationPackForm, EnsclRegistrationForm
@@ -32,7 +29,6 @@ class AbstractRegistrationView(CreateView):
     ticketing_field = ""
     registration: Registration = None
     description = None
-    send_email_notification = False
 
     def dispatch(self, request, *args, **kwargs):
         self.current_registration_session = RegistrationSession.objects.get_current_registration_session()
@@ -41,7 +37,6 @@ class AbstractRegistrationView(CreateView):
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
-        created = True
         self.registration = form.save(False)
         if self.current_registration_session.registrations.filter(email_school=self.registration.email_school).count() == 0:
             self.registration.session = self.current_registration_session
@@ -53,29 +48,9 @@ class AbstractRegistrationView(CreateView):
                 self.registration.original_school = form.cleaned_data.get('original_school')
             self.registration.save()
         else:
-            created = False
             self.registration = self.current_registration_session.registrations.filter(email_school=self.registration.email_school).first()
 
         self.registration.save()
-
-        if created and self.send_email_notification:
-            try:
-                send_mail(
-                    subject=f"[Nouvelle Adhésion] {self.registration.get_school_display()} {self.registration.first_name.upper()} {self.registration.last_name}",
-                    from_email=settings.EMAIL_HOST_FROM,
-                    recipient_list=[settings.EMAIL_HOST_FROM],
-                    message=f"Une demande d'adhésion vient d'être effectué sur le site pour l'étudiant {self.registration.first_name} {self.registration.last_name}",
-                    html_message=render_to_string(
-                        'cla_registration/admin/mail.html',
-                        {
-                            'site_href': f"https://{settings.ALLOWED_HOSTS[0]}",
-                            'campaign_href': f"https://{settings.ALLOWED_HOSTS[0]}{resolve_url('admin:cla_registration_registrationsession_change', self.current_registration_session.pk)}",
-                            'registration': self.registration
-                        }
-                    )
-                )
-            except Exception as e:
-                pass
 
         return HttpResponseRedirect(self.get_success_url())
 
@@ -116,7 +91,6 @@ class CentralePackRegistrationView(AbstractPackRegistrationView):
     registration_type = Registration.Types.CENTRALE_PACK
     contribution = 355
     description = "Étudiante ou étudiant à l'école Centrale de Lille, vous souhaitez adhérer à Centrale Lille Associations et à Centrale Lille Alumni en profitant du pack CLA+Alumni."
-    send_email_notification = True
 
 
 class CentralePackDDRegistrationView(AbstractPackRegistrationView):
@@ -126,7 +100,6 @@ class CentralePackDDRegistrationView(AbstractPackRegistrationView):
     registration_type = Registration.Types.CENTRALE_DD_PACK
     contribution = 265
     description = "Étudiante ou étudiant en double diplôme à l'école Centrale de Lille en provenance d'un établissement français, vous souhaitez adhérer à Centrale Lille Associations et à Centrale Lille Alumni en profitant du pack CLA+Alumni."
-    send_email_notification = True
 
 
 class CentralePackDDInterRegistrationView(AbstractPackRegistrationView):
@@ -135,7 +108,6 @@ class CentralePackDDInterRegistrationView(AbstractPackRegistrationView):
     registration_type = Registration.Types.CENTRALE_DD_INTER_PACK
     contribution = 125
     description = "Étudiante ou étudiant en double diplôme international à l'école Centrale de Lille, vous souhaitez adhérer à Centrale Lille Associations et à Centrale Lille Alumni en profitant du pack CLA+Alumni."
-    send_email_notification = True
 
 
 class ITEEMPackRegistrationView(AbstractPackRegistrationView):
@@ -143,7 +115,6 @@ class ITEEMPackRegistrationView(AbstractPackRegistrationView):
     registration_type = Registration.Types.ITEEM_PACK
     contribution = 445
     description = "Étudiante ou étudiant à l'ITEEM, vous souhaitez adhérer à Centrale Lille Associations et à Centrale Lille Alumni en profitant du pack CLA+Alumni."
-    send_email_notification = True
 
 
 class CentraleCLARegistrationView(AbstractRegistrationView):
@@ -151,7 +122,6 @@ class CentraleCLARegistrationView(AbstractRegistrationView):
     registration_type = Registration.Types.CENTRALE_CLA
     contribution = 270
     description = "Étudiante ou étudiant à l'école Centrale de Lille, vous souhaitez adhérer à Centrale Lille Associations."
-    send_email_notification = True
 
 
 class CentraleCLADDRegistrationView(AbstractRegistrationView):
@@ -161,7 +131,6 @@ class CentraleCLADDRegistrationView(AbstractRegistrationView):
     registration_type = Registration.Types.CENTRALE_DD_CLA
     contribution = 180
     description = "Étudiante ou étudiant en double diplôme à l'école Centrale de Lille en provenance d'un établissement français, vous souhaitez adhérer à Centrale Lille Associations."
-    send_email_notification = True
 
 
 class CentraleCLADDInterRegistrationView(AbstractRegistrationView):
@@ -170,7 +139,6 @@ class CentraleCLADDInterRegistrationView(AbstractRegistrationView):
     registration_type = Registration.Types.CENTRALE_DD_INTER_CLA
     contribution = 40
     description = "Étudiante ou étudiant en double diplôme international à l'école Centrale de Lille, vous souhaitez adhérer à Centrale Lille Associations."
-    send_email_notification = True
 
 
 class ITEEMCLARegistrationView(AbstractRegistrationView):
@@ -178,7 +146,6 @@ class ITEEMCLARegistrationView(AbstractRegistrationView):
     registration_type = Registration.Types.ITEEM_CLA
     contribution = 360
     description = "Étudiante ou étudiant à l'ITEEM, vous souhaitez adhérer à Centrale Lille Associations."
-    send_email_notification = True
 
 
 class ENSCLCLARegistrationView(AbstractRegistrationView):
@@ -188,7 +155,6 @@ class ENSCLCLARegistrationView(AbstractRegistrationView):
     registration_type = Registration.Types.ENSCL_CLA
     contribution = 225
     description = "Étudiante ou étudiant à l'ENSCL, vous souhaitez adhérer à Centrale Lille Associations."
-    send_email_notification = True
 
 
 class RegistrationPaiementView(DetailView):

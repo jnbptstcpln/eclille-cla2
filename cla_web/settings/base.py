@@ -29,9 +29,8 @@ ALLOWED_HOSTS = config("ALLOWED_HOSTS").split(",")
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
-# Admins
-
-ADMINS = [(x, x) for x in config("ADMINS", "").split(',')]
+# Mails
+# ADMINS reste vide : Django n'envoie pas de mail à chaque erreur 500 (une panne viderait le quota Brevo).
 SERVER_EMAIL = config("EMAIL_FROM")
 
 # Adresse de contact réelle : reçoit les réponses aux mails du site (qui partent du noreply)

@@ -17,6 +17,7 @@ Exemple :
 import logging
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils import timezone
@@ -69,3 +70,12 @@ def send_to_users(kind, users, subject, text, template=None, context=None) -> li
         send(kind, user.email, subject, text, template=template, context=context, user=user)
         for user in users if user.email
     ]
+
+
+def users_with_permission(app_label, codename):
+    """Utilisateurs actifs qui ont la permission `app_label.codename` par l'un de leurs groupes."""
+    return get_user_model().objects.filter(
+        is_active=True,
+        groups__permissions__content_type__app_label=app_label,
+        groups__permissions__codename=codename,
+    ).distinct()
