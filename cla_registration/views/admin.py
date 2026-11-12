@@ -1,5 +1,5 @@
 import csv
-import bugsnag
+import logging
 
 from django.template.loader import render_to_string
 from django.views import generic
@@ -19,6 +19,8 @@ from cla_registration.models import Registration, RegistrationSession
 from cla_registration.forms import RegistrationAdminForm
 from cla_auth.models import UserInfos, UserMembership
 from cla_mail.models import Mail
+
+logger = logging.getLogger(__name__)
 
 
 class RegistrationValidationView(UserPassesTestMixin, generic.FormView):
@@ -79,7 +81,7 @@ class RegistrationValidationView(UserPassesTestMixin, generic.FormView):
                 if self.registration.pack:
                     self.registration.rgpd_sharing_alumni = True
         except Exception as e:
-            bugsnag.notify(e, metadata={"form": form.cleaned_data})
+            logger.exception("Mise à jour de l'adhésion %s impossible", self.registration.pk)
 
         # Creating user object
         user = User(

@@ -10,7 +10,7 @@ Le site est déployé avec [Coolify](https://coolify.io), à partir du `Dockerfi
 - les fichiers statiques sont servis par WhiteNoise ;
 - la base de données est un conteneur `mysql:8` géré par Coolify.
 
-Les réglages Django utilisés sont `cla_web.settings.coolify` (valeur par défaut du `Dockerfile`). Pour une préproduction, utiliser `cla_web.settings.staging` : aucun mail n'est envoyé (ils apparaissent dans les logs) et Bugsnag n'est pas notifié.
+Les réglages Django utilisés sont `cla_web.settings.coolify` (valeur par défaut du `Dockerfile`). Pour une préproduction, utiliser `cla_web.settings.staging` : aucun mail n'est envoyé (ils apparaissent dans les logs).
 
 > [!IMPORTANT]
 > Le dossier `/usr/src/app/media` (photos, logos, affiches, PDF signés…) doit être un **volume persistant** dans Coolify, sinon les fichiers envoyés sont perdus à chaque déploiement.
@@ -28,7 +28,7 @@ Les réglages Django utilisés sont `cla_web.settings.coolify` (valeur par défa
 | `CONTACT_EMAIL` | non | Adresse qui reçoit les réponses aux mails du site, `cla@centralelille.fr` par défaut. |
 | `MAIL_DAILY_LIMIT`, `MAIL_URGENT_RESERVE` | non | Quota de mails par jour (300 par défaut) et part réservée aux mails urgents (50 par défaut). Voir [Quota](#quota-et-mails-en-attente). |
 | `MAIL_RETENTION_DAYS` | non | Durée de conservation du journal des mails, 90 jours par défaut. |
-| `BUGSNAG_KEY`, `BUGSNAG_STAGE` | non | Bugsnag n'est notifié que si `BUGSNAG_STAGE=production`. |
+| `ERROR_RETENTION_DAYS` | non | Durée de conservation des erreurs réglées dans le journal des erreurs, 90 jours par défaut. |
 | `DJANGO_SETTINGS_MODULE` | non | `cla_web.settings.coolify` par défaut, `cla_web.settings.staging` en préproduction. |
 | `SECURE_COOKIES` | non | `True` par défaut (cookies réservés au HTTPS). |
 | `SERVE_MEDIA` | non | `False` par défaut. `True` pour que Django serve lui-même `/media/`. |
@@ -61,21 +61,34 @@ Pour ne jamais dépasser les 300 mails par jour (par exemple le jour où l'on va
 - **Mails urgents** (mot de passe oublié, code de validation, mail de test) : toujours envoyés tout de suite. Les 50 derniers mails du quota leur sont réservés.
 - **Mails qui peuvent attendre** (activation de compte, alertes « à valider » aux responsables) : envoyés tout de suite tant qu'on reste sous 250 mails dans la journée. Au-delà, ils passent **« En attente »** dans le journal et partent automatiquement dès que le quota le permet.
 
-Les mails en attente sont envoyés par une **tâche planifiée Coolify**, à créer une fois sur l'application (*Scheduled Tasks*) :
-
-- **Commande** : `python manage.py send_pending_mails`
-- **Fréquence** : `0 * * * *` (toutes les heures)
-
-La même commande efface du journal les mails de plus de 90 jours. Si Brevo refuse un mail en attente, il est réessayé au passage suivant, puis marqué « Échec » après 3 tentatives.
+Les mails en attente sont envoyés par la [tâche planifiée](#tâche-planifiée), qui efface aussi du journal les mails de plus de 90 jours. Si Brevo refuse un mail en attente, il est réessayé au passage suivant, puis marqué « Échec » après 3 tentatives.
 
 Si on passe à une offre Brevo payante, augmenter `MAIL_DAILY_LIMIT`.
+
+## Erreurs du site
+
+Les pages qui plantent (erreur 500) et les erreurs signalées par le code sont enregistrées dans l'admin : *Suivi du site › Journal des erreurs*. Elles apparaissent aussi dans les logs du conteneur.
+
+- Les erreurs identiques sont regroupées sur une ligne, avec leur nombre d'occurrences et la dernière page concernée.
+- Une fois le problème corrigé, sélectionner l'erreur et utiliser l'action « Marquer comme réglées ». Si elle se reproduit, elle repasse « À traiter ».
+- Le journal ne contient jamais ce que l'utilisateur a tapé (formulaires, mots de passe).
+- Les erreurs réglées depuis plus de 90 jours sont effacées par la tâche planifiée.
+
+## Tâche planifiée
+
+Une seule tâche planifiée Coolify, à créer une fois sur l'application (*Scheduled Tasks*) :
+
+- **Commande** : `python manage.py scheduled_tasks`
+- **Fréquence** : `0 * * * *` (toutes les heures)
+
+Elle envoie les mails en attente et nettoie les journaux des mails et des erreurs.
 
 ## Déployer une nouvelle version
 
 1. Lancer les tests (voir ci-dessous).
 2. Si la version contient des migrations, **faire une sauvegarde de la base** (backup Coolify ou `mysqldump`).
 3. Fusionner sur la branche déployée : Coolify construit l'image et remplace le conteneur. Le nouveau conteneur ne reçoit du trafic qu'une fois les migrations et `collectstatic` terminés.
-4. Vérifier les logs du conteneur dans Coolify, puis le site (connexion, pages modifiées) et Bugsnag.
+4. Vérifier les logs du conteneur dans Coolify, puis le site (connexion, pages modifiées) et le journal des erreurs de l'admin.
 
 > [!WARNING]
 > Pendant le déploiement, l'ancien conteneur continue de répondre alors que les migrations du nouveau sont déjà appliquées. Si une migration ajoute un champ qui **ne peut pas** être `null` sur un modèle existant, les enregistrements de ce modèle échouent (`This field cannot be null.`) jusqu'à la fin du déploiement : préférer un champ `null=True` ou avec une valeur par défaut.

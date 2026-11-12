@@ -151,5 +151,6 @@ def _build(mail):
 def _record_failure(mail, error):
     mail.status = Mail.Status.FAILED
     mail.error = f"{type(error).__name__} : {error}"
-    logger.exception("Mail « %s » non envoyé à %s", mail.kind, mail.recipient or mail.user)
+    # warning et non error : l'échec est déjà visible dans le journal des mails, pas dans celui des erreurs
+    logger.warning("Mail « %s » non envoyé à %s", mail.kind, mail.recipient or mail.user, exc_info=True)
     mail.save()

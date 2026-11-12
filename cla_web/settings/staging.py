@@ -1,7 +1,6 @@
 """
 Préproduction : mêmes réglages que la prod, mais :
-- aucun mail réel n'est envoyé (ils sont affichés dans les logs du conteneur),
-- à utiliser avec BUGSNAG_STAGE=staging (Bugsnag ne notifie que "production").
+- aucun mail réel n'est envoyé (ils sont affichés dans les logs du conteneur).
 """
 import os
 

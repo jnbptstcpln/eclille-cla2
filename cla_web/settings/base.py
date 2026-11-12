@@ -67,10 +67,10 @@ INSTALLED_APPS = [
     'cla_event.apps.ClaEventConfig',
     'cla_reservation.apps.ClaReservationConfig',
     'cla_mail.apps.ClaMailConfig',
+    'cla_monitoring.apps.ClaMonitoringConfig',
 ]
 
 MIDDLEWARE = [
-    'bugsnag.django.middleware.BugsnagMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -224,9 +224,15 @@ BLEACH_ALLOWED_ATTRIBUTES = {
 }
 
 
-BUGSNAG = {
-    'api_key': config('BUGSNAG_KEY', ''),
-    'project_root': str(BASE_DIR),
-    'release_stage': config('BUGSNAG_STAGE', 'development'),
-    'notify_release_stages': ('production',)
+# Journal des erreurs (admin › Suivi du site) : les erreurs sont enregistrées en base,
+# et toujours affichées dans les logs du conteneur.
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {"class": "logging.StreamHandler"},
+        "journal": {"class": "cla_monitoring.handlers.DatabaseHandler", "level": "ERROR"},
+    },
+    "root": {"handlers": ["console", "journal"], "level": "WARNING"},
 }
+ERROR_RETENTION_DAYS = config("ERROR_RETENTION_DAYS", 90, cast=int)  # pour les erreurs réglées

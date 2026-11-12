@@ -1,7 +1,6 @@
 asgiref==3.13.0
 bcrypt==4.3.0
 bleach==6.4.0
-bugsnag==4.9.2
 certifi==2026.10.23
 Django==5.2.19
 django-admin-inline-paginator-plus==0.1.5
