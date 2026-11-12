@@ -912,3 +912,30 @@ class ServiceTicket(models.Model):
                 return True
             except:
                 return False
+
+
+class PasswordChange(models.Model):
+    """
+    Date du dernier changement de mot de passe de chaque utilisateur, enregistrée automatiquement
+    à chaque `set_password` suivi d'un `save` (voir cla_auth.signals.record_password_change).
+
+    Un utilisateur qui a un mot de passe mais aucune ligne ici doit en choisir un nouveau à sa
+    prochaine connexion (cla_auth.middlewares.PasswordChangeRequiredMiddleware). C'est le cas de tous
+    les comptes après l'incident de sécurité de novembre 2026, et de nouveau après
+    `python manage.py require_password_change`.
+    """
+
+    class Meta:
+        verbose_name = "changement de mot de passe"
+        verbose_name_plural = "changements de mot de passe"
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True, related_name="password_change")
+    changed_on = models.DateTimeField("mot de passe changé le")
+
+
+def must_change_password(user) -> bool:
+    """Vrai si l'utilisateur se connecte avec un mot de passe qu'il doit changer."""
+    return (
+        bool(user.password) and user.has_usable_password()
+        and not PasswordChange.objects.filter(user_id=user.pk).exists()
+    )

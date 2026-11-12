@@ -25,6 +25,8 @@ urlpatterns = [
     ),
     # Account validation
     path("validation", views.validation.validate, name="validate"),
+    # Changement de mot de passe obligatoire (après un incident de sécurité)
+    path("motdepasse/nouveau", views.password_change.password_change_required, name="password_change_required"),
     # Password reset
     path("reinitialiser/<str:reset_jwt>", views.reset.reset, name="reset"),
     # Services

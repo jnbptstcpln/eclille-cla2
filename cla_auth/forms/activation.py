@@ -49,8 +49,8 @@ class ActivationPasswordForm(forms.Form):
     )
 
     def clean_password2(self):
-        password1 = self.cleaned_data['password1']
+        password1 = self.cleaned_data.get('password1')  # absent si le premier mot de passe est refusé
         password2 = self.cleaned_data['password2']
-        if password1 != password2:
+        if password1 is not None and password1 != password2:
             raise forms.ValidationError('Les mots de passes ne correspondent pas')
         return password2

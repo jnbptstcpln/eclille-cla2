@@ -87,6 +87,21 @@ Une seule tâche planifiée Coolify, à créer une fois sur l'application (*Sche
 
 Elle envoie les mails en attente et nettoie les journaux des mails et des erreurs.
 
+## Après un incident de sécurité
+
+Pour obliger tout le monde (superusers compris) à choisir un nouveau mot de passe, sans envoyer de mail, lancer dans le terminal du conteneur :
+
+```shell
+python manage.py require_password_change
+```
+
+À sa prochaine visite, chaque utilisateur connecté est envoyé sur une page « Choisissez un nouveau mot de passe » et ne peut aller nulle part ailleurs (admin compris) avant de l'avoir fait ; il revient ensuite sur la page qu'il voulait ouvrir. La date du dernier changement de mot de passe de chaque compte est enregistrée automatiquement (modèle `PasswordChange` de `cla_auth`).
+
+Penser aussi à changer `SECRET_KEY` (déconnecte tout le monde et invalide les liens déjà envoyés), la clé API Brevo et les mots de passe de la base.
+
+> [!NOTE]
+> Le premier déploiement de cette fonctionnalité (novembre 2026) a le même effet que la commande : aucun compte n'a encore de date de changement, tous doivent donc choisir un nouveau mot de passe.
+
 ## Déployer une nouvelle version
 
 1. Lancer les tests (voir ci-dessous).

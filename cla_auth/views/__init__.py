@@ -3,6 +3,7 @@ from . import (
     activation,
     validation,
     reset,
+    password_change,
     service,
     debug,
     docs,
