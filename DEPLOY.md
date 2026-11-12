@@ -25,6 +25,7 @@ Les réglages Django utilisés sont `cla_web.settings.coolify` (valeur par défa
 | `DATABASE_USER`, `DATABASE_PASSWORD`, `DATABASE_NAME` | oui | Accès MySQL. |
 | `EMAIL_FROM` | oui | Adresse d'expédition des mails : `noreply@centralelilleassos.fr` (voir [Mails](#mails-brevo)). |
 | `BREVO_API_KEY` | oui | Clé API Brevo (v3). Inutile en préproduction. |
+| `CONTACT_EMAIL` | non | Adresse qui reçoit les réponses aux mails du site, `cla@centralelille.fr` par défaut. |
 | `ADMINS` | non | Adresses des administrateurs, séparées par des virgules. |
 | `BUGSNAG_KEY`, `BUGSNAG_STAGE` | non | Bugsnag n'est notifié que si `BUGSNAG_STAGE=production`. |
 | `DJANGO_SETTINGS_MODULE` | non | `cla_web.settings.coolify` par défaut, `cla_web.settings.staging` en préproduction. |
@@ -39,6 +40,7 @@ Les mails du site (activation de compte, mot de passe oublié, code de validatio
 - **Cette adresse n'a pas de boîte de réception** : personne ne peut lire les réponses. L'adresse de contact réelle est cla@centralelille.fr.
 - Le serveur ne connaît **aucun mot de passe de boîte mail**. Il n'a que la clé API Brevo, qui sert uniquement à envoyer des mails depuis les expéditeurs vérifiés. Si elle fuit, on la supprime dans Brevo et on en crée une autre.
 - Offre gratuite : **300 mails par jour**.
+- Tous les mails envoyés (ou en échec) sont listés dans l'admin : *Mails › Journal des mails*. Le contenu n'y est pas enregistré, car il contient des liens secrets.
 
 Configuration du compte Brevo (à refaire seulement si on change de compte) :
 

@@ -26,8 +26,9 @@ from cla_event.models import Event, EventPlace, EventType
 from cla_registration.models import ImageRightAgreement
 from cla_ticketing.models import DancingParty, Event as TicketingEvent
 
-# Ajout seulement via un bouton depuis un évènement/une soirée (paramètres GET requis)
-NO_ADD_VIEW = {"eventregistration", "dancingpartyregistration"}
+# Ajout seulement via un bouton depuis un évènement/une soirée (paramètres GET requis),
+# ou jamais à la main (journal des mails)
+NO_ADD_VIEW = {"eventregistration", "dancingpartyregistration", "mail"}
 
 # Les styles en ligne sont tous vidés : aucun `styles`/`css_sanitizer` n'est passé à bleach.clean
 BLEACH_EXPECTED = {

@@ -34,6 +34,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 ADMINS = [(x, x) for x in config("ADMINS", "").split(',')]
 SERVER_EMAIL = config("EMAIL_FROM")
 
+# Adresse de contact réelle : reçoit les réponses aux mails du site (qui partent du noreply)
+CONTACT_EMAIL = config("CONTACT_EMAIL", "cla@centralelille.fr")
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -59,6 +62,7 @@ INSTALLED_APPS = [
     'cla_association.apps.ClaAssociationConfig',
     'cla_event.apps.ClaEventConfig',
     'cla_reservation.apps.ClaReservationConfig',
+    'cla_mail.apps.ClaMailConfig',
 ]
 
 MIDDLEWARE = [
