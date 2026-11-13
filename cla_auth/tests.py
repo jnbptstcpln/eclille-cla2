@@ -77,3 +77,13 @@ class PasswordChangeRequiredTest(TestCase):
     def test_logout_stays_possible(self):
         response = self.client.get(reverse("cla_auth:logout"))
         self.assertRedirects(response, reverse("cla_public:index"), fetch_redirect_response=False)
+
+
+class ServiceValidateTest(TestCase):
+    def test_unknown_service_is_a_404_not_a_crash(self):
+        from cla_monitoring.models import Error
+        # Requête réelle d'un robot qui cherchait un dossier .git exposé
+        response = self.client.get("/authentification/.git/config")
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.json()["message"], "No service correspond to this identifier")
+        self.assertFalse(Error.objects.exists())

@@ -216,9 +216,9 @@ def authorize(req, identifier):
 
 
 def validate(req, identifier, ticket_jwt):
-    service: Service = Service.objects.get(identifier=identifier)
+    service: Service = Service.objects.filter(identifier=identifier).first()
 
-    if not service:
+    if not service:  # identifiant inconnu (souvent un robot qui scanne le site) : 404 et non erreur 500
         return _get_error_json_response("No service correspond to this identifier", status_code=404)
 
     ticket = _get_service_ticket_from_jwt(ticket_jwt)
