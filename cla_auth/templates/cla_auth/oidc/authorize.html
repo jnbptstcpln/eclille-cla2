@@ -1,0 +1,52 @@
+{% extends "layout/standalone.html" %}
+
+{% block page_title %}Autorisation | CLA{% endblock %}
+
+{% block content_align %}align-items-center{% endblock %}
+
+{% block content %}
+    <div id="main" class="card" style="max-width: 450px; height: initial">
+        <div class="card-body w-100 overflow-auto">
+            <div class="p-2 p-md-4">
+                <h1 class="text-center mb-4">
+                    <span class="cla_logo" style="transform: scale(1.25)">
+                        <span class="cl">Centrale Lille</span>
+                        <span class="a">Associations</span>
+                    </span>
+                </h1>
+                {% if error %}
+                    <p class="text-center">La demande de connexion est invalide.</p>
+                    <p class="text-center small text-muted mb-0">{{ error.error }} : {{ error.description }}</p>
+                {% else %}
+                    <form method="post">
+                        {% csrf_token %}
+                        {% for field in form.hidden_fields %}{{ field }}{% endfor %}
+                        <div class="overflow-auto" style="max-height: 33vh">
+                            <p>
+                                C'est la première fois que vous utilisez votre compte CLA pour vous connecter au site {{ service.domain }}.
+                            </p>
+                            <p>
+                                <strong>
+                                    En cliquant sur continuer vous acceptez que les informations suivantes soient transmises
+                                    au site "{{ service.domain }}" :
+                                </strong>
+                            </p>
+                            <ul class="max-w-400 ms-auto">
+                                {% for scope in scopes_descriptions %}
+                                    <li>{{ scope }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+
+                        <p class="mt-3">
+                            <button type="submit" name="allow" value="1" class="btn btn-primary btn-lg btn-block">Continuer</button>
+                        </p>
+                        <p class="small mt-4 mb-0 text-center">
+                            <button type="submit" class="btn btn-link btn-sm">Annuler</button>
+                        </p>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

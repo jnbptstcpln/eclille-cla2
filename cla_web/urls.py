@@ -20,6 +20,7 @@ from django.conf.urls.static import static
 from django.shortcuts import redirect
 from django.contrib.flatpages import views
 
+from cla_auth.urls import oidc_urlpatterns
 from cla_auth.views.session import login
 
 urlpatterns = [
@@ -30,6 +31,7 @@ urlpatterns = [
     path("qr_code/", include("qr_code.urls", namespace="qr_code")),
     # Project's apps
     path("", include("cla_auth.urls")),
+    path("auth/", include(oidc_urlpatterns)),
     path("", include("cla_public.urls")),
     path("", include("cla_registration.urls")),
     path("espace-adherent/", include("cla_member.urls")),
