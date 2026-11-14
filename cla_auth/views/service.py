@@ -119,7 +119,7 @@ def render_access_error(req, service, error, redirect_url):
 
 def authenticate(req, identifier):
 
-    service: Service = get_object_or_404(Service, identifier=identifier)
+    service: Service = get_object_or_404(Service, identifier=identifier, legacy_sso_enabled=True)
 
     if not req.user.is_authenticated or (not service.auto_login and not req.session.get(f"cla_auth:{service.identifier}_login", False)):
         return login(req, identifier)
@@ -141,7 +141,7 @@ def authenticate(req, identifier):
 
 
 def login(req, identifier):
-    service: Service = get_object_or_404(Service, identifier=identifier)
+    service: Service = get_object_or_404(Service, identifier=identifier, legacy_sso_enabled=True)
 
     if req.user.is_authenticated and service.auto_login:
         return redirect('cla_auth:service_authenticate', service.identifier)
@@ -181,7 +181,7 @@ def login(req, identifier):
 
 
 def authorize(req, identifier):
-    service: Service = get_object_or_404(Service, identifier=identifier)
+    service: Service = get_object_or_404(Service, identifier=identifier, legacy_sso_enabled=True)
 
     if service.has_user_gave_authorization(req.user):
         return redirect('cla_auth:service_authenticate', service.identifier)
@@ -203,9 +203,9 @@ def authorize(req, identifier):
 
 
 def validate(req, identifier, ticket_jwt):
-    service: Service = Service.objects.filter(identifier=identifier).first()
+    service: Service = Service.objects.filter(identifier=identifier, legacy_sso_enabled=True).first()
 
-    if not service:  # identifiant inconnu (souvent un robot qui scanne le site) : 404 et non erreur 500
+    if not service:  # identifiant inconnu (souvent un robot qui scanne le site) ou ancien SSO désactivé : 404
         return _get_error_json_response("No service correspond to this identifier", status_code=404)
 
     ticket = _get_service_ticket_from_jwt(ticket_jwt)

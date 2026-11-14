@@ -27,6 +27,7 @@ La commande affiche la clé sur une ligne, avec des `\n`, pour `settings.ini` ou
    - Copier **Client id** et **Client secret** *avant* d'enregistrer : le secret est ensuite haché et ne peut plus être affiché.
 2. Dans *Services*, ouvrir le service et sélectionner l'application dans **Application OpenID Connect**.
 3. Transmettre aux développeurs du service le client id, le client secret et l'URL de découverte.
+4. Une fois le service passé à OIDC en production, décocher **Ancien SSO activé** sur le service : `/authentification/<service>` répond alors 404.
 
 Une application qui n'est liée à aucun service est refusée.
 

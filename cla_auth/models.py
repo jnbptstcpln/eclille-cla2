@@ -866,6 +866,11 @@ class Service(models.Model):
         verbose_name="Application OpenID Connect",
         help_text="Permet au service de se connecter via OIDC (/auth/), en plus de l'ancien SSO",
     )
+    legacy_sso_enabled = models.BooleanField(
+        default=True,
+        verbose_name="Ancien SSO activé",
+        help_text="À décocher une fois le service passé à OIDC : /authentification/<service> répond alors 404",
+    )
 
     def access_error(self, user: User):
         """

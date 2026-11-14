@@ -192,6 +192,15 @@ class OidcTest(TestCase):
         self.client.force_login(self.user)
         self.code_from(self.authorize())
 
+    def test_legacy_sso_can_be_disabled(self):
+        self.client.force_login(self.user)
+        self.service.authorization_required = False
+        self.service.legacy_sso_enabled = False
+        self.service.save()
+        self.assertEqual(self.client.get("/authentification/service").status_code, 404)
+        self.assertEqual(self.client.get("/authentification/service/ticket").status_code, 404)
+        self.code_from(self.authorize())  # OIDC fonctionne toujours
+
     def test_access_rules(self):
         self.client.force_login(self.user)
         self.service.colleges = []
