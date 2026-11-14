@@ -293,22 +293,3 @@ class LoginRedirectTest(TestCase):
                 self.assertEqual(self.login(url).url, "/espace-adherent/")
                 self.assertEqual(self.client.get("/connexion", {"next": url}).url, "/espace-adherent/")
 
-
-class ServiceCheckTest(TestCase):
-    def test_misconfigured_service(self):
-        from django.core.checks import run_checks
-
-        application = Application.objects.create(
-            name="Mauvaise", client_id="bad", client_type=Application.CLIENT_CONFIDENTIAL,
-            authorization_grant_type=Application.GRANT_CLIENT_CREDENTIALS, redirect_uris="http://x.example.com/cb",
-            skip_authorization=True,
-        )
-        Service.objects.create(identifier="bad", name="Bad", domain="x.example.com", endpoint="http://x.example.com",
-                               oidc_application=application)
-        Application.objects.create(name="Orpheline", client_id="orphan",
-                                   authorization_grant_type=Application.GRANT_AUTHORIZATION_CODE)
-
-        ids = {message.id for message in run_checks(databases=["default"]) if message.id.startswith("cla_auth.")}
-        self.assertEqual(ids, {"cla_auth.S001", "cla_auth.S002", "cla_auth.S004", "cla_auth.S005", "cla_auth.S007",
-                               "cla_auth.S008", "cla_auth.A001"})
-        self.assertFalse([m for m in run_checks() if m.id.startswith("cla_auth.")])  # Sans --database

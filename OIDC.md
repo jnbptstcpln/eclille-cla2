@@ -30,12 +30,6 @@ La commande affiche la clé sur une ligne, avec des `\n`, pour `settings.ini` ou
 
 Une application qui n'est liée à aucun service est refusée.
 
-Pour vérifier la configuration de tous les services (ancien SSO et OIDC) :
-
-```shell
-python manage.py check --database default
-```
-
 ## Intégrer OIDC dans un service (développeurs)
 
 Toute bibliothèque OIDC standard convient. Il suffit de lui donner l'URL de découverte :
