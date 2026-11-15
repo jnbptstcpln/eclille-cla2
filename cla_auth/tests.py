@@ -164,6 +164,7 @@ class OidcTest(TestCase):
                                      "allow": "1"})
         tokens = self.exchange(self.code_from(response))
         self.assertTrue(ServiceAuthorization.objects.filter(service=self.service, user=self.user).exists())
+        self.assertEqual(self.service.tickets.filter(user=self.user, used=True).count(), 1)  # Dernières connexions
 
         keys = jwk.JWKSet.from_json(self.client.get("/auth/.well-known/jwks.json").content)
         id_token = json.loads(jwt.JWT(jwt=tokens["id_token"], key=keys).claims)

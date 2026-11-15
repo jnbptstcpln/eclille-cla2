@@ -11,7 +11,7 @@ from django.utils.http import urlencode
 from oauth2_provider import views as oauth2_views
 from oauth2_provider.models import get_application_model
 
-from cla_auth.models import ServiceAuthorization
+from cla_auth.models import ServiceAuthorization, ServiceTicket
 from cla_auth.views.service import render_access_error
 
 # Date à laquelle l'utilisateur a été envoyé vers la page de connexion par ce flux
@@ -58,6 +58,9 @@ class AuthorizationView(oauth2_views.AuthorizationView):
             return render_access_error(self.request, self.service, error, resolve_url("cla_public:index"))
         if form.cleaned_data.get("allow") and self.service.authorization_required:
             ServiceAuthorization.objects.get_or_create(service=self.service, user=self.request.user)
+        if form.cleaned_data.get("allow"):
+            # Ticket déjà utilisé : alimente « Dernières connexions » dans l'admin, comme l'ancien SSO
+            ServiceTicket.objects.create(service=self.service, user=self.request.user, used=True)
         return super().form_valid(form)
 
     def render_to_response(self, context, **response_kwargs):
