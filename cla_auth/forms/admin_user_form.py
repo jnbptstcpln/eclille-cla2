@@ -35,9 +35,11 @@ class UserCreationForm(forms.ModelForm):
 class UserChangeForm(Auth_UserChangeForm):
     def __init__(self, *args, reset_request=None, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['first_name'].required = True
-        self.fields['last_name'].required = True
-        self.fields['email'].required = True
+        # Les champs peuvent être absents du formulaire (ex. utilisateur avec la seule
+        # permission de consultation : l'admin les passe tous en lecture seule)
+        for name in ('first_name', 'last_name', 'email'):
+            if name in self.fields:
+                self.fields[name].required = True
         # Password field customization
         password = self.fields.get('password')
         if password:
