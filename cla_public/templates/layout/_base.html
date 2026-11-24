@@ -16,13 +16,10 @@
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="{% static 'app/img/logo/cla_s.png' %}"/>
 
-    <!-- Google fonts -->
-    <link href='https://fonts.googleapis.com/css?family=Montserrat:400,500,600,700,300' rel='stylesheet' type='text/css'>
-    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300,400,500,600,700' rel='stylesheet' type='text/css'>
-    <link href='https://fonts.googleapis.com/css?family=Rambla:400,700' rel='stylesheet' type='text/css'>
-    <link href='https://fonts.googleapis.com/css?family=Calligraffitti' rel='stylesheet' type='text/css'>
-    <link href='https://fonts.googleapis.com/css?family=Roboto+Slab:400,700' rel='stylesheet' type='text/css'>
-    <link href='https://fonts.googleapis.com/css?family=Roboto:100,400,700' rel='stylesheet' type='text/css'>
+    <!-- Polices hébergées sur le site : Open Sans (texte) et Montserrat (logo) -->
+    <link rel="preload" href="{% static 'fonts/open-sans-latin-wght-normal.woff2' %}" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="{% static 'fonts/montserrat-latin-wght-normal.woff2' %}" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="{% static 'fonts/fonts.css' %}">
 
     <!-- Bootstrap v4.5.0 CSS via CDN -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
