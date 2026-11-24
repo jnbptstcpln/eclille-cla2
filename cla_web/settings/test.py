@@ -18,4 +18,5 @@ from .coolify import *  # noqa: E402,F401,F403
 DATABASES = {"default": {"ENGINE": "django.db.backends.sqlite3", "NAME": ":memory:"}}
 STORAGES = {**STORAGES, "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"}}
 SESSION_COOKIE_SECURE = CSRF_COOKIE_SECURE = False
+SECURE_SSL_REDIRECT = False  # le client de test parle en HTTP
 PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]  # tests plus rapides

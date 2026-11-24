@@ -4,6 +4,7 @@ Lancer avec : DJANGO_SETTINGS_MODULE=cla_web.settings.test python manage.py test
 """
 import io
 import tempfile
+from unittest import mock
 from datetime import date, time, timedelta
 
 import bleach
@@ -14,7 +15,7 @@ from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
 from django.template import Context, Template
 from django.template.loader import render_to_string
-from django.test import RequestFactory, TestCase
+from django.test import RequestFactory, TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
 from PIL import Image
@@ -177,3 +178,32 @@ class SmokeTest(TestCase):
             "image_right_agreement": agreement, "associations": {"cla": None, "bde": None}, "signature": "Jean",
         })
         self.assertTrue(HTML(string=html).write_pdf().startswith(b"%PDF"))
+
+
+class HealthAndHttpsTest(TestCase):
+    """Healthcheck Coolify (/sante/) et redirection HTTPS."""
+
+    def test_sante_ok(self):
+        response = self.client.get("/sante/")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, b"OK")
+
+    def test_sante_base_injoignable(self):
+        with mock.patch("cla_web.health.connection.cursor", side_effect=Exception("down")):
+            response = self.client.get("/sante/")
+        self.assertEqual(response.status_code, 503)
+
+    @override_settings(SECURE_SSL_REDIRECT=True)
+    def test_redirection_https(self):
+        # Le healthcheck (nouveau et ancien chemin) reste accessible en HTTP…
+        self.assertEqual(self.client.get("/sante/").status_code, 200)
+        self.assertEqual(self.client.get(reverse("login")).status_code, 200)
+        # … tout le reste est redirigé vers HTTPS
+        response = self.client.get(reverse("faq"))
+        self.assertEqual(response.status_code, 301)
+        self.assertTrue(response["Location"].startswith("https://"))
+
+    def test_hsts(self):
+        self.assertEqual(settings.SECURE_HSTS_SECONDS, 3600)
+        response = self.client.get("/sante/", secure=True)
+        self.assertEqual(response["Strict-Transport-Security"], "max-age=3600")

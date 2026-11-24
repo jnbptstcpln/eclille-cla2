@@ -22,8 +22,11 @@ from django.contrib.flatpages import views
 
 from cla_auth.urls import oidc_urlpatterns
 from cla_auth.views.session import login
+from cla_web.health import sante
 
 urlpatterns = [
+    path("sante/", sante, name="sante"),  # Healthcheck Coolify
+
     path("admin/login/", login),  # Override default login
     path("admin/", admin.site.urls),
     # Dependencies

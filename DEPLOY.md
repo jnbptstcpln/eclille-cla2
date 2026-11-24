@@ -15,6 +15,10 @@ Les réglages Django utilisés sont `cla_web.settings.coolify` (valeur par défa
 > [!IMPORTANT]
 > Le dossier `/usr/src/app/media` (photos, logos, affiches, PDF signés…) doit être un **volume persistant** dans Coolify, sinon les fichiers envoyés sont perdus à chaque déploiement.
 
+### Healthcheck
+
+Dans Coolify : *HTTP request*, `GET`, `HTTP`, `localhost`, port `8000`, chemin **`/sante/`**, code attendu `200`, texte `OK`. La page vérifie que la base répond (`503` sinon) et n'est pas redirigée vers HTTPS.
+
 ## Variables d'environnement
 
 | Variable | Obligatoire | Description |
@@ -31,6 +35,8 @@ Les réglages Django utilisés sont `cla_web.settings.coolify` (valeur par défa
 | `ERROR_RETENTION_DAYS` | non | Durée de conservation des erreurs réglées dans le journal des erreurs, 90 jours par défaut. |
 | `DJANGO_SETTINGS_MODULE` | non | `cla_web.settings.coolify` par défaut, `cla_web.settings.staging` en préproduction. |
 | `SECURE_COOKIES` | non | `True` par défaut (cookies réservés au HTTPS). |
+| `SSL_REDIRECT` | non | `True` par défaut : Django redirige HTTP vers HTTPS, sauf le healthcheck `/sante/`. `False` pour couper la redirection en cas de souci. |
+| `HSTS_SECONDS` | non | Durée HSTS en secondes, `3600` (1 h) par défaut. Passer à `31536000` (1 an) une fois le HTTPS vérifié. Difficile à annuler : pendant cette durée, les navigateurs refusent le site en HTTP. |
 | `SERVE_MEDIA` | non | `False` par défaut. `True` pour que Django serve lui-même `/media/`. |
 | `GUNICORN_WORKERS` | non | Nombre de workers gunicorn, 3 par défaut. |
 | `OIDC_RSA_PRIVATE_KEY` | non | Clé RSA (PEM) qui signe les jetons OpenID Connect. Sans elle, OpenID Connect est désactivé et seul l'ancien SSO fonctionne. Les retours à la ligne peuvent être écrits `\n`. À ne pas changer sans raison : les jetons déjà émis ne seraient plus vérifiables. Voir [OIDC.md](OIDC.md). |
