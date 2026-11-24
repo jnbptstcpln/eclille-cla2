@@ -197,9 +197,9 @@ class HealthAndHttpsTest(TestCase):
     def test_redirection_https(self):
         # Le healthcheck (nouveau et ancien chemin) reste accessible en HTTP…
         self.assertEqual(self.client.get("/sante/").status_code, 200)
-        self.assertEqual(self.client.get(reverse("login")).status_code, 200)
+        self.assertEqual(self.client.get("/connexion").status_code, 200)
         # … tout le reste est redirigé vers HTTPS
-        response = self.client.get(reverse("faq"))
+        response = self.client.get("/faq/")
         self.assertEqual(response.status_code, 301)
         self.assertTrue(response["Location"].startswith("https://"))
 
