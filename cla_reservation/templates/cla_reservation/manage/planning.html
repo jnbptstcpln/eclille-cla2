@@ -1,5 +1,8 @@
 {% extends "cla_reservation/manage/_layout.html" %}
 
+{% block vendor_css %}{% include "components/fullcalendar_css.html" %}{% endblock %}
+{% block vendor_js %}{% include "components/fullcalendar_js.html" %}{% endblock %}
+
 {% block page_title %}Planning {{ name|capfirst }} | CLA{% endblock %}
 
 {% block section_title %}Planning {{ name|capfirst }}{% endblock %}

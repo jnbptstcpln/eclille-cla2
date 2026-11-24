@@ -17,7 +17,7 @@ from decouple import config
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 # Project Version
-PROJECT_VERSION = "0.4"
+PROJECT_VERSION = "0.5"
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
