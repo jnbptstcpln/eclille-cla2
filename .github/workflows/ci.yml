@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  tests:
+    runs-on: ubuntu-24.04
+    env:
+      DJANGO_SETTINGS_MODULE: cla_web.settings.test
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      # mysqlclient (compilation) et WeasyPrint (génération des PDF), comme dans le Dockerfile
+      - name: Dépendances système
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            pkg-config default-libmysqlclient-dev \
+            libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz-subset0
+
+      - name: Dépendances Python
+        run: pip install -r requirements.txt
+
+      - name: Migrations oubliées
+        run: python manage.py makemigrations --check --dry-run
+
+      - name: Tests
+        run: python manage.py test
