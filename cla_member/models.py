@@ -20,6 +20,10 @@ class FilePath:
     def website_visual(cls, instance, filename):
         return cls._path(instance, ["cla_member", "website_visual"], filename)
 
+    @classmethod
+    def official_document(cls, instance, filename):
+        return cls._path(instance, ["cla_member", "official_document"], filename)
+
 
 class Website(models.Model):
 
@@ -38,3 +42,36 @@ class Website(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class OfficialDocument(models.Model):
+    """Documents officiels de l'association (statuts, RI), déposés depuis l'admin."""
+
+    class Meta:
+        verbose_name = "Document officiel"
+        verbose_name_plural = "Documents officiels"
+        ordering = ["type"]
+
+    class Type(models.TextChoices):
+        STATUTES = "statuts", "Statuts de l'association"
+        INTERNAL_RULES = "reglement-interieur", "Règlement intérieur"
+
+    type = models.CharField(max_length=30, choices=Type.choices, unique=True, verbose_name="Document")
+    file = models.FileField(upload_to=FilePath.official_document, verbose_name="Fichier PDF")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Mis à jour le")
+
+    def save(self, *args, **kwargs):
+        # Remplacement : on supprime l'ancien fichier du stockage
+        if self.pk:
+            previous = OfficialDocument.objects.filter(pk=self.pk).first()
+            if previous and previous.file and previous.file.name != self.file.name:
+                previous.file.delete(save=False)
+        super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        if self.file:
+            self.file.delete(save=False)
+        super().delete(*args, **kwargs)
+
+    def __str__(self):
+        return self.get_type_display()

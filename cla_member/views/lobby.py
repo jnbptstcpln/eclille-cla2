@@ -1,19 +1,19 @@
 import csv
 
 from django.db.models import Q
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, View
 from django.contrib import admin, messages
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.utils.text import slugify
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect, reverse, get_object_or_404
-from django.http import HttpRequest, HttpResponseNotAllowed, Http404
+from django.http import HttpRequest, HttpResponseNotAllowed, Http404, FileResponse
 from django.utils import timezone
 
 from cla_association.models import AssociationMember, Association
 from cla_auth.mixins import IsContributorMixin, HasMembershipMixin
 from cla_auth.models import UserMembership
-from cla_member.models import Website
+from cla_member.models import Website, OfficialDocument
 from cla_ticketing.models import Event, DancingParty, DancingPartyRegistration
 
 
@@ -94,10 +94,29 @@ class AccountView(ClaMemberModuleMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        documents = {doc.type: doc for doc in OfficialDocument.objects.all()}
         context.update({
             'user': self.request.user,
+            'official_documents': [
+                {'type': value, 'label': label, 'document': documents.get(value)}
+                for value, label in OfficialDocument.Type.choices
+            ],
         })
         return context
+
+
+class OfficialDocumentDownloadView(ClaMemberModuleMixin, View):
+
+    def get(self, request, doc_type):
+        document = get_object_or_404(OfficialDocument, type=doc_type)
+        if not document.file:
+            raise Http404
+        return FileResponse(
+            document.file.open("rb"),
+            as_attachment=True,
+            filename=f"{slugify(document.get_type_display())}.pdf",
+            content_type="application/pdf",
+        )
 
 
 class AccountValidationView(ClaMemberModuleMixin, TemplateView):
