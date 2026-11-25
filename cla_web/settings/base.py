@@ -164,6 +164,11 @@ USE_TZ = True
 
 STATIC_ROOT = BASE_DIR.joinpath('static')
 STATIC_URL = '/static/'
+# cla_web n'est pas une app installée : ses fichiers statiques (thème de l'admin) sont déclarés ici
+STATICFILES_DIRS = [BASE_DIR / "cla_web" / "static"]
+
+# Bandeau affiché dans l'en-tête de l'admin pour ne pas confondre avec la production (vide = pas de bandeau)
+ENVIRONMENT_LABEL = ""
 
 # Media
 MEDIA_ROOT = BASE_DIR.joinpath('media')

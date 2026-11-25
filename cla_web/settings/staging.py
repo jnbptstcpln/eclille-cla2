@@ -10,3 +10,5 @@ os.environ.setdefault("BREVO_API_KEY", "unused")
 from .coolify import *  # noqa: E402,F401,F403
 
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+ENVIRONMENT_LABEL = "Préproduction"

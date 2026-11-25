@@ -11,4 +11,7 @@ def cla_web_context(request):
     # School year
     context['school_year'] = current_school_year()
 
+    # Environnement (bandeau « Préproduction » dans l'admin)
+    context['environment_label'] = getattr(settings, 'ENVIRONMENT_LABEL', '')
+
     return context

@@ -2,6 +2,8 @@ from .base import *
 
 DEBUG = True
 
+ENVIRONMENT_LABEL = "Développement"
+
 
 # Email
 

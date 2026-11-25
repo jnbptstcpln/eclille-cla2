@@ -1,14 +1,40 @@
 {% extends "admin/base.html" %}
 {% comment %}
-    Copie de admin/base_site.html de Django, avec en plus la pastille d'alerte (erreurs à traiter,
-    mails en échec) avant le message de bienvenue. Voir cla_monitoring/alerts.py.
+    Copie de admin/base_site.html de Django, avec en plus :
+    - le thème CLA (couleurs, polices, logo) : cla_web/static/cla_web/admin/theme.css ;
+    - un bandeau d'environnement si settings.ENVIRONMENT_LABEL est renseigné (préprod, dev) ;
+    - la pastille d'alerte (erreurs à traiter, mails en échec) avant le message de bienvenue.
+      Voir cla_monitoring/alerts.py.
 {% endcomment %}
-{% load monitoring %}
+{% load static monitoring %}
 
 {% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
 
+{% block extrastyle %}{{ block.super }}
+<link rel="icon" type="image/png" href="{% static 'app/img/logo/cla_s.png' %}">
+<link rel="stylesheet" href="{% static 'fonts/fonts.css' %}">
+<link rel="stylesheet" href="{% static 'cla_web/admin/theme.css' %}">
+{% endblock %}
+
+{% block bodyclass %}{{ block.super }}{% if environment_label %} cla-env{% endif %}{% endblock %}
+
 {% block branding %}
-<div id="site-name"><a href="{% url 'admin:index' %}">{{ site_header|default:_('Django administration') }}</a></div>
+<div id="site-name">
+    <a href="{% url 'admin:index' %}" title="{{ site_header|default:_('Django administration') }}">
+        {# Logo CLA en SVG : l'arc suit la couleur du texte de l'en-tête, le point reste rouge #}
+        <svg class="cla-admin-logo" viewBox="0 0 311 311" aria-hidden="true" focusable="false">
+            <path d="M152 16 A138 138 0 0 0 152 292" fill="none" stroke="currentColor" stroke-width="13"/>
+            <circle cx="155" cy="154" r="48" fill="#e9463f"/>
+        </svg>
+        <span class="cla-admin-name">
+            <span class="cl">Centrale Lille</span>
+            <span class="a">Associations</span>
+        </span>
+    </a>
+</div>
+{% if environment_label %}
+    <span class="cla-env-badge" title="Vous n'êtes pas sur le site de production">{{ environment_label }}</span>
+{% endif %}
 {% if user.is_anonymous %}
   {% include "admin/color_theme_toggle.html" %}
 {% endif %}

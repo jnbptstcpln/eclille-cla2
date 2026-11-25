@@ -1,0 +1,190 @@
+/*
+ * Thème de l'admin aux couleurs de CLA (chargé par cla_web/templates/admin/base_site.html).
+ *
+ * On ne fait que redéfinir les variables CSS de l'admin Django (admin/css/base.css et
+ * dark_mode.css) : aucun template de Django n'est recopié, le mode sombre et le bouton
+ * clair/sombre continuent de fonctionner.
+ *
+ * Couleurs du logo : bleu nuit #263142 (arc) et rouge #e9463f (point).
+ * Rouge du site public : #be3e1d (cla_public/static/theme/colour-red.min.css).
+ */
+
+/* ---------- Mode clair ---------- */
+:root,
+html[data-theme="light"] {
+    --cla-navy: #263142;
+    --cla-navy-light: #3a4a61;
+    --cla-red: #be3e1d;
+    --cla-red-dark: #923016;
+    --cla-red-darker: #66210f;
+    --cla-logo-red: #e9463f;
+
+    --primary: var(--cla-red);
+    --secondary: var(--cla-navy);
+    --accent: #f6d3c9;
+    --primary-fg: #fff;
+
+    --header-color: #d5dbe4;
+    --header-branding-color: #fff;
+    --header-bg: var(--cla-navy);
+    --header-link-color: #fff;
+
+    --breadcrumbs-fg: #f6d3c9;
+    --breadcrumbs-link-fg: #fff;
+    --breadcrumbs-bg: var(--cla-red);
+
+    --link-fg: #a8361a;
+    --link-hover-color: var(--cla-red-darker);
+    --link-selected-fg: var(--cla-red-dark);
+
+    --selected-row: #fbeae5;
+
+    --button-bg: var(--cla-red);
+    --button-hover-bg: var(--cla-red-dark);
+    --default-button-bg: var(--cla-navy);
+    --default-button-hover-bg: var(--cla-navy-light);
+
+    --object-tools-bg: var(--cla-navy);
+    --object-tools-hover-bg: var(--cla-red);
+
+    --cla-env-bg: #f59e0b;
+    --cla-env-fg: #1f1300;
+
+    --font-family-primary: "Open Sans", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --cla-font-title: "Montserrat", var(--font-family-primary);
+}
+
+/* ---------- Mode sombre (système, sauf si l'utilisateur a forcé le clair) ---------- */
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+        --primary: #8c2f17;
+        --accent: #f6d3c9;
+        --header-bg: #1b2330;
+        --breadcrumbs-bg: #6e2511;
+        --breadcrumbs-fg: #f3c2b5;
+        --link-fg: #f39a83;
+        --link-hover-color: #f8c0b1;
+        --link-selected-fg: #f08a70;
+        --selected-row: #3a211b;
+        --button-bg: var(--cla-red);
+        --button-hover-bg: #d9573a;
+        --default-button-bg: var(--cla-navy-light);
+        --default-button-hover-bg: #4d6080;
+        --object-tools-bg: #333;
+        --object-tools-hover-bg: var(--cla-red);
+    }
+}
+
+/* ---------- Mode sombre (forcé via le bouton) ---------- */
+html[data-theme="dark"] {
+    --primary: #8c2f17;
+    --accent: #f6d3c9;
+    --header-bg: #1b2330;
+    --breadcrumbs-bg: #6e2511;
+    --breadcrumbs-fg: #f3c2b5;
+    --link-fg: #f39a83;
+    --link-hover-color: #f8c0b1;
+    --link-selected-fg: #f08a70;
+    --selected-row: #3a211b;
+    --button-bg: var(--cla-red);
+    --button-hover-bg: #d9573a;
+    --default-button-bg: var(--cla-navy-light);
+    --default-button-hover-bg: #4d6080;
+    --object-tools-bg: #333;
+    --object-tools-hover-bg: var(--cla-red);
+}
+
+/* ---------- Typographie ---------- */
+#site-name,
+#content h1,
+#content > h2 {
+    font-family: var(--cla-font-title);
+}
+
+#content h1 {
+    font-weight: 500;
+}
+
+.module h2,
+.module caption,
+.inline-group h2 {
+    font-family: var(--cla-font-title);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+}
+
+/* ---------- En-tête : logo et nom ---------- */
+#header {
+    border-bottom: 3px solid var(--cla-logo-red);
+}
+
+#site-name a:link,
+#site-name a:visited {
+    color: var(--header-branding-color);
+}
+
+#site-name a {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.cla-admin-logo {
+    flex: none;
+    width: 40px;
+    height: 40px;
+    color: #fff; /* arc du logo : clair sur l'en-tête bleu nuit */
+}
+
+.cla-admin-name {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.05;
+    text-transform: uppercase;
+}
+
+.cla-admin-name .cl {
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+}
+
+.cla-admin-name .a {
+    font-size: 1.15rem;
+    font-weight: 400;
+    letter-spacing: 0.05em;
+}
+
+/* Bandeau d'environnement (préproduction, développement) */
+.cla-env-badge {
+    align-self: center;
+    margin-left: 14px;
+    padding: 3px 10px;
+    border-radius: 4px;
+    background: var(--cla-env-bg);
+    color: var(--cla-env-fg);
+    font-family: var(--font-family-primary);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+body.cla-env #header {
+    border-bottom-color: var(--cla-env-bg);
+}
+
+@media (max-width: 767px) {
+    .cla-admin-logo {
+        width: 32px;
+        height: 32px;
+    }
+
+    .cla-admin-name .cl {
+        font-size: 0.8rem;
+    }
+
+    .cla-admin-name .a {
+        font-size: 0.95rem;
+    }
+}
