@@ -190,3 +190,152 @@ body.cla-env #header {
         font-size: 0.95rem;
     }
 }
+
+/* ---------- Formes adoucies ----------
+ * Angles arrondis sans `overflow: hidden` sur les blocs : il couperait les menus déroulants
+ * positionnés à l'intérieur (éditeur Summernote, widgets). On arrondit donc les titres
+ * et les conteneurs qui ont leur propre fond.
+ */
+:root {
+    --cla-radius-control: 6px;  /* boutons, champs */
+    --cla-radius-block: 8px;    /* blocs, barres d'outils */
+}
+
+/* Boutons */
+body .button,
+body a.button,
+body button.button,
+body input[type=submit],
+body input[type=button],
+body .submit-row input,
+body .submit-row a.deletelink,
+body .submit-row a.closelink,
+body #toolbar form input[type=submit],
+body .object-tools a {
+    border-radius: var(--cla-radius-control);
+}
+
+body .button,
+body a.button,
+body input[type=submit],
+body input[type=button],
+body .submit-row input {
+    font-weight: 600;
+}
+
+body .submit-row input.default {
+    text-transform: none;
+}
+
+/* Champs */
+body input[type=text],
+body input[type=password],
+body input[type=email],
+body input[type=url],
+body input[type=number],
+body input[type=tel],
+body input[type=search],
+body textarea,
+body select,
+body .vTextField,
+body #toolbar #searchbar {
+    border-radius: var(--cla-radius-control);
+}
+
+body input[type=text]:focus,
+body input[type=password]:focus,
+body input[type=email]:focus,
+body input[type=url]:focus,
+body input[type=number]:focus,
+body input[type=tel]:focus,
+body input[type=search]:focus,
+body textarea:focus,
+body select:focus,
+body .vTextField:focus,
+body #toolbar #searchbar:focus {
+    outline: none;
+    border-color: var(--cla-red);
+    box-shadow: 0 0 0 3px rgba(190, 62, 29, 0.18);
+}
+
+/* Les cases à cocher et boutons radio gardent le contour de focus du navigateur (accessibilité) */
+body input[type=checkbox]:focus-visible,
+body input[type=radio]:focus-visible {
+    outline: 2px solid var(--cla-red);
+    outline-offset: 2px;
+}
+
+/* Blocs : titres arrondis en haut, ou entièrement quand le bloc est replié */
+body .module,
+body .inline-group {
+    border-radius: var(--cla-radius-block);
+}
+
+body .module h2,
+body .module caption,
+body .inline-group h2,
+body #changelist-filter h2 {
+    border-radius: var(--cla-radius-block) var(--cla-radius-block) 0 0;
+    text-transform: none;
+    letter-spacing: 0.01em;
+    font-size: 0.9rem;
+    padding: 10px 14px;
+}
+
+/* Blocs repliables : le fond est porté par <summary>, pas par le titre */
+body fieldset.collapse details > summary {
+    border-radius: var(--cla-radius-block) var(--cla-radius-block) 0 0;
+}
+
+body fieldset.collapse details:not([open]) > summary {
+    border-radius: var(--cla-radius-block);
+}
+
+body #nav-sidebar .module {
+    margin-bottom: 14px;
+}
+
+/* Conteneurs avec leur propre fond */
+body #changelist-filter,
+body #toolbar,
+body #changelist .actions,
+body .submit-row,
+body ul.messagelist li,
+body .errornote,
+body .selector-available,
+body .selector-chosen {
+    border-radius: var(--cla-radius-block);
+}
+
+body .selector-available h2,
+body .selector-chosen h2 {
+    border-radius: var(--cla-radius-block) var(--cla-radius-block) 0 0;
+}
+
+/* Messages (succès, erreur) : alignés sur le contenu plutôt que collés au menu */
+body ul.messagelist {
+    padding: 12px 40px 0;
+}
+
+body ul.messagelist li {
+    margin-bottom: 8px;
+}
+
+@media (max-width: 1024px) {
+    body ul.messagelist {
+        padding: 10px 20px 0;
+    }
+}
+
+@media (max-width: 767px) {
+    body ul.messagelist {
+        padding: 10px 15px 0;
+    }
+}
+
+/* En-têtes de tableaux sans majuscules forcées */
+body #changelist table thead th,
+body .inline-group .tabular thead th {
+    text-transform: none;
+    font-weight: 600;
+}
