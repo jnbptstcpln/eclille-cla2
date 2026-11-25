@@ -54,18 +54,20 @@ html[data-theme="light"] {
     --cla-font-title: "Montserrat", var(--font-family-primary);
 }
 
+/* En sombre, pas de grands aplats rouges : fonds bleu nuit, le rouge reste sur les liens et boutons. */
+
 /* ---------- Mode sombre (système, sauf si l'utilisateur a forcé le clair) ---------- */
 @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-        --primary: #8c2f17;
+        --primary: var(--cla-navy-light);
         --accent: #f6d3c9;
         --header-bg: #1b2330;
-        --breadcrumbs-bg: #6e2511;
-        --breadcrumbs-fg: #f3c2b5;
+        --breadcrumbs-bg: #253041;
+        --breadcrumbs-fg: #b9c3d2;
         --link-fg: #f39a83;
         --link-hover-color: #f8c0b1;
         --link-selected-fg: #f08a70;
-        --selected-row: #3a211b;
+        --selected-row: #2a3547;
         --button-bg: var(--cla-red);
         --button-hover-bg: #d9573a;
         --default-button-bg: var(--cla-navy-light);
@@ -77,15 +79,15 @@ html[data-theme="light"] {
 
 /* ---------- Mode sombre (forcé via le bouton) ---------- */
 html[data-theme="dark"] {
-    --primary: #8c2f17;
+    --primary: var(--cla-navy-light);
     --accent: #f6d3c9;
     --header-bg: #1b2330;
-    --breadcrumbs-bg: #6e2511;
-    --breadcrumbs-fg: #f3c2b5;
+    --breadcrumbs-bg: #253041;
+    --breadcrumbs-fg: #b9c3d2;
     --link-fg: #f39a83;
     --link-hover-color: #f8c0b1;
     --link-selected-fg: #f08a70;
-    --selected-row: #3a211b;
+    --selected-row: #2a3547;
     --button-bg: var(--cla-red);
     --button-hover-bg: #d9573a;
     --default-button-bg: var(--cla-navy-light);
